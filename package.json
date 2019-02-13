@@ -26,11 +26,11 @@
   },
   "scripts": {},
   "dependencies": {
-    "@openstfoundation/mosaic.js": "0.10.0-beta.1",
+    "@openstfoundation/mosaic.js": "git+ssh://git@github.com/OpenSTFoundation/mosaic.js.git",
     "bn.js": "4.11.8",
+    "js-scrypt": "0.2.0",
     "web3": "1.0.0-beta.37",
-    "web3-eth-accounts": "1.0.0-beta.37",
-    "js-scrypt": "0.2.0"
+    "web3-eth-accounts": "1.0.0-beta.37"
   },
   "devDependencies": {
     "chai": "4.2.0",
