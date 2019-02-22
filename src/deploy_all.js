@@ -5,10 +5,10 @@ const Mosaic = require('@openstfoundation/mosaic.js');
 const EIP20Token = require('../contracts/EIP20Token');
 const UtilityToken = require('../contracts/UtilityToken');
 
-const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
-const GAS_PRICE_GWEI = new BN(13)
-const GWEI_FACTOR = new BN(1e9)
-const GAS_PRICE = GAS_PRICE_GWEI.mul(GWEI_FACTOR)
+const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
+const GAS_PRICE_GWEI = new BN(13);
+const GWEI_FACTOR = new BN(1e9);
+const GAS_PRICE = GAS_PRICE_GWEI.mul(GWEI_FACTOR);
 
 const config = {
   token: {
@@ -75,7 +75,9 @@ const deployToken = () => {
 };
 
 const deployUtilityToken = (tokenAddress, organizationAddress) => {
-  const contract = new auxiliaryWeb3.eth.Contract(UtilityToken.abi, undefined, config.auxiliary.txOptions);
+  const contract = new auxiliaryWeb3.eth.Contract(
+    UtilityToken.abi, undefined, config.auxiliary.txOptions,
+  );
 
   return contract
     .deploy(
@@ -97,73 +99,69 @@ const deployUtilityToken = (tokenAddress, organizationAddress) => {
     });
 };
 
-const deployOrganization = (web3, from, txOptions) => {
-  return Mosaic.ContractInteract.Organization.setup(
-    web3,
-    {
-      deployer: from,
-      owner: from,
-      admin: from,
-      workers: [],
-      workerExpirationHeight: '0',
-    },
-    txOptions,
-  );
-};
+const deployOrganization = (web3, from, txOptions) => Mosaic.ContractInteract.Organization.setup(
+  web3,
+  {
+    deployer: from,
+    owner: from,
+    admin: from,
+    workers: [],
+    workerExpirationHeight: '0',
+  },
+  txOptions,
+);
 
-const deployOriginAnchor = (organizationAddress) => {
-  return Mosaic.ContractInteract.Anchor.setup(
-    originWeb3,
-    auxiliaryWeb3,
-    {
-      remoteChainId: config.auxiliary.chainId,
-      maxStateRoots: '20',
-      organization: organizationAddress,
-      deployer: config.origin.from,
-      organizationOwner: config.origin.from,
-    },
-    config.origin.txOptions,
-  );
-};
+const deployOriginAnchor = organizationAddress => Mosaic.ContractInteract.Anchor.setup(
+  originWeb3,
+  auxiliaryWeb3,
+  {
+    remoteChainId: config.auxiliary.chainId,
+    maxStateRoots: '20',
+    organization: organizationAddress,
+    deployer: config.origin.from,
+    organizationOwner: config.origin.from,
+  },
+  config.origin.txOptions,
+);
 
-const deployAuxiliaryAnchor = (coAnchorAddress, organizationAddress) => {
-  return Mosaic.ContractInteract.Anchor.setup(
-    auxiliaryWeb3,
-    originWeb3,
-    {
-      remoteChainId: config.origin.chainId,
-      maxStateRoots: '200',
-      organization: organizationAddress,
-      coAnchorAddress,
-      deployer: config.auxiliary.from,
-      organizationOwner: config.auxiliary.from,
-    },
-    config.auxiliary.txOptions,
-  );
-};
+const deployAuxiliaryAnchor = (
+  coAnchorAddress, organizationAddress,
+) => Mosaic.ContractInteract.Anchor.setup(
+  auxiliaryWeb3,
+  originWeb3,
+  {
+    remoteChainId: config.origin.chainId,
+    maxStateRoots: '200',
+    organization: organizationAddress,
+    coAnchorAddress,
+    deployer: config.auxiliary.from,
+    organizationOwner: config.auxiliary.from,
+  },
+  config.auxiliary.txOptions,
+);
 
-const deployMerklePatriciaProof = (web3, txOptions) => {
-  return Mosaic.ContractInteract.MerklePatriciaProof.deploy(
-    web3,
-    txOptions,
-  );
-}
+const deployMerklePatriciaProof = (
+  web3, txOptions,
+) => Mosaic.ContractInteract.MerklePatriciaProof.deploy(
+  web3,
+  txOptions,
+);
 
-const deployGatewayLib = (web3, merklePatriciaProofContract, txOptions) => {
-  return Mosaic.ContractInteract.GatewayLib.deploy(
-    web3,
-    merklePatriciaProofContract.address,
-    txOptions,
-  );
-};
+const deployGatewayLib = (
+  web3, merklePatriciaProofContract, txOptions,
+) => Mosaic.ContractInteract.GatewayLib.deploy(
+  web3,
+  merklePatriciaProofContract.address,
+  txOptions,
+);
 
-const deployMessageBus = (web3, merklePatriciaProofContract, txOptions) => {
-  return Mosaic.ContractInteract.MessageBus.deploy(
-    web3,
-    merklePatriciaProofContract.address,
-    txOptions,
-  );
-};
+const deployMessageBus = (
+  web3, merklePatriciaProofContract, txOptions,
+) => Mosaic.ContractInteract.MessageBus.deploy(
+  web3,
+  merklePatriciaProofContract.address,
+  txOptions,
+);
 
 const deployGateways = (
   originMessageBus,
@@ -176,37 +174,35 @@ const deployGateways = (
   utilityTokenAddress,
   auxiliaryAnchorAddress,
   auxiliaryOrganizationAddress,
-) => {
-  return Mosaic.ContractInteract.EIP20Gateway.setupPair(
-    originWeb3,
-    auxiliaryWeb3,
-    {
-      token: tokenAddress,
-      baseToken: config.origin.contractAddresses.OST,
-      stateRootProvider: originAnchorAddress,
-      bounty: '0',
-      organization: originOrganizationAddress,
-      burner: ZERO_ADDRESS,
-      messageBus: originMessageBus.address,
-      gatewayLib: originGatewayLib.address,
-      deployer: config.origin.from,
-      organizationOwner: config.origin.from,
-    },
-    {
-      valueToken: tokenAddress,
-      utilityToken: utilityTokenAddress,
-      stateRootProvider: auxiliaryAnchorAddress,
-      bounty: '0',
-      organization: auxiliaryOrganizationAddress,
-      burner: ZERO_ADDRESS,
-      messageBus: auxiliaryMessageBus.address,
-      gatewayLib: auxiliaryGatewayLib.address,
-      deployer: config.auxiliary.from,
-    },
-    config.origin.txOptions,
-    config.auxiliary.txOptions,
-  );
-};
+) => Mosaic.ContractInteract.EIP20Gateway.setupPair(
+  originWeb3,
+  auxiliaryWeb3,
+  {
+    token: tokenAddress,
+    baseToken: config.origin.contractAddresses.OST,
+    stateRootProvider: originAnchorAddress,
+    bounty: '0',
+    organization: originOrganizationAddress,
+    burner: ZERO_ADDRESS,
+    messageBus: originMessageBus.address,
+    gatewayLib: originGatewayLib.address,
+    deployer: config.origin.from,
+    organizationOwner: config.origin.from,
+  },
+  {
+    valueToken: tokenAddress,
+    utilityToken: utilityTokenAddress,
+    stateRootProvider: auxiliaryAnchorAddress,
+    bounty: '0',
+    organization: auxiliaryOrganizationAddress,
+    burner: ZERO_ADDRESS,
+    messageBus: auxiliaryMessageBus.address,
+    gatewayLib: auxiliaryGatewayLib.address,
+    deployer: config.auxiliary.from,
+  },
+  config.origin.txOptions,
+  config.auxiliary.txOptions,
+);
 
 const deployOrganizations = () => {
   const originOrganization = deployOrganization(
@@ -224,30 +220,24 @@ const deployOrganizations = () => {
     originOrganization,
     auxiliaryOrganization,
   ];
-}
-
-const deployAnchors = (originOrganizationAddress, auxiliaryOrganizationAddress) => {
-  return deployOriginAnchor(originOrganizationAddress)
-    .then((originAnchor) => {
-      return Promise.all([
-        deployAuxiliaryAnchor(originAnchor.address, auxiliaryOrganizationAddress),
-        originAnchor,
-      ]);
-    })
-    .then(([auxiliaryAnchor, originAnchor]) => {
-      return Promise.all([
-        originAnchor.setCoAnchorAddress(
-          auxiliaryAnchor.address,
-          config.origin.txOptions,
-        ),
-        originAnchor,
-        auxiliaryAnchor,
-      ]);
-    })
-    .then(([_, originAnchor, auxiliaryAnchor]) => {
-      return [originAnchor, auxiliaryAnchor]
-    });
 };
+
+const deployAnchors = (
+  originOrganizationAddress, auxiliaryOrganizationAddress,
+) => deployOriginAnchor(originOrganizationAddress)
+  .then(originAnchor => Promise.all([
+    deployAuxiliaryAnchor(originAnchor.address, auxiliaryOrganizationAddress),
+    originAnchor,
+  ]))
+  .then(([auxiliaryAnchor, originAnchor]) => Promise.all([
+    originAnchor.setCoAnchorAddress(
+      auxiliaryAnchor.address,
+      config.origin.txOptions,
+    ),
+    originAnchor,
+    auxiliaryAnchor,
+  ]))
+  .then(([_, originAnchor, auxiliaryAnchor]) => [originAnchor, auxiliaryAnchor]);
 
 const deployGatewaysWithLibs = (
   tokenAddress,
@@ -256,68 +246,142 @@ const deployGatewaysWithLibs = (
   utilityTokenAddress,
   auxiliaryAnchorAddress,
   auxiliaryOrganizationAddress,
-) => {
-  return Promise
-    .all([
-      deployMerklePatriciaProof(
-        originWeb3,
-        config.origin.txOptions,
-      ),
-      deployMerklePatriciaProof(
-        auxiliaryWeb3,
-        config.auxiliary.txOptions,
-      )
-    ])
-    .then(([originMerklePatriciaProof, auxiliaryMerklePatriciaProof]) => {
+) => Promise
+  .all([
+    deployMerklePatriciaProof(
+      originWeb3,
+      config.origin.txOptions,
+    ),
+    deployMerklePatriciaProof(
+      auxiliaryWeb3,
+      config.auxiliary.txOptions,
+    ),
+  ])
+  .then(([originMerklePatriciaProof, auxiliaryMerklePatriciaProof]) => Promise.all([
+    originMerklePatriciaProof,
+    auxiliaryMerklePatriciaProof,
+    deployGatewayLib(
+      originWeb3,
+      originMerklePatriciaProof,
+      config.origin.txOptions,
+    ),
+    deployGatewayLib(
+      auxiliaryWeb3,
+      auxiliaryMerklePatriciaProof,
+      config.auxiliary.txOptions,
+    ),
+    deployMessageBus(
+      originWeb3,
+      originMerklePatriciaProof,
+      config.origin.txOptions,
+    ),
+    deployMessageBus(
+      auxiliaryWeb3,
+      auxiliaryMerklePatriciaProof,
+      config.auxiliary.txOptions,
+    ),
+  ]))
+  .then((
+    [
+      originMerklePatriciaProof,
+      auxiliaryMerklePatriciaProof,
+      originGatewayLib, auxiliaryGatewayLib,
+      originMessageBus, auxiliaryMessageBus,
+    ],
+  ) => Promise.all([
+    deployGateways(
+      originMessageBus,
+      originGatewayLib,
+      auxiliaryMessageBus,
+      auxiliaryGatewayLib,
+      tokenAddress,
+      originAnchorAddress,
+      originOrganizationAddress,
+      utilityTokenAddress,
+      auxiliaryAnchorAddress,
+      auxiliaryOrganizationAddress,
+    ),
+    originMerklePatriciaProof,
+    auxiliaryMerklePatriciaProof,
+    originGatewayLib,
+    auxiliaryGatewayLib,
+    originMessageBus,
+    auxiliaryMessageBus,
+  ]))
+  .then(([
+    gateway,
+    coGateway,
+    originMerklePatriciaProof,
+    auxiliaryMerklePatriciaProof,
+    originGatewayLib,
+    auxiliaryGatewayLib,
+    originMessageBus,
+    auxiliaryMessageBus,
+  ]) => [
+    originMerklePatriciaProof,
+    auxiliaryMerklePatriciaProof,
+    originGatewayLib,
+    auxiliaryGatewayLib,
+    originMessageBus,
+    auxiliaryMessageBus,
+    gateway,
+    coGateway,
+  ]);
+
+const deployAll = () => deployToken()
+  .then((token) => {
+    console.log('Token deployed');
+    const tokenAddress = token._address;
+
+    return Promise.all([
+      tokenAddress,
+      Promise.all(deployOrganizations()),
+    ]);
+  })
+  .then(
+    ([tokenAddress, [originOrganization, auxiliaryOrganization]]) => {
+      console.log('Organizations deployed');
       return Promise.all([
-        originMerklePatriciaProof,
-        auxiliaryMerklePatriciaProof,
-        deployGatewayLib(
-          originWeb3,
-          originMerklePatriciaProof,
-          config.origin.txOptions,
-        ),
-        deployGatewayLib(
-          auxiliaryWeb3,
-          auxiliaryMerklePatriciaProof,
-          config.auxiliary.txOptions,
-        ),
-        deployMessageBus(
-          originWeb3,
-          originMerklePatriciaProof,
-          config.origin.txOptions,
-        ),
-        deployMessageBus(
-          auxiliaryWeb3,
-          auxiliaryMerklePatriciaProof,
-          config.auxiliary.txOptions,
-        )
+        deployUtilityToken(tokenAddress, auxiliaryOrganization.address),
+        deployAnchors(originOrganization.address, auxiliaryOrganization.address),
+        tokenAddress,
+        originOrganization,
+        auxiliaryOrganization,
       ]);
-    })
-    .then(([originMerklePatriciaProof, auxiliaryMerklePatriciaProof, originGatewayLib, auxiliaryGatewayLib, originMessageBus, auxiliaryMessageBus]) => {
+    },
+  )
+  .then(
+    ([
+      utilityToken,
+      [originAnchor, auxiliaryAnchor],
+      tokenAddress,
+      originOrganization,
+      auxiliaryOrganization,
+    ]) => {
+      console.log('Utility Token and Anchors deployed');
+      const utilityTokenAddress = utilityToken._address;
+
       return Promise.all([
-        deployGateways(
-          originMessageBus,
-          originGatewayLib,
-          auxiliaryMessageBus,
-          auxiliaryGatewayLib,
+        deployGatewaysWithLibs(
           tokenAddress,
-          originAnchorAddress,
-          originOrganizationAddress,
+          originAnchor.address,
+          originOrganization.address,
           utilityTokenAddress,
-          auxiliaryAnchorAddress,
-          auxiliaryOrganizationAddress,
+          auxiliaryAnchor.address,
+          auxiliaryOrganization.address,
         ),
-        originMerklePatriciaProof,
-        auxiliaryMerklePatriciaProof,
-        originGatewayLib,
-        auxiliaryGatewayLib,
-        originMessageBus,
-        auxiliaryMessageBus,
+        utilityToken,
+        originAnchor,
+        auxiliaryAnchor,
+        tokenAddress,
+        originOrganization,
+        auxiliaryOrganization,
       ]);
-    })
-    .then(([gateway, coGateway, originMerklePatriciaProof, auxiliaryMerklePatriciaProof, originGatewayLib, auxiliaryGatewayLib, originMessageBus, auxiliaryMessageBus]) => {
-      return [
+    },
+  )
+  .then(
+    ([
+      [
         originMerklePatriciaProof,
         auxiliaryMerklePatriciaProof,
         originGatewayLib,
@@ -326,97 +390,36 @@ const deployGatewaysWithLibs = (
         auxiliaryMessageBus,
         gateway,
         coGateway,
-      ];
-    });
-};
-
-const deployAll = () => {
-  return deployToken()
-    .then((token) => {
-      console.log('Token deployed');
-      const tokenAddress = token._address;
-
-      return Promise.all([
-        tokenAddress,
-        Promise.all(deployOrganizations()),
-      ]);
-    })
-    .then(
-      ([tokenAddress, [originOrganization, auxiliaryOrganization]]) => {
-        console.log('Organizations deployed');
-        return Promise.all([
-          deployUtilityToken(tokenAddress, auxiliaryOrganization.address),
-          deployAnchors(originOrganization.address, auxiliaryOrganization.address),
-          tokenAddress,
-          originOrganization,
-          auxiliaryOrganization,
-        ]);
-      }
-    )
-    .then(
-      ([utilityToken, [originAnchor, auxiliaryAnchor], tokenAddress, originOrganization, auxiliaryOrganization]) => {
-        console.log('Utility Token and Anchors deployed');
-        const utilityTokenAddress = utilityToken._address;
-
-        return Promise.all([
-          deployGatewaysWithLibs(
-            tokenAddress,
-            originAnchor.address,
-            originOrganization.address,
-            utilityTokenAddress,
-            auxiliaryAnchor.address,
-            auxiliaryOrganization.address,
-          ),
-          utilityToken,
-          originAnchor,
-          auxiliaryAnchor,
-          tokenAddress,
-          originOrganization,
-          auxiliaryOrganization,
-        ]);
-      }
-    ).then(
-      ([
-        [
-          originMerklePatriciaProof,
-          auxiliaryMerklePatriciaProof,
-          originGatewayLib,
-          auxiliaryGatewayLib,
-          originMessageBus,
-          auxiliaryMessageBus,
-          gateway,
-          coGateway,
-        ],
+      ],
+      utilityToken,
+      originAnchor,
+      auxiliaryAnchor,
+      tokenAddress,
+      originOrganization,
+      auxiliaryOrganization,
+    ]) => {
+      console.log('Gateways and Libs deployed');
+      console.log(
+        originMerklePatriciaProof,
+        auxiliaryMerklePatriciaProof,
+        originGatewayLib,
+        auxiliaryGatewayLib,
+        originMessageBus,
+        auxiliaryMessageBus,
+        gateway,
+        coGateway,
         utilityToken,
         originAnchor,
         auxiliaryAnchor,
         tokenAddress,
         originOrganization,
         auxiliaryOrganization,
-      ]) => {
-        console.log('Gateways and Libs deployed');
-        console.log(
-          originMerklePatriciaProof,
-          auxiliaryMerklePatriciaProof,
-          originGatewayLib,
-          auxiliaryGatewayLib,
-          originMessageBus,
-          auxiliaryMessageBus,
-          gateway,
-          coGateway,
-          utilityToken,
-          originAnchor,
-          auxiliaryAnchor,
-          tokenAddress,
-          originOrganization,
-          auxiliaryOrganization,
-        );
-      }
-    );
-};
+      );
+    },
+  );
 
-(async function () {
-  console.log('Deploying')
+(async () => {
+  console.log('Deploying');
   await deployAll().catch(console.log);
   console.log('Done');
 })();
