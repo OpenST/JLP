@@ -1,12 +1,6 @@
 # Jean-Luc Picards Star Fleet training academy
 
-## getting started
+## getting started (on testnet)
 
-(Jean-Luc Picard Token 0x2902a9e437c07168fc73b96821ed82b8eb69b20f)[https://ropsten.etherscan.io/address/0x2902a9e437c07168fc73b96821ed82b8eb69b20f]
-
-## Notes
-- Organization is not exposed in mosaic.js
-- A worker is mandatory, as is ExpirationHeight, and it shouldnt be
-- web3 typechecks dont work when used from example repo
-
-- UtilityToken.sol (docs for token can specifiy that the `token` in the constructor); UTInterface also does not have it exposed; so deadcode??
+You'll need RPC access to a full node for Ropsten and a full node running the test sidechain.
+If you need to set up your nodes, you can use the scripts in [chains](./chains) docker to run these nodes.  To install docker visit [https://docs.docker.com/install/](https://docs.docker.com/install/).
