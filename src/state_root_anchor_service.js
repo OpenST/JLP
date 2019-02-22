@@ -27,7 +27,7 @@ class StateRootAnchorService {
     }
 
     assert(Number.isInteger(anchorBlockDelay));
-    assert(anchorBlockDelay > 0);
+    assert(anchorBlockDelay >= 0);
     this.anchorBlockDelay = anchorBlockDelay;
 
     assert(isObject(mosaic));
@@ -102,4 +102,4 @@ class StateRootAnchorService {
   }
 }
 
-export default StateRootAnchorService;
+module.exports = StateRootAnchorService;
