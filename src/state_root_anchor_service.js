@@ -1,3 +1,4 @@
+'use strict';
 
 const assert = require('assert');
 const interval = require('interval-promise');
@@ -78,6 +79,11 @@ class StateRootAnchorService {
   async start() {
     this.run = true;
 
+    process
+      .on('SIGTERM', this.stop)
+      .on('SIGINT', this.stop)
+      .on('SIGQUIT', this.stop);
+
     interval(async (_, stop) => {
       if (this.run === false) {
         stop();
@@ -89,6 +95,10 @@ class StateRootAnchorService {
 
   stop() {
     this.run = false;
+
+    process.removeListener('SIGTERM', this.stop);
+    process.removeListener('SIGINT', this.stop);
+    process.removeListener('SIGQUIT', this.stop);
   }
 }
 
