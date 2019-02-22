@@ -1,0 +1,61 @@
+{
+    "type": "object",
+    "properties": {
+        "origin": {
+            "type": "object",
+            "properties": {
+                "rpcProvider": {
+                    "type": "string"
+                },
+                "chainId": {
+                    "type": "number"
+                },
+                "contractAddresses": {
+                    "type": "object",
+                    "properties": {
+                        "OST": {
+                            "type": "string"
+                        },
+                        "Anchor": {
+                            "type": "string"
+                        },
+                        "Token": {
+                            "type": "string"
+                        },
+                        "EIP20Gateway": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "auxiliary": {
+            "type": "object",
+            "properties": {
+                "rpcProvider": {
+                    "type": "string"
+                },
+                "chainId": {
+                    "type": "number"
+                },
+                "contractAddresses": {
+                    "type": "object",
+                    "properties": {
+                        "OSTPrime": {
+                            "type": "string"
+                        },
+                        "Anchor": {
+                            "type": "string"
+                        },
+                        "Token": {
+                            "type": "string"
+                        },
+                        "EIP20CoGateway": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
