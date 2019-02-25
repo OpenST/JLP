@@ -11,24 +11,29 @@ const StateRootAnchorService = require('./state_root_anchor_service.js');
 const { version } = require('../package.json');
 
 program
-  .version(version, '-v, --version', 'Outputs the version number.')
-  .option('-d, --direction <origin|auxiliary>', 'The source chain to anchor a state root '
-  + 'to the target chain.', /^(origin|auxiliary)$/i)
-  .option('-y, --delay <delay>', 'The delay to wait in blocks on the source '
-  + 'chain before anchoring.', /^\d+$/i)
-  .option('-c, --config <config>', 'The config file path to read chains '
-  + 'access info and contract addresses from.')
+  .version(version)
+  .name('anchor')
+  .arguments('<config> <direction> <delay>')
+  .description('An executable to anchor state roots across chains.')
+  .action(
+    (config, direction, delay) => {
+      const stateRootAnchorService = new StateRootAnchorService(
+        direction,
+        delay,
+        utils.createMosaic(JSON.parse(fs.readFileSync(config, 'utf8'))),
+      );
+
+      stateRootAnchorService.start();
+    },
+  )
+  .on(
+    '--help',
+    () => {
+      console.log('');
+      console.log('Arguments:');
+      console.log('  config     path to a config file');
+      console.log('  direction  which direction to anchor (target chain)');
+      console.log('  delay      number of blocks to wait before anchoring a state root');
+    },
+  )
   .parse(process.argv);
-
-assert(program.direction !== undefined);
-assert(program.delay !== undefined);
-assert(program.config !== undefined);
-
-// Create a state root anchoring service.
-const stateRootAnchorService = new StateRootAnchorService(
-  program.direction,
-  program.delay,
-  utils.createMosaic(JSON.parse(fs.readFileSync(program.config, 'utf8'))),
-);
-
-stateRootAnchorService.start();
