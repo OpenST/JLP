@@ -2,77 +2,83 @@
 
 const assert = require('assert');
 const interval = require('interval-promise');
-const Mosaic = require('@openstfoundation/mosaic.js');
+const { ContractInteract } = require('@openstfoundation/mosaic.js');
 
-/** @todo Move into utils. */
-function isObject(obj) {
-  return typeof obj === 'object' && obj !== null && !Array.isArray(obj);
-}
+const logger = require('./logger');
 
 class StateRootAnchorService {
+  /**
+   * @param {number} anchorBlockDelay The number of block to wait before anchoring.
+   * @param {ChainConfig} config A configuration instance.
+   */
   constructor(
-    direction,
     anchorBlockDelay,
-    mosaic,
+    sourceWeb3,
+    targetWeb3,
+    anchorAddress,
+    targetTxOptions,
   ) {
-    if (direction === 'origin') {
-      this.source = 'origin';
-      this.target = 'auxiliary';
-    } else if (direction === 'auxiliary') {
-      this.source = 'auxiliary';
-      this.target = 'origin';
-    } else {
-      throw new Error(`Unexpected value (${direction}) for direction. `
-        + 'Expected values are: origin, auxiliary.');
-    }
-
     assert(Number.isInteger(anchorBlockDelay));
     assert(anchorBlockDelay >= 0);
     this.anchorBlockDelay = anchorBlockDelay;
 
-    assert(isObject(mosaic));
-    this.mosaic = mosaic;
-
-    const anchorContractAddress = this.mosaic[this.target].contractAddresses.Anchor;
-    assert(this.mosaic[this.target].web3.utils.isAddress(anchorContractAddress));
-    this.anchorContractInteract = new Mosaic.ContractInteract.Anchor(
-      this.mosaic[this.target].web3, anchorContractAddress,
+    assert(targetWeb3.utils.isAddress(anchorAddress));
+    this.anchorContract = new ContractInteract.Anchor(
+      targetWeb3, anchorAddress,
     );
 
-    this.INTERVAL_TIMEOUT = 1000;
+    this.source = sourceWeb3;
+    this.target = targetWeb3;
+    this.targetTxOptions = targetTxOptions;
 
+    this.INTERVAL_TIMEOUT = 1000;
     this.run = false;
   }
 
-  async getAnchorInfo(blockHashOrBlockNumber) {
-    const block = await this.mosaic[this.source].web3.eth.getBlock(
-      blockHashOrBlockNumber,
-    );
+  async getSourceInfo(blockIdentifier) {
+    const block = await this.source.eth.getBlock(blockIdentifier);
 
     return {
       blockNumber: block.number,
-      stateRoot: block.StateRoot,
+      stateRoot: block.stateRoot,
     };
   }
 
   async anchor(anchorInfo, txOptions) {
-    await this.anchorContractInteract.anchorStateRoot(
-      anchorInfo.blockNumber,
-      anchorInfo.stateRoot,
-      txOptions,
+    logger.info('anchoring state root', anchorInfo);
+    try {
+      await this.anchorContract.anchorStateRoot(
+        anchorInfo.blockNumber.toString(),
+        anchorInfo.stateRoot,
+        txOptions,
+      );
+      logger.info('anchored state root', anchorInfo);
+    } catch (error) {
+      logger.error('could not anchor state root', { error: error.toString() });
+    }
+  }
+
+  async getLatestAnchoredBlockNumber() {
+    const blockNumber = await this.anchorContract
+      .contract
+      .methods
+      .getLatestStateRootBlockHeight()
+      .call();
+    return Number.parseInt(
+      blockNumber,
+      10,
     );
   }
 
-  async getLatestStateRootBlockNumber() {
-    return this.anchorContractInteract.getLatestStateRootBlockHeight();
-  }
-
   async commit() {
-    const anchorInfo = await this.getAnchorInfo('latest');
-    const latestStateRootBlockNumber = await this.getLatestStateRootBlockNumber();
+    const latestSourceInfo = await this.getSourceInfo('latest');
+    const latestAnchoredBlockNumber = await this.getLatestAnchoredBlockNumber();
 
-    if (anchorInfo.blockNumber > latestStateRootBlockNumber + this.anchorBlockDelay) {
-      await this.anchor(anchorInfo);
+    if (latestSourceInfo.blockNumber > latestAnchoredBlockNumber + this.anchorBlockDelay) {
+      const delayedSourceBlockNumber = latestSourceInfo.blockNumber - this.anchorBlockDelay;
+      const delayedSourceInfo = await this.getSourceInfo(delayedSourceBlockNumber.toString());
+
+      await this.anchor(delayedSourceInfo, this.targetTxOptions);
     }
   }
 
@@ -87,7 +93,7 @@ class StateRootAnchorService {
     interval(async (_, stop) => {
       if (this.run === false) {
         stop();
-        console.log('Stopped.');
+        logger.info('Stopped.');
       }
       await this.commit();
     }, this.INTERVAL_TIMEOUT, { stopOnError: true });
