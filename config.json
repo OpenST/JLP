@@ -21,7 +21,7 @@
     "GatewayContract": {
       "address":"0x22393f72c7a422f5fc9cf1049f5dd0de1a7ed8fa"
     },
-    "port":"8545"
+    "ipcProvider":"http://localhost:8545"
   },
   "auxiliary":{
     "CoAnchor":{
@@ -44,5 +44,5 @@
       }
     }
   },
-  "port":"8547"
+  "ipcProvider":"http://localhost:8547"
 }
