@@ -28,6 +28,7 @@ class Deployer {
     };
   }
 
+
   _deployOrganization() {
     return Setup.organizations(
       this.origin.web3,
@@ -150,7 +151,7 @@ class Deployer {
       auxiliaryUtilityToken,
     );
 
-    // Fix me  https://github.com/OpenSTFoundation/mosaic.js/issues/129
+    // Fix me https://github.com/OpenSTFoundation/mosaic.js/issues/129
     await auxiliaryUtilityToken.setCoGateway(
       auxiliaryCoGateway.address,
       this.auxiliary.txOptions,

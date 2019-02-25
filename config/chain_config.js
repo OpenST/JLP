@@ -48,7 +48,7 @@ class ChainConfig {
   }
 
   static get auxiliaryGasPrice() {
-    return process.env.ORIGIN_GAS_PRICE || '1000000000';
+    return process.env.AUXILIARY_GAS_PRICE || '1000000000';
   }
 }
 
