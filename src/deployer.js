@@ -1,6 +1,8 @@
 const { Setup, ContractInteract } = require('@openstfoundation/mosaic.js');
 const Web3 = require('web3');
 
+const logger = require('./logger');
+
 class Deployer {
   constructor(ChainConfig) {
     this.origin = {
@@ -52,7 +54,7 @@ class Deployer {
     );
   }
 
-  _deployAnchors(originOrganization, auxiliaryOrganization) {
+  _deployAnchors(originOrganizationAddress, auxiliaryOrganizationAddress) {
     return Setup.anchors(
       this.origin.web3,
       this.auxiliary.web3,
@@ -60,7 +62,7 @@ class Deployer {
         remoteChainId: this.auxiliary.chainId,
         // Anchors use ring buffers to limit the number of state roots they store:
         maxStateRoots: '10',
-        organization: originOrganization.address,
+        organization: originOrganizationAddress,
         organizationOwner: this.origin.masterKey,
         deployer: this.origin.deployer,
       },
@@ -69,7 +71,7 @@ class Deployer {
         remoteChainId: this.origin.chainId,
         // Anchors use ring buffers to limit the number of state roots they store:
         maxStateRoots: '10',
-        organization: auxiliaryOrganization.address,
+        organization: auxiliaryOrganizationAddress,
         organizationOwner: this.auxiliary.masterKey,
         deployer: this.auxiliary.deployer,
       },
@@ -125,23 +127,29 @@ class Deployer {
   }
 
   async deployUtilityToken() {
-    console.log('deploying organization  ');
+    logger.info('Deploying organization ');
 
     const [originOrganization, auxiliaryOrganization] = await this._deployOrganization();
-    console.log('organization deployed origin  ', originOrganization.address);
-    console.log('organization deployed auxiliary  ', auxiliaryOrganization.address);
 
+    logger.info(`origin organization address: ${originOrganization.address}`);
+    logger.info(`auxiliary organization address:  ${auxiliaryOrganization.address}`);
+
+    logger.info('Deploying anchor');
     const [originAnchor, auxiliaryAnchor] = await this._deployAnchors(
-      originOrganization,
-      auxiliaryOrganization,
+      originOrganization.address,
+      auxiliaryOrganization.address,
     );
 
-    console.log('originAnchor deployed origin  ', originAnchor.address);
-    console.log('auxiliaryAnchor deployed auxiliary  ', auxiliaryAnchor.address);
+    logger.info(`origin anchor address ${originAnchor.address}`);
+    logger.info(`auxiliary anchor address${auxiliaryAnchor.address}`);
+
+    logger.info('Deploying utility token ');
 
     const auxiliaryUtilityToken = await this._deployUtilityToken(auxiliaryOrganization);
 
-    console.log('auxiliary utilityToken', auxiliaryUtilityToken.address);
+    logger.info(`auxiliary utilityToken address ${auxiliaryUtilityToken.address}`);
+
+    logger.info('Deploying gateways');
 
     const [originGateway, auxiliaryCoGateway] = await this._deployGateways(
       originAnchor,
@@ -151,14 +159,17 @@ class Deployer {
       auxiliaryUtilityToken,
     );
 
+    logger.info(`origin gateway address ${originGateway.address}`);
+    logger.info(`auxiliary coGateway address ${auxiliaryCoGateway.address}`);
+
+    logger.info('Setting cogateway in utility token');
     // Fix me https://github.com/OpenSTFoundation/mosaic.js/issues/129
     await auxiliaryUtilityToken.setCoGateway(
       auxiliaryCoGateway.address,
       this.auxiliary.txOptions,
     );
 
-    console.log('originGateway deployed origin  ', originGateway.address);
-    console.log('auxiliaryCoGateway deployed auxiliary  ', auxiliaryCoGateway.address);
+    logger.info('Deployment successful!!!');
 
     return {
       originOrganization,

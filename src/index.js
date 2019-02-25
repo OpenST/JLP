@@ -5,7 +5,7 @@ const Deployer = require('./deployer');
 const deployer = new Deployer(ChainConfig);
 const fileName = 'contracts.json';
 
-const numberOfDeployment = 2;
+const numberOfDeployment = 1;
 
 deployContracts = async () => {
   const allDeployedContracts = [];
