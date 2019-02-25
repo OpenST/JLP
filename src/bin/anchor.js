@@ -4,11 +4,11 @@
 
 const program = require('commander');
 const fs = require('fs');
-const utils = require('./utils.js');
+const utils = require('../utils.js');
 
-const StateRootAnchorService = require('./state_root_anchor_service.js');
+const StateRootAnchorService = require('../state_root_anchor_service.js');
 
-const { version } = require('../package.json');
+const { version } = require('../../package.json');
 
 program
   .version(version)

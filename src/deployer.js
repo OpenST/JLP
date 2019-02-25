@@ -4,29 +4,29 @@ const Web3 = require('web3');
 const logger = require('./logger');
 
 class Deployer {
-  constructor(ChainConfig) {
+  constructor(chainConfig) {
     this.origin = {
-      web3: new Web3(ChainConfig.originWeb3Provider),
-      chainId: ChainConfig.originChainId,
-      deployer: ChainConfig.originDeployerAddress,
+      web3: new Web3(chainConfig.originWeb3Provider),
+      chainId: chainConfig.originChainId,
+      deployer: chainConfig.originDeployerAddress,
       txOptions: {
-        gasPrice: ChainConfig.originGasPrice,
+        gasPrice: chainConfig.originGasPrice,
       },
-      token: ChainConfig.simpleTokenAddress,
-      baseToken: ChainConfig.simpleTokenAddress,
-      burner: ChainConfig.originBurnerAddress,
-      masterKey: ChainConfig.originMasterKey,
+      token: chainConfig.simpleTokenAddress,
+      baseToken: chainConfig.simpleTokenAddress,
+      burner: chainConfig.originBurnerAddress,
+      masterKey: chainConfig.originMasterKey,
     };
 
     this.auxiliary = {
-      web3: new Web3(ChainConfig.auxiliaryWeb3Provider),
-      chainId: ChainConfig.auxiliaryChainId,
-      deployer: ChainConfig.auxiliaryDeployerAddress,
+      web3: new Web3(chainConfig.auxiliaryWeb3Provider),
+      chainId: chainConfig.auxiliaryChainId,
+      deployer: chainConfig.auxiliaryDeployerAddress,
       txOptions: {
-        gasPrice: ChainConfig.auxiliaryGasPrice,
+        gasPrice: chainConfig.auxiliaryGasPrice,
       },
-      burner: ChainConfig.auxiliaryBurnerAddress,
-      masterKey: ChainConfig.auxiliaryMasterKey,
+      burner: chainConfig.auxiliaryBurnerAddress,
+      masterKey: chainConfig.auxiliaryMasterKey,
     };
   }
 
