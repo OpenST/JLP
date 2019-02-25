@@ -27,6 +27,20 @@ Use the ei20 executable for that:
 
 It will write `eip20TokenAddress` to your config file.
 
+## Branded Token
+
+To deploy a new Branded Token:
+
+```bash
+# Help:
+./src/bin/bt -h
+
+# Deploy JLP token (conversion rate 35 & decimals 1 => conversion rate 3.5):
+./src/bin/bt.js deploy config.json JLP "Jean-Luc Picard Token" 18 35 1
+```
+
+It will write `originBrandedTokenAddress` and `originBrandedTokenOrganizationAddress` to your config file.
+
 ## Mosaic Deployment
 
 Prerequisite: `eip20TokenAddress` in your config file.
