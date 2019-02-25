@@ -1,4 +1,5 @@
 const { Setup, ContractInteract } = require('@openstfoundation/mosaic.js');
+const { ContractInteract: { BrandedToken } } = require('@openstfoundation/brandedtoken.js');
 const Web3 = require('web3');
 
 const logger = require('./logger');
@@ -16,6 +17,7 @@ class Deployer {
       baseToken: chainConfig.simpleTokenAddress,
       burner: chainConfig.originBurnerAddress,
       masterKey: chainConfig.originMasterKey,
+      organization: chainConfig.originOrganizationAddress,
     };
 
     this.auxiliary = {
@@ -51,6 +53,20 @@ class Deployer {
       },
       this.origin.txOptions,
       this.auxiliary.txOptions,
+    );
+  }
+
+  _deployBTOrganization() {
+    return ContractInteract.Organization.setup(
+      this.origin.web3,
+      {
+        deployer: this.origin.deployer,
+        owner: this.origin.masterKey,
+        admin: this.origin.masterKey,
+        workers: [],
+        workerExpirationHeight: '0',
+      },
+      this.origin.txOptions,
     );
   }
 
@@ -180,6 +196,35 @@ class Deployer {
       auxiliaryCoGateway,
       auxiliaryUtilityToken,
     };
+  }
+
+  async deployBrandedToken(symbol, name, decimals, conversionRate, conversionRateDecimals) {
+    logger.info('Deploying Organization for Branded Token');
+    const organization = await this._deployBTOrganization();
+    logger.info(`Branded Token Organization address: ${organization.address}`);
+
+    logger.info('Deploying Branded Token');
+    const txOptions = Object.assign(
+      {},
+      this.origin.txOptions,
+      { from: this.origin.deployer },
+    );
+
+    const brandedToken = await BrandedToken.deploy(
+      this.origin.web3,
+      this.origin.baseToken,
+      symbol,
+      name,
+      decimals,
+      conversionRate,
+      conversionRateDecimals,
+      organization.address,
+      txOptions,
+    );
+
+    logger.info('Branded Token deployment successful!');
+
+    return { organization, brandedToken };
   }
 }
 
