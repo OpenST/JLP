@@ -20,7 +20,8 @@
     },
     "GatewayContract": {
       "address":"0x22393f72c7a422f5fc9cf1049f5dd0de1a7ed8fa"
-    }
+    },
+    "port":"8545"
   },
   "auxiliary":{
     "CoAnchor":{
@@ -42,5 +43,6 @@
         "admin":"0xd9cd903023c0b1e9cbcba9bec3aa79fb6d7f2e66"
       }
     }
-  }
+  },
+  "port":"8547"
 }
