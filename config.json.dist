@@ -12,12 +12,12 @@
   "auxiliaryDeployerAddress": "0xe84e1244e8c74b5b2df317d3ecf2f8ffd1f134d8",
   "originGasPrice": "13000000000",
   "auxiliaryGasPrice": "1000000000",
-  "originOrganizationAddress": "0x6e933B17F1F0111c5b18f08807506A17Cf333AaC",
-  "auxiliaryOrganizationAddress": "0xD561403069d467b83336857de080561a46fE32Fc",
-  "originAnchorAddress": "0xEe8DeBA844F16951781f63af5Fc296C4931251C8",
-  "auxiliaryAnchorAddress": "0xEe8DeBA844F16951781f63af5Fc296C4931251C8",
-  "originGatewayAddress": "0xEe8DeBA844F16951781f63af5Fc296C4931251C8",
-  "auxiliaryCoGatewayAddress": "0x958a1e31d24Cad130C0E489160358AE59eaba57E",
-  "auxiliaryUtilityTokenAddress": "0xB009e95Da5943074bA9864BB195B0d542E8cF46d",
-  "eip20TokenAddress": "0xf46f81E8c3C95Cf491c61C314600656957703D28"
+  "eip20TokenAddress": "0x35076a7d01B981F1fA6c0F7D2A2d9bd65F669A18",
+  "originOrganizationAddress": "0x08927Ae77eEBd09C67914DBCf52202922A93E4c4",
+  "auxiliaryOrganizationAddress": "0x7401B7Ad1e739845E7e40Fc8600c85105b55eefC",
+  "originAnchorAddress": "0x638314F39b1016a29b7a36B3c3d024c2511f86D7",
+  "auxiliaryAnchorAddress": "0x622B5Afb703d4C04E05C1B2Bd31cCa3b560815B7",
+  "originGatewayAddress": "0xf568fc40524Ea286b6e5e64eC15FcE5BB5d84A7D",
+  "auxiliaryCoGatewayAddress": "0xef4F57252310d7F295e5f316d1F978D0c3E25284",
+  "auxiliaryUtilityTokenAddress": "0x9f03B6eD04B7d3410386E1B921d7a8e163605B9A"
 }

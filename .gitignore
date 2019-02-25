@@ -4,3 +4,4 @@ package-lock.json
 .idea/
 .DS_Store
 log/
+config.json
