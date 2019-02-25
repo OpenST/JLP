@@ -22,8 +22,6 @@ class ChainConfig {
 
     // If a file path is given, config from the file will overwrite config from ENV or default.
     this.parseFile(filePath);
-
-    console.log(JSON.stringify(this));
   }
 
   parseFile(filePath) {
@@ -33,12 +31,12 @@ class ChainConfig {
     }
   }
 
-  update(contracts) {
-    Object.assign(this, contracts);
+  update(values) {
+    return Object.assign(this, values);
   }
 
   write(filePath) {
-    fs.writeFileSync(filePath, JSON.stringify(this));
+    fs.writeFileSync(filePath, JSON.stringify(this, null, '  '));
   }
 }
 

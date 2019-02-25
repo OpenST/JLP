@@ -12,7 +12,7 @@ class Deployer {
       txOptions: {
         gasPrice: chainConfig.originGasPrice,
       },
-      token: chainConfig.simpleTokenAddress,
+      token: chainConfig.eip20TokenAddress,
       baseToken: chainConfig.simpleTokenAddress,
       burner: chainConfig.originBurnerAddress,
       masterKey: chainConfig.originMasterKey,
