@@ -1,4 +1,6 @@
 const fs = require('fs');
+const Web3 = require('web3');
+const Mosaic = require('@openstfoundation/mosaic.js');
 
 class ChainConfig {
   /**
@@ -37,6 +39,29 @@ class ChainConfig {
 
   write(filePath) {
     fs.writeFileSync(filePath, JSON.stringify(this, null, '  '));
+  }
+
+  toMosaic() {
+    const originChain = new Mosaic.Chain(
+      new Web3(this.originWeb3Provider),
+      {
+        Organization: this.originOrganizationAddress,
+        EIP20Gateway: this.originGatewayAddress,
+        Anchor: this.originAnchorAddress,
+        EIP20Token: this.eip20TokenAddress,
+      },
+    );
+    const auxiliaryChain = new Mosaic.Chain(
+      new Web3(this.auxiliaryWeb3Provider),
+      {
+        Organization: this.originOrganizationAddress,
+        EIP20CoGateway: this.originGatewayAddress,
+        Anchor: this.originAnchorAddress,
+        UtilityToken: this.eip20TokenAddress,
+      },
+    );
+
+    return new Mosaic(originChain, auxiliaryChain);
   }
 }
 
