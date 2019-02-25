@@ -1,0 +1,46 @@
+{
+  "origin":{
+    "SimpleToken": {
+      "address":"0x325f05a75999347b7d8461baef274afae0b8ae1c",
+      "owner":"0xc3ce7e38bd43870a1f30a7cdbe695b37611c2c18",
+      "admin":"0xc08f06de9ca61ce317f8c5c431bb35950a40718b",
+      "organization": {
+        "address":"0xc50bf1e9a287d8fc67fa30bced1c4e6dc104542c",
+        "admin":"0xc1dc3b328d72f9b700c3c783bfecd7472ab253ad"
+      }
+    },
+    "Anchor":{
+      "address":"0xd7a5a15618ba8dc9e5d501c505468c92932a8e75",
+      "organization":{
+        "address":"0x6a204e10a5b16fa5a93d1e5a6e00840f4b05ffa3",
+        "admin":"0xfd3009ea06c69d3e7b7f2d7427c86fcfd169a6b5",
+        "owner":"0xff481b0f4244b2e62be168b9d0e6bb3947632b73",
+        "worker":"0x73c0357214d5cfe2ccaad1471031a500cfe8b5a5"
+      }
+    },
+    "GatewayContract": {
+      "address":"0x22393f72c7a422f5fc9cf1049f5dd0de1a7ed8fa"
+    }
+  },
+  "auxiliary":{
+    "CoAnchor":{
+      "address":"0x78bfb18708de1354c15bd69c9d6ba824533b393a",
+      "organization":{
+        "address":"0xe3ea52805fa9073ef1aeb7be0f5f042695df0e3e",
+        "owner":"0xa17e5283f122e9cb82feb1fbadaff0273bc7ebb7",
+        "admin":"0x39f58674dbc1558a797982bbd6a8c398d1cf454e",
+        "worker":"0x7343a5d1c7d30cb107daae655b6c364cc1269fea"
+      }
+    },
+    "CoGateway":{
+      "address":"0x00acd3642e7b7573afe472e5891dbedfb945d902"
+  },
+    "SimpleTokenPrime": {
+      "address":"0x05cd5fcd2aeca6aea1a554fae9fac76ce52dc5d6",
+      "organization":{
+        "owner":"0x904fd00ec5aedd2e77a9d9032c30a6ec8b7202b3",
+        "admin":"0xd9cd903023c0b1e9cbcba9bec3aa79fb6d7f2e66"
+      }
+    }
+  }
+}
