@@ -28,6 +28,10 @@ program
 
         logger.info(`  messageHash ${messageHash}`);
         logger.info(`  unlockSecret ${unlockSecret}`);
+        chainConfig.write(configPath);
+      }
+      if (direction === 'progressStake') {
+
       } else {
         logger.error('Type option is incorrectly passed, currently only stake is allowed');
       }

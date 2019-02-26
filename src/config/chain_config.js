@@ -21,6 +21,7 @@ class ChainConfig {
     this.auxiliaryDeployerAddress = process.env.AUXILIARY_DEPLOYER_ADDRESS || '0xe84e1244e8c74b5b2df317d3ecf2f8ffd1f134d8';
     this.originGasPrice = process.env.ORIGIN_GAS_PRICE || '13000000000';
     this.auxiliaryGasPrice = process.env.AUXILIARY_GAS_PRICE || '1000000000';
+    this.stakes = {};
 
     // If a file path is given, config from the file will overwrite config from ENV or default.
     this.parseFile(filePath);

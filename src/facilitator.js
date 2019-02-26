@@ -51,11 +51,51 @@ class Facilitator {
       staker,
     ).call();
 
-    const messageHash = activeProcess.messageHash_;
+    // FixMe https://github.com/OpenSTFoundation/mosaic.js/issues/136
+    const nextNonce = await gatewayInstance.contract.methods.getNonce(staker).call();
+    const currentNonce = parseInt(nextNonce, 10) - 1;
+
     // FixMe In mosaic.js facilitator.stake should return messageHash. https://github.com/OpenSTFoundation/mosaic.js/issues/136
+    const messageHash = activeProcess.messageHash_;
+    stakeRequest.messageHash = messageHash;
+    stakeRequest.nonce = currentNonce;
+
+    const { stakes } = this.chainConfig;
+
+    stakes[messageHash] = stakeRequest;
 
     logger.info('Stake successful');
-    return { messageHash, unlockSecret };
+    return { messageHash, unlockSecret, nonce: currentNonce };
+  }
+
+  async progressStake(messageHash) {
+    logger.info('Stake progress started');
+    const stakeRequest = this.chainConfig.stakes[messageHash];
+
+    if (!stakeRequest) {
+      logger.error('No stake request found');
+      return Promise.reject(new Error('No stake request found.'));
+    }
+
+    const txOptionAuxiliary = {
+      gasPrice: this.chainConfig.auxiliaryGasPrice,
+      from: this.chainConfig.auxiliaryDeployerAddress,
+    };
+
+    await this.mosaicFacilitator.progressStake(
+      stakeRequest.staker,
+      stakeRequest.amount,
+      stakeRequest.beneficiary,
+      stakeRequest.gasPrice,
+      stakeRequest.gasLimit,
+      stakeRequest.nonce,
+      stakeRequest.hashLock,
+      stakeRequest.unlockSecret,
+      stakeRequest.txOptions,
+      txOptionAuxiliary,
+    );
+
+    logger.info('Stake progress success');
   }
 }
 
