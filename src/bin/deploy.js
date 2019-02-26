@@ -23,8 +23,8 @@ program
         originOrganizationAddress: contractInstances.originOrganization.address,
         auxiliaryOrganizationAddress: contractInstances.auxiliaryOrganization.address,
         originAnchorAddress: contractInstances.originAnchor.address,
-        auxiliaryAnchorAddress: contractInstances.originAnchor.address,
-        originGatewayAddress: contractInstances.originAnchor.address,
+        auxiliaryAnchorAddress: contractInstances.auxiliaryAnchor.address,
+        originGatewayAddress: contractInstances.originGateway.address,
         auxiliaryCoGatewayAddress: contractInstances.auxiliaryCoGateway.address,
         auxiliaryUtilityTokenAddress: contractInstances.auxiliaryUtilityToken.address,
       });
