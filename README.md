@@ -61,14 +61,36 @@ It will keep on running and anchoring until you kill it.
 
 ## Stake Facilitator 
 
-Prerequisite: `originGatewayAddress`  and `eip20TokenAddress` in config file.
+Prerequisite: `originGatewayAddress`  and `eip20TokenAddress` in your config file.
 
 ```bash
 
-node src/bin/facilitator.js src/bin/config.json stake stakerAddress stakeAmount beneficiaryAddress
+node src/bin/facilitator.js stake path_to_config.json stakerAddress stakeAmount beneficiaryAddress
 
 ```
 
+ *  Replace `path_to_config.json` with a file location where config must be stored. 
  *  Replace `stakeAddress` with an address holding `eip20TokenAddress` balance.
  * Replace `stakeAmount` with number representing stake amount in wei.
  * Replace `beneficiaryAddress` with an address on auxiliary chain where token will be minted. 
+ 
+ It will write stake request details in the config file, which will be needed for progress stake.
+ 
+ 
+
+## Progress Stake Facilitator 
+
+Prerequisite:
+ 1. `originGatewayAddress` , `eip20TokenAddress` and `stakeRequest` generated in previous step in the config file.
+ 2. Run anchor state root after stake facilitator step.
+
+```bash
+
+node src/bin/facilitator.js progressStake path_to_config.json messageHash
+
+```
+
+ *  Replace `messageHash` with a hash generated in stake facilitator step. 
+. 
+ 
+ This step will mint tokens in auxiliary chain.
