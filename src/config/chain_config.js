@@ -18,7 +18,7 @@ class ChainConfig {
     this.originBurnerAddress = process.env.ORIGIN_BURNER_ADDRESS || '0x0000000000000000000000000000000000000000';
     this.auxiliaryBurnerAddress = process.env.AUXILIARY_BURNER_ADDRESS || '0x0000000000000000000000000000000000000000';
     this.originDeployerAddress = process.env.ORIGIN_DEPLOYER_ADDRESS || '0x6d4e5f5ca54b88fdb68a5d0e6ea5aa3869f88116';
-    this.auxiliaryDeployerAddress = process.env.ORIGIN_DEPLOYER_ADDRESS || '0xe84e1244e8c74b5b2df317d3ecf2f8ffd1f134d8';
+    this.auxiliaryDeployerAddress = process.env.AUXILIARY_DEPLOYER_ADDRESS || '0xe84e1244e8c74b5b2df317d3ecf2f8ffd1f134d8';
     this.originGasPrice = process.env.ORIGIN_GAS_PRICE || '13000000000';
     this.auxiliaryGasPrice = process.env.AUXILIARY_GAS_PRICE || '1000000000';
 

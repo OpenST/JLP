@@ -1,8 +1,6 @@
-const { Facilitator: MosaicFacilitator, createSecretHashLock, AbiBinProvider } = require('@openstfoundation/mosaic.js');
-const Web3 = require('web3');
+const { Facilitator: MosaicFacilitator, Utils, ContractInteract } = require('@openstfoundation/mosaic.js');
 
 const logger = require('./logger');
-const EventDecoder = require('./event_decoder');
 
 class Facilitator {
   constructor(chainConfig) {
@@ -11,9 +9,11 @@ class Facilitator {
     this.mosaicFacilitator = new MosaicFacilitator(this.mosaic);
   }
 
+  async stake(staker, amount, beneficiary) {
+    logger.info('Performing stake');
+    const { hashLock, unlockSecret } = Utils.createSecretHashLock();
 
-  stake(staker, amount, beneficiary) {
-    const { hashLock, unlockSecret } = createSecretHashLock();
+    logger.info('Hashlock, unlockSecret generated');
 
     const txOptions = {
       gasPrice: this.chainConfig.originGasPrice,
@@ -23,6 +23,7 @@ class Facilitator {
     const stakeRequest = {
       staker,
       beneficiary,
+      amount,
       gasPrice: '0',
       gasLimit: '0',
       hashLock,
@@ -30,8 +31,9 @@ class Facilitator {
       unlockSecret,
     };
 
-    const receipt = this.mosaicFacilitator.stake(
+    await this.mosaicFacilitator.stake(
       stakeRequest.staker,
+      stakeRequest.amount,
       stakeRequest.beneficiary,
       stakeRequest.gasPrice,
       stakeRequest.gasLimit,
@@ -39,20 +41,22 @@ class Facilitator {
       stakeRequest.txOptions,
     );
 
-    // FixMe In mosaic.js facilitator.stake should return messageHash. https://github.com/OpenSTFoundation/mosaic.js/issues/136
-    const gatewayABI = new AbiBinProvider().getABI('EIP20Gateway');
-
-    const decodedEvents = EventDecoder.perform(
-      receipt,
-      this.chainConfig.originGatewayAddress,
-      gatewayABI,
+    const gatewayInstance = new ContractInteract.EIP20Gateway(
+      this.mosaic.origin.web3,
+      this.mosaic.origin.contractAddresses.EIP20Gateway,
     );
 
-    const messageHash = decodedEvents.StakeIntentDeclared._messageHash;
+    logger.info('Getting message hash from the gateway');
+    const activeProcess = await gatewayInstance.contract.methods.getOutboxActiveProcess(
+      staker,
+    ).call();
 
-    return {
-      messageHash,
-      unlockSecret,
-    };
+    const messageHash = activeProcess.messageHash_;
+    // FixMe In mosaic.js facilitator.stake should return messageHash. https://github.com/OpenSTFoundation/mosaic.js/issues/136
+
+    logger.info('Stake successful');
+    return { messageHash, unlockSecret };
   }
 }
+
+module.exports = Facilitator;

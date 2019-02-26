@@ -58,3 +58,17 @@ If you want to anchor state roots, use the `anchor` executable:
 ```
 
 It will keep on running and anchoring until you kill it.
+
+## Stake Facilitator 
+
+Prerequisite: `originGatewayAddress`  and `eip20TokenAddress` in config file.
+
+```bash
+
+node src/bin/facilitator.js src/bin/config.json stake stakerAddress stakeAmount beneficiaryAddress
+
+```
+
+ *  Replace `stakeAddress` with an address holding `eip20TokenAddress` balance.
+ * Replace `stakeAmount` with number representing stake amount in wei.
+ * Replace `beneficiaryAddress` with an address on auxiliary chain where token will be minted. 
