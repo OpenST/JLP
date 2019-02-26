@@ -13,41 +13,47 @@ const { version } = require('../../package.json');
 program
   .version(version)
   .name('facilitator')
-  .description('An executable to facilitate stake and mint.')
-  .arguments('<config> <direction> <staker> <amount> <beneficiary>')
+  .description('An executable to facilitate stake and mint.');
+
+
+program.command('stake <config> <staker> <amount> <beneficiary>')
   .action(
-    async (configPath, direction, staker, amount, beneficiary) => {
+    async (configPath, staker, amount, beneficiary) => {
+      const chainConfig = new ChainConfig(configPath);
+      const facilitator = new Facilitator(chainConfig);
+      const {
+        messageHash,
+        unlockSecret,
+      } = await facilitator.stake(staker, amount, beneficiary);
+
+      logger.info(`  messageHash ${messageHash}`);
+      logger.info(`  unlockSecret ${unlockSecret}`);
+      chainConfig.write(configPath);
+    },
+  );
+
+program.command('progressStake <config> <messageHash>')
+  .action(
+    async (configPath, messageHash) => {
       const chainConfig = new ChainConfig(configPath);
       const facilitator = new Facilitator(chainConfig);
 
-      if (direction === 'stake') {
-        const {
-          messageHash,
-          unlockSecret,
-        } = await facilitator.stake(staker, amount, beneficiary);
-
-        logger.info(`  messageHash ${messageHash}`);
-        logger.info(`  unlockSecret ${unlockSecret}`);
-        chainConfig.write(configPath);
-      }
-      if (direction === 'progressStake') {
-
-      } else {
-        logger.error('Type option is incorrectly passed, currently only stake is allowed');
-      }
+      await facilitator.progressStake(messageHash);
     },
-  )
-  .on(
-    '--help',
-    () => {
-      console.log('');
-      console.log('Arguments:');
-      console.log('  config        Path to a config file');
-      console.log('  direction     It can be stake or redeem ');
-      console.log('  staker        Address of staker ');
-      console.log('  amount        Amount in wei for stake or redeem ');
-      console.log('  beneficiary   Address which will receive tokens after'
+  );
+
+program.on(
+  '--help',
+  () => {
+    console.log('');
+    console.log('Arguments:');
+    console.log('  config        Path to a config file');
+    console.log('  direction     It can be stake or redeem ');
+    console.log('  staker        Address of staker ');
+    console.log('  amount        Amount in wei for stake or redeem ');
+    console.log('  beneficiary   Address which will receive tokens after'
         + ' successful stake or redeem ');
-    },
-  )
-  .parse(process.argv);
+  },
+);
+
+program.parse(process.argv);

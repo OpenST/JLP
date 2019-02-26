@@ -58,7 +58,7 @@ class Facilitator {
     // FixMe In mosaic.js facilitator.stake should return messageHash. https://github.com/OpenSTFoundation/mosaic.js/issues/136
     const messageHash = activeProcess.messageHash_;
     stakeRequest.messageHash = messageHash;
-    stakeRequest.nonce = currentNonce;
+    stakeRequest.nonce = currentNonce.toString();
 
     const { stakes } = this.chainConfig;
 
@@ -88,7 +88,7 @@ class Facilitator {
       stakeRequest.beneficiary,
       stakeRequest.gasPrice,
       stakeRequest.gasLimit,
-      stakeRequest.nonce,
+      stakeRequest.nonce.toString(),
       stakeRequest.hashLock,
       stakeRequest.unlockSecret,
       stakeRequest.txOptions,

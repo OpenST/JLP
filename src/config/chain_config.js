@@ -55,10 +55,10 @@ class ChainConfig {
     const auxiliaryChain = new Mosaic.Chain(
       new Web3(this.auxiliaryWeb3Provider),
       {
-        Organization: this.originOrganizationAddress,
-        EIP20CoGateway: this.originGatewayAddress,
-        Anchor: this.originAnchorAddress,
-        UtilityToken: this.eip20TokenAddress,
+        Organization: this.auxiliaryOrganizationAddress,
+        EIP20CoGateway: this.auxiliaryCoGatewayAddress,
+        Anchor: this.auxiliaryAnchorAddress,
+        UtilityToken: this.auxiliaryUtilityTokenAddress,
       },
     );
 
