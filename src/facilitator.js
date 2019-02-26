@@ -95,6 +95,9 @@ class Facilitator {
       txOptionAuxiliary,
     );
 
+    const { stakes } = this.chainConfig;
+    delete stakes[messageHash];
+
     logger.info('Stake progress success');
   }
 }

@@ -39,6 +39,7 @@ program.command('progressStake <config> <messageHash>')
       const facilitator = new Facilitator(chainConfig);
 
       await facilitator.progressStake(messageHash);
+      chainConfig.write(configPath);
     },
   );
 
