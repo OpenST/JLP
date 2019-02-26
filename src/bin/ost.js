@@ -21,28 +21,31 @@ program.command('wrap <config> <address> <amount>')
     async(configPath, address, amount) => {
       const chainConfig = new ChainConfig(configPath);
       const mosaic = chainConfig.toMosaic();
-      const ostPrime = new OSTPrime(mosaic.auxiliary.web3, mosaic.auxiliary.contractAddresses.UtilityToken);
+      const ostPrime = new OSTPrime(mosaic.auxiliary.web3, mosaic.auxiliary.contractAddresses.OSTPrime);
 
       const txOptions = {
         from: address,
         value: amount,
       };
 
-    ostPrime
+    await ostPrime
       .wrap(txOptions)
       .then(receipt => {
         logger.info(`Wrapped ${amount} of OSTPrime`, receipt.transactionHash);
         }
       )
     }
-  )
-  .on(
-    '--help',
-    () => {
-      console.log('');
-      console.log('Arguments:');
-      console.log('  config       path to a config file');
-      console.log('  address      address of OST holder');
-      console.log('  amount       the amount of OST');
-    },
-  ).parse(process.argv);
+  );
+
+program.on(
+  '--help',
+  () => {
+    console.log('');
+    console.log('Arguments:');
+    console.log('  config       path to a config file');
+    console.log('  address      address of OST holder');
+    console.log('  amount       the amount of OST');
+  },
+);
+
+program.parse(process.argv);
