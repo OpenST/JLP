@@ -9,6 +9,8 @@ If you need to set up your nodes, you can use the scripts in [chains](./chains) 
 
 Copy the `config.json.dist` example to `config.json`.
 
+⚠️ You may need to change the web3 provider ports.
+
 ⚠️ You have to put in your `{origin,auxiliary}masterKey`!
 You also may want to change other parameters.
 If you don't put in the `{origin/auxiliary}deployerAddress`, you need to run the `refill` command to generate and fund them (see below).
