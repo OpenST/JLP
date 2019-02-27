@@ -19,9 +19,7 @@ program
 program.command('wrap <config> <address> <amount>')
   .action(
     async(configPath, address, amount) => {
-      const chainConfig = new ChainConfig(configPath);
-      const mosaic = chainConfig.toMosaic();
-      const ostPrime = new OSTPrime(mosaic.auxiliary.web3, mosaic.auxiliary.contractAddresses.OSTPrime);
+      const ostPrime = getOSTPrime(configPath);
 
       const txOptions = {
         from: address,
@@ -31,8 +29,25 @@ program.command('wrap <config> <address> <amount>')
     await ostPrime
       .wrap(txOptions)
       .then(receipt => {
-        logger.info(`Wrapped ${amount} wei for ${address}`);
-        logger.info(`TxHash: ${receipt.transactionHash}`);
+        logger.info(`Wrapped ${amount} wei for ${address}, txHash: ${receipt.transactionHash}`);
+        }
+      )
+    }
+  );
+
+program.command('unwrap <config> <address> <amount>')
+  .action(
+    async(configPath, address, amount) => {
+      const ostPrime = getOSTPrime(configPath);
+
+      const txOptions = {
+        from: address,
+      };
+
+    await ostPrime
+      .unwrap(amount, txOptions)
+      .then(receipt => {
+        logger.info(`Unwrapped ${amount} wei for ${address}, txHash: ${receipt.transactionHash}`);
         }
       )
     }
@@ -51,3 +66,10 @@ program.on(
 );
 
 program.parse(process.argv);
+
+function getOSTPrime(configPath) {
+  const chainConfig = new ChainConfig(configPath);
+  const mosaic = chainConfig.toMosaic();
+
+  return new OSTPrime(mosaic.auxiliary.web3, mosaic.auxiliary.contractAddresses.OSTPrime);
+}
