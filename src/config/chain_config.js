@@ -60,7 +60,7 @@ class ChainConfig {
         EIP20CoGateway: this.auxiliaryCoGatewayAddress,
         Anchor: this.auxiliaryAnchorAddress,
         UtilityToken: this.auxiliaryUtilityTokenAddress,
-        OSTPrime: this.auxiliaryOSTPrimeAddress,
+        OSTPrime: this.auxiliaryOSTPrimeAddress || '0x05cd5fcd2aeca6aea1a554fae9fac76ce52dc5d6',
       },
     );
 
