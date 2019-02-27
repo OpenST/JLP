@@ -17,7 +17,7 @@ You may want to store different config files for different tests.
 
 ## Funding of Addresses
 
-Prerequisite: `originMasterKey` and `auxiliaryMasterKey` in your config file.
+Prerequisite: `originMasterKey` and `auxiliaryMasterKey` in your config file have funds.
 
 To ensure that all the addresses in your config file are funded, you can use the
 `refill` executable. It will transfer funds from the `{origin,auxiliary}MasterKey` addresses
