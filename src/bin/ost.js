@@ -31,7 +31,8 @@ program.command('wrap <config> <address> <amount>')
     await ostPrime
       .wrap(txOptions)
       .then(receipt => {
-        logger.info(`Wrapped ${amount} of OSTPrime`, receipt.transactionHash);
+        logger.info(`Wrapped ${amount} wei for ${address}`);
+        logger.info(`TxHash: ${receipt.transactionHash}`);
         }
       )
     }
@@ -42,9 +43,10 @@ program.on(
   () => {
     console.log('');
     console.log('Arguments:');
+    console.log('  direction    wrap or unwrap');
     console.log('  config       path to a config file');
     console.log('  address      address of OST holder');
-    console.log('  amount       the amount of OST');
+    console.log('  amount       amount of OST in wei');
   },
 );
 
