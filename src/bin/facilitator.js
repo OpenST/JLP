@@ -47,13 +47,17 @@ program.on(
   '--help',
   () => {
     console.log('');
-    console.log('Arguments:');
+    console.log('facilitator stake Arguments:');
     console.log('  config        Path to a config file');
     console.log('  direction     It can be stake or redeem ');
     console.log('  staker        Address of staker ');
     console.log('  amount        Amount in wei for stake or redeem ');
     console.log('  beneficiary   Address which will receive tokens after'
         + ' successful stake or redeem ');
+    console.log('');
+    console.log('facilitator progressStake Arguments:');
+    console.log('  config        Path to a config file');
+    console.log('  messageHash   Hash to identify stake process');
   },
 );
 
