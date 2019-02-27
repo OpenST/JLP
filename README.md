@@ -12,10 +12,26 @@ Copy the `config.json.dist` example to `config.json`.
 ⚠️ Other commands will overwrite your config, for example when they deploy contracts.
 You may want to store different config files for different tests.
 
+## Funding of Addresses
+
+Prerequisite: `originMasterKey` and `auxiliaryMasterKey` in your config file.
+
+To ensure that all the addresses in your config file are funded, you can use the
+`refill` executable. It will transfer funds from the `{origin,auxiliary}MasterKey` addresses
+to the addresses in your config file to refill them to a balance of 1 (currency of the chain).
+
+```bash
+# Help:
+./src/bin/refill -h
+
+# Refill addresses
+./src/bin/refill.js config.json
+```
+
 ## EIP20 Token
 
 If you do not have an EIP20 token, you must deploy one on origin.
-Use the ei20 executable for that:
+Use the eip20 executable for that:
 
 ```bash
 # Help:
