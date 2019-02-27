@@ -100,6 +100,23 @@ class Facilitator {
 
     logger.info('Stake progress success');
   }
+
+  async redeem(redeemer, amount, beneficiary) {
+    const { hashLock, unlockSecret } = Utils.createSecretHashLock();
+
+    logger.info('Hashlock, unlockSecret generated');
+
+    console.log("redeemer :- ",redeemer);
+    const txOptions = {
+      gasPrice: '150000000',
+      gas: '1500000', // needs to be worked out
+      from: redeemer,
+    };
+
+    let result = await this.mosaicFacilitator.redeem(redeemer, amount, beneficiary, '0', '0', hashLock, txOptions);
+    console.log(JSON.stringify(result));
+    logger.info('Redeem initiated');
+  }
 }
 
 module.exports = Facilitator;

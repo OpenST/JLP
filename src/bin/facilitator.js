@@ -43,6 +43,16 @@ program.command('progressStake <config> <messageHash>')
     },
   );
 
+program.command('redeem <config> <redeemer> <amount> <beneficiary>')
+  .action(
+    async (configPath, redeemer, amount, beneficiary) => {
+      const chainConfig = new ChainConfig(configPath);
+      const facilitator = new Facilitator(chainConfig);
+     await facilitator.redeem(redeemer, amount, beneficiary);
+
+    },
+  );
+
 program.on(
   '--help',
   () => {
