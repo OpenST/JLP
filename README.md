@@ -114,3 +114,29 @@ node src/bin/facilitator.js progressStake path_to_config.json messageHash
 . 
  
  This step will mint tokens in auxiliary chain.
+
+## Wrapping and Unwrapping OST
+
+Prerequisite: `auxiliaryOSTPrimeAddress` in your config file.
+
+In order to wrap OST in OSTPrime or to unwrap OST from OSTPrime, use the `ost` executable:
+
+```bash
+# Help:
+./src/bin/deploy.js -h
+
+# Wrap OST
+node src/bin/ost.js wrap <config.json> <address> <amount>
+
+# Unwrap OST
+node src/bin/ost.js unwrap <config.json> <address> <amount>
+
+```
+
+* Replace `config.json` with the path to the configuration file.
+* Replace `address` with an unlocked address with OST on the auxiliary chain to wrap or unwrap.
+* Replace `amount` with an amount of OST to wrap or unwrap in wei.
+
+In wrapping, it will transfer OST to the OSTPrime contract from `address`.
+
+In unwrapping, it will transfer OST from the OSTPrime contract to `address`.
