@@ -9,6 +9,9 @@ If you need to set up your nodes, you can use the scripts in [chains](./chains) 
 
 Copy the `config.json.dist` example to `config.json`.
 
+⚠️ You have to put in your `{origin,auxiliary}masterKey` and `{origin/auxiliary}deployerAddress`!
+You also may want to change other parameters.
+
 ⚠️ Other commands will overwrite your config, for example when they deploy contracts.
 You may want to store different config files for different tests.
 
