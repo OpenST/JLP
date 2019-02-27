@@ -15,9 +15,10 @@ program
   .version(version)
   .name('anchor')
   .arguments('<config> <direction> <delay>')
+  .option('-t, --timeout <t>', 'Wait time between checking for new state root in seconds', parseInt)
   .description('An executable to anchor state roots across chains.')
   .action(
-    (config, direction, delay) => {
+    (config, direction, delay, options) => {
       const chainConfig = new ChainConfig(config);
       let sourceWeb3;
       let targetWeb3;
@@ -45,12 +46,20 @@ program
         process.exit(1);
       }
 
+      let timeout;
+      if (options.timeout) {
+        timeout = options.timeout * 1000;
+      } else {
+        timeout = 1000;
+      }
+
       const stateRootAnchorService = new StateRootAnchorService(
         Number.parseInt(delay, 10),
         sourceWeb3,
         targetWeb3,
         anchorAddress,
         targetTxOptions,
+        timeout,
       );
 
       stateRootAnchorService.start();
