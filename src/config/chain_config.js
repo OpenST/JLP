@@ -23,6 +23,7 @@ class ChainConfig {
     this.auxiliaryGasPrice = process.env.AUXILIARY_GAS_PRICE || '1000000000';
     this.password = process.env.PASSWORD || 'hunter2';
     this.stakes = {};
+    this.redeems = {};
     this.utilityBrandedTokens = [];
 
     // If a file path is given, config from the file will overwrite config from ENV or default.

@@ -48,7 +48,25 @@ program.command('redeem <config> <redeemer> <amount> <beneficiary>')
     async (configPath, redeemer, amount, beneficiary) => {
       const chainConfig = new ChainConfig(configPath);
       const facilitator = new Facilitator(chainConfig);
-      await facilitator.redeem(redeemer, amount, beneficiary);
+
+      const {
+        messageHash,
+        unlockSecret,
+      } = await facilitator.redeem(redeemer, amount, beneficiary);
+
+      logger.info(`  messageHash ${messageHash}`);
+      logger.info(`  unlockSecret ${unlockSecret}`);
+      chainConfig.write(configPath);
+    },
+  );
+
+program.command('progressRedeem <config> <messageHash>')
+  .action(
+    async (configPath, messageHash) => {
+      const chainConfig = new ChainConfig(configPath);
+      const facilitator = new Facilitator(chainConfig);
+
+      await facilitator.progressRedeem(messageHash);
     },
   );
 
