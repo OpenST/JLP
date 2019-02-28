@@ -76,15 +76,26 @@ program.on(
     console.log('');
     console.log('facilitator stake Arguments:');
     console.log('  config        Path to a config file');
-    console.log('  direction     It can be stake or redeem ');
     console.log('  staker        Address of staker ');
     console.log('  amount        Amount in wei for stake or redeem ');
     console.log('  beneficiary   Address which will receive tokens after'
-        + ' successful stake or redeem ');
+        + ' successful stake');
     console.log('');
     console.log('facilitator progressStake Arguments:');
     console.log('  config        Path to a config file');
     console.log('  messageHash   Hash to identify stake process');
+
+    console.log('');
+    console.log('facilitator redeem Arguments:');
+    console.log('  config        Path to a config file');
+    console.log('  redeem        Address of staker ');
+    console.log('  amount        Amount in wei for stake or redeem ');
+    console.log('  beneficiary   Address which will receive tokens after'
+      + ' successful redeem');
+    console.log('');
+    console.log('facilitator progressRedeem Arguments:');
+    console.log('  config        Path to a config file');
+    console.log('  messageHash   Hash to identify redeem process');
   },
 );
 
