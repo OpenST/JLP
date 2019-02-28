@@ -77,7 +77,7 @@ program.on(
     console.log('facilitator stake Arguments:');
     console.log('  config        Path to a config file');
     console.log('  staker        Address of staker ');
-    console.log('  amount        Amount in wei for stake or redeem ');
+    console.log('  amount        Amount in wei for stake ');
     console.log('  beneficiary   Address which will receive tokens after'
         + ' successful stake');
     console.log('');
@@ -88,8 +88,8 @@ program.on(
     console.log('');
     console.log('facilitator redeem Arguments:');
     console.log('  config        Path to a config file');
-    console.log('  redeem        Address of staker ');
-    console.log('  amount        Amount in wei for stake or redeem ');
+    console.log('  redeem        Address of redeem ');
+    console.log('  amount        Amount in wei for redeem ');
     console.log('  beneficiary   Address which will receive tokens after'
       + ' successful redeem');
     console.log('');
