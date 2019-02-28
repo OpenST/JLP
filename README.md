@@ -9,12 +9,16 @@ If you need to set up your nodes, you can use the scripts in [chains](./chains) 
 
 Copy the `config.json.dist` example to `config.json`.
 
+⚠️ You have to put in your `{origin,auxiliary}masterKey`!
+You also may want to change other parameters.
+If you don't put in the `{origin/auxiliary}deployerAddress`, you need to run the `refill` command to generate and fund them (see below).
+
 ⚠️ Other commands will overwrite your config, for example when they deploy contracts.
 You may want to store different config files for different tests.
 
 ## Funding of Addresses
 
-Prerequisite: `originMasterKey` and `auxiliaryMasterKey` in your config file.
+Prerequisite: `originMasterKey` and `auxiliaryMasterKey` in your config file have funds.
 
 To ensure that all the addresses in your config file are funded, you can use the
 `refill` executable. It will transfer funds from the `{origin,auxiliary}MasterKey` addresses
@@ -110,3 +114,29 @@ node src/bin/facilitator.js progressStake path_to_config.json messageHash
 . 
  
  This step will mint tokens in auxiliary chain.
+
+## Wrapping and Unwrapping OST
+
+Prerequisite: `auxiliaryOSTPrimeAddress` in your config file.
+
+In order to wrap OST in OSTPrime or to unwrap OST from OSTPrime, use the `ost` executable:
+
+```bash
+# Help:
+./src/bin/deploy.js -h
+
+# Wrap OST
+node src/bin/ost.js wrap <config.json> <address> <amount>
+
+# Unwrap OST
+node src/bin/ost.js unwrap <config.json> <address> <amount>
+
+```
+
+* Replace `config.json` with the path to the configuration file.
+* Replace `address` with an unlocked address with OST on the auxiliary chain to wrap or unwrap.
+* Replace `amount` with an amount of OST to wrap or unwrap in wei.
+
+In wrapping, it will transfer OST to the OSTPrime contract from `address`.
+
+In unwrapping, it will transfer OST from the OSTPrime contract to `address`.

@@ -8,8 +8,12 @@ const logger = require('./logger');
 
 class StateRootAnchorService {
   /**
-   * @param {number} anchorBlockDelay The number of block to wait before anchoring.
-   * @param {ChainConfig} config A configuration instance.
+   * @param {number} anchorBlockDelay The number of block to wait before anchoring the state root.
+   * @param {Web3} sourceWeb3 Web3 instance pointing to the source chain.
+   * @param {Web3} targetWeb3 Web3 instance pointing to the target chain.
+   * @param {string} anchorAddress Address of the anchor on target.
+   * @param {Object} targetTxOptions Transaction options for anchoring.
+   * @param {number} timeout Timeout to wait between checks for a new state root in milliseconds.
    */
   constructor(
     anchorBlockDelay,
@@ -17,6 +21,7 @@ class StateRootAnchorService {
     targetWeb3,
     anchorAddress,
     targetTxOptions,
+    timeout,
   ) {
     assert(Number.isInteger(anchorBlockDelay));
     assert(anchorBlockDelay >= 0);
@@ -31,7 +36,7 @@ class StateRootAnchorService {
     this.target = targetWeb3;
     this.targetTxOptions = targetTxOptions;
 
-    this.INTERVAL_TIMEOUT = 1000;
+    this.timeout = timeout;
     this.run = false;
   }
 
@@ -41,6 +46,7 @@ class StateRootAnchorService {
     return {
       blockNumber: block.number,
       stateRoot: block.stateRoot,
+      anchorAddress: this.anchorContract.address,
     };
   }
 
@@ -96,7 +102,7 @@ class StateRootAnchorService {
         logger.info('Stopped.');
       }
       await this.commit();
-    }, this.INTERVAL_TIMEOUT, { stopOnError: true });
+    }, this.timeout, { stopOnError: true });
   }
 
   stop() {
