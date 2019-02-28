@@ -14,15 +14,16 @@ class ChainConfig {
     this.auxiliaryChainId = process.env.ORIGIN_CHAIN_ID || 200;
     this.simpleTokenAddress = process.env.SIMPLE_TOKEN_ADDRESS || '0xca954C91BE676cBC4D5Ab5F624b37402E5f0d957';
     this.originMasterKey = process.env.ORIGIN_MASTER_KEY || '0x6d4e5f5ca54b88fdb68a5d0e6ea5aa3869f88116';
-    this.auxiliaryMasterKey = process.env.AUXILIARY_MASTER_KEY || '0xe84e1244e8c74b5b2df317d3ecf2f8ffd1f134d8';
+    this.auxiliaryMasterKey = process.env.AUXILIARY_MASTER_KEY || '0x490cc731b076e58509e1f7cee6c68b39cfe5ad62';
     this.originBurnerAddress = process.env.ORIGIN_BURNER_ADDRESS || '0x0000000000000000000000000000000000000000';
     this.auxiliaryBurnerAddress = process.env.AUXILIARY_BURNER_ADDRESS || '0x0000000000000000000000000000000000000000';
     this.originDeployerAddress = process.env.ORIGIN_DEPLOYER_ADDRESS || '0x6d4e5f5ca54b88fdb68a5d0e6ea5aa3869f88116';
-    this.auxiliaryDeployerAddress = process.env.AUXILIARY_DEPLOYER_ADDRESS || '0xe84e1244e8c74b5b2df317d3ecf2f8ffd1f134d8';
+    this.auxiliaryDeployerAddress = process.env.AUXILIARY_DEPLOYER_ADDRESS || '0x490cc731b076e58509e1f7cee6c68b39cfe5ad62';
     this.originGasPrice = process.env.ORIGIN_GAS_PRICE || '13000000000';
     this.auxiliaryGasPrice = process.env.AUXILIARY_GAS_PRICE || '1000000000';
     this.password = process.env.PASSWORD || 'hunter2';
     this.stakes = {};
+    this.utilityBrandedTokens = [];
 
     // If a file path is given, config from the file will overwrite config from ENV or default.
     this.parseFile(filePath);

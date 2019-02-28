@@ -89,8 +89,8 @@ node src/bin/facilitator.js stake path_to_config.json stakerAddress stakeAmount 
 
 ```
 
- *  Replace `path_to_config.json` with a file location where config must be stored. 
- *  Replace `stakeAddress` with an address holding `eip20TokenAddress` balance.
+ * Replace `path_to_config.json` with a file location where config must be stored. 
+ * Replace `stakeAddress` with an address holding `eip20TokenAddress` balance.
  * Replace `stakeAmount` with number representing stake amount in wei.
  * Replace `beneficiaryAddress` with an address on auxiliary chain where token will be minted. 
  
@@ -110,6 +110,7 @@ node src/bin/facilitator.js progressStake path_to_config.json messageHash
 
 ```
 
+* Replace `path_to_config.json` with a file location where config must be stored.
  *  Replace `messageHash` with a hash generated in stake facilitator step. 
 . 
  
@@ -140,3 +141,28 @@ node src/bin/ost.js unwrap <config.json> <address> <amount>
 In wrapping, it will transfer OST to the OSTPrime contract from `address`.
 
 In unwrapping, it will transfer OST from the OSTPrime contract to `address`.
+
+
+## Setup Branded Token
+
+Prerequisite: `eip20TokenAddress`in config file. Optionally, you can run EIP20 Token setup step mentioned above. 
+
+```bash
+# Help: 
+node src/bin/bt.js --help
+
+node src/bin/bt.js brandedToken <config.json> <symbol> <name> <decimal> <conversionRate> <conversionDecimal>
+
+```
+
+## Setup Utility Branded Token
+
+Prerequisite: Branded token config in config file.
+
+```bash
+# Help: 
+node src/bin/bt.js --help
+
+node src/bin/bt.js setupUtilityBrandedToken <config.json>
+
+```

@@ -48,8 +48,7 @@ program.command('redeem <config> <redeemer> <amount> <beneficiary>')
     async (configPath, redeemer, amount, beneficiary) => {
       const chainConfig = new ChainConfig(configPath);
       const facilitator = new Facilitator(chainConfig);
-     await facilitator.redeem(redeemer, amount, beneficiary);
-
+      await facilitator.redeem(redeemer, amount, beneficiary);
     },
   );
 
