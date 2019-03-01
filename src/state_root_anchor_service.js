@@ -89,28 +89,13 @@ class StateRootAnchorService {
   }
 
   async start() {
-    this.run = true;
-
-    process
-      .on('SIGTERM', this.stop)
-      .on('SIGINT', this.stop)
-      .on('SIGQUIT', this.stop);
-
-    interval(async (_, stop) => {
-      if (this.run === false) {
-        stop();
-        logger.info('Stopped.');
+    interval(async () => {
+      try {
+        await this.commit();
+      } catch (error) {
+        logger.error(error);
       }
-      await this.commit();
     }, this.timeout, { stopOnError: true });
-  }
-
-  stop() {
-    this.run = false;
-
-    process.removeListener('SIGTERM', this.stop);
-    process.removeListener('SIGINT', this.stop);
-    process.removeListener('SIGQUIT', this.stop);
   }
 }
 

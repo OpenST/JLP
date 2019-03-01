@@ -17,7 +17,7 @@ program
   .action(
     async (configPath) => {
       const chainConfig = new ChainConfig(configPath);
-      const deployer = new Deployer(chainConfig);
+      const deployer = await Deployer.create(chainConfig);
       const contractInstances = await deployer.deployUtilityToken();
       chainConfig.update({
         originOrganizationAddress: contractInstances.originOrganization.address,

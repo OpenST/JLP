@@ -5,9 +5,11 @@
 const program = require('commander');
 const Web3 = require('web3');
 
+const Account = require('../account');
 const ChainConfig = require('../config/chain_config');
 const EIP20Token = require('../../contracts/EIP20Token');
 const logger = require('../logger');
+const Provider = require('../provider');
 
 const { version } = require('../../package.json');
 
@@ -19,10 +21,13 @@ program
   .action(
     async (config, symbol, name, totalSupply, decimals) => {
       const chainConfig = new ChainConfig(config);
-      const web3 = new Web3(chainConfig.originWeb3Provider);
+      const originAccount = await Account.unlock('origin');
+      const originProvider = Provider.create('origin', originAccount, chainConfig);
+
+      const web3 = new Web3(originProvider);
       const txOptions = {
         gasPrice: chainConfig.originGasPrice,
-        from: chainConfig.originMasterKey,
+        from: originAccount.address,
       };
       const contract = new web3.eth.Contract(EIP20Token.abi, undefined, txOptions);
 

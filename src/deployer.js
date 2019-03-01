@@ -3,35 +3,51 @@ const OpenST = require('@openstfoundation/openst.js');
 
 const Web3 = require('web3');
 
+const Account = require('./account');
 const logger = require('./logger');
+const Provider = require('./provider');
 
 class Deployer {
-  constructor(chainConfig) {
+  constructor(chainConfig, originProvider, auxiliaryProvider, originAccount, auxiliaryAccount) {
     this.origin = {
-      web3: new Web3(chainConfig.originWeb3Provider),
+      web3: new Web3(originProvider),
       chainId: chainConfig.originChainId,
-      deployer: chainConfig.originDeployerAddress,
+      deployer: originAccount.address,
       txOptions: {
         gasPrice: chainConfig.originGasPrice,
       },
       token: chainConfig.eip20TokenAddress,
       baseToken: chainConfig.simpleTokenAddress,
       burner: chainConfig.originBurnerAddress,
-      masterKey: chainConfig.originMasterKey,
+      masterKey: originAccount.address,
     };
 
     this.auxiliary = {
-      web3: new Web3(chainConfig.auxiliaryWeb3Provider),
+      web3: new Web3(auxiliaryProvider),
       chainId: chainConfig.auxiliaryChainId,
-      deployer: chainConfig.auxiliaryDeployerAddress,
+      deployer: auxiliaryAccount.address,
       txOptions: {
         gasPrice: chainConfig.auxiliaryGasPrice,
       },
       burner: chainConfig.auxiliaryBurnerAddress,
-      masterKey: chainConfig.auxiliaryMasterKey,
+      masterKey: auxiliaryAccount.address,
     };
   }
 
+  static async create(chainConfig) {
+    const originAccount = await Account.unlock('origin');
+    const auxiliaryAccount = await Account.unlock('auxiliary');
+    const originProvider = Provider.create('origin', originAccount, chainConfig);
+    const auxiliaryProvider = Provider.create('auxiliary', auxiliaryAccount, chainConfig);
+
+    return new Deployer(
+      chainConfig,
+      originProvider,
+      auxiliaryProvider,
+      originAccount,
+      auxiliaryAccount,
+    );
+  }
 
   _deployOrganization() {
     return Setup.organizations(

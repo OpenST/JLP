@@ -5,8 +5,10 @@
 const program = require('commander');
 const Web3 = require('web3');
 
+const Account = require('../account');
 const ChainConfig = require('../config/chain_config');
 const logger = require('../logger');
+const Provider = require('../provider');
 
 const { version } = require('../../package.json');
 
@@ -19,16 +21,16 @@ program
     async (configPath) => {
       const chainConfig = new ChainConfig(configPath);
 
-      const chainWeb3 = (chain) => {
-        if (chain === 'origin') {
-          return new Web3(chainConfig.originWeb3Provider);
-        }
-        return new Web3(chainConfig.auxiliaryWeb3Provider);
+      const chainWeb3 = async (chain) => {
+        const account = await Account.unlock(chain);
+        const provider = Provider.create(chain, account, chainConfig);
+
+        return new Web3(provider);
       };
 
       const ensureAccount = async (accountName, chain) => {
         if (!chainConfig[accountName]) {
-          const web3 = chainWeb3(chain);
+          const web3 = await chainWeb3(chain);
 
           const address = await web3.eth.personal.newAccount(chainConfig.password);
           chainConfig[accountName] = address;
@@ -39,7 +41,7 @@ program
       const ensureFunding = async (chain, sourceAddress, targetAddress) => {
         const maxBalance = '1000000000000000000';
 
-        const web3 = chainWeb3(chain);
+        const web3 = await chainWeb3(chain);
         const currentBalance = await web3.eth.getBalance(targetAddress);
         if (currentBalance < maxBalance) {
           const transferBalance = maxBalance - currentBalance;

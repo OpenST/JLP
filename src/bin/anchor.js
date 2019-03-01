@@ -5,8 +5,10 @@
 const program = require('commander');
 const Web3 = require('web3');
 
+const Account = require('../account');
 const ChainConfig = require('../config/chain_config');
 const logger = require('../logger');
+const Provider = require('../provider');
 const StateRootAnchorService = require('../state_root_anchor_service.js');
 
 const { version } = require('../../package.json');
@@ -18,27 +20,33 @@ program
   .option('-t, --timeout <t>', 'Wait time between checking for new state root in seconds', parseInt)
   .description('An executable to anchor state roots across chains.')
   .action(
-    (config, direction, delay, options) => {
+    async (config, direction, delay, options) => {
       const chainConfig = new ChainConfig(config);
+
+      const originAccount = await Account.unlock('origin');
+      const auxiliaryAccount = await Account.unlock('auxiliary');
+      const originProvider = Provider.create('origin', originAccount, chainConfig);
+      const auxiliaryProvider = Provider.create('auxiliary', auxiliaryAccount, chainConfig);
+
       let sourceWeb3;
       let targetWeb3;
       let anchorAddress;
       let targetTxOptions;
 
       if (direction === 'origin') {
-        sourceWeb3 = new Web3(chainConfig.auxiliaryWeb3Provider);
-        targetWeb3 = new Web3(chainConfig.originWeb3Provider);
+        sourceWeb3 = new Web3(auxiliaryProvider);
+        targetWeb3 = new Web3(originProvider);
         anchorAddress = chainConfig.originAnchorAddress;
         targetTxOptions = {
-          from: chainConfig.originMasterKey,
+          from: originAccount.address,
           gasPrice: chainConfig.originGasPrice,
         };
       } else if (direction === 'auxiliary') {
-        sourceWeb3 = new Web3(chainConfig.originWeb3Provider);
-        targetWeb3 = new Web3(chainConfig.auxiliaryWeb3Provider);
+        sourceWeb3 = new Web3(originProvider);
+        targetWeb3 = new Web3(auxiliaryProvider);
         anchorAddress = chainConfig.auxiliaryAnchorAddress;
         targetTxOptions = {
-          from: chainConfig.auxiliaryMasterKey,
+          from: auxiliaryAccount.address,
           gasPrice: chainConfig.auxiliaryGasPrice,
         };
       } else {
