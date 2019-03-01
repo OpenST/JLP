@@ -105,17 +105,92 @@ class Facilitator {
     const { hashLock, unlockSecret } = Utils.createSecretHashLock();
 
     logger.info('Hashlock, unlockSecret generated');
+    const coGatewayInstance = new ContractInteract.EIP20CoGateway(
+      this.mosaic.auxiliary.web3,
+      this.mosaic.auxiliary.contractAddresses.EIP20CoGateway,
+    );
 
-    console.log("redeemer :- ",redeemer);
     const txOptions = {
-      gasPrice: '150000000',
-      gas: '1500000', // needs to be worked out
+      gasPrice: this.chainConfig.auxiliaryGasPrice,
       from: redeemer,
     };
 
-    let result = await this.mosaicFacilitator.redeem(redeemer, amount, beneficiary, '0', '0', hashLock, txOptions);
-    console.log(JSON.stringify(result));
+    const redeemRequest = {
+      redeemer,
+      beneficiary,
+      amount,
+      gasPrice: '0',
+      gasLimit: '0',
+      hashLock,
+      txOptions,
+      unlockSecret,
+    };
+
+    await this.mosaicFacilitator.redeem(
+      redeemer,
+      amount,
+      beneficiary,
+      redeemRequest.gasPrice,
+      redeemRequest.gasLimit,
+      hashLock,
+      txOptions,
+    );
+    const nextNonce = await coGatewayInstance.contract.methods.getNonce(redeemer).call();
+    const currentNonce = parseInt(nextNonce, 10) - 1;
+
+    const activeProcess = await coGatewayInstance.contract.methods.getOutboxActiveProcess(
+      redeemer,
+    ).call();
+
+    const messageHash = activeProcess.messageHash_;
+    redeemRequest.messageHash = messageHash;
+    redeemRequest.nonce = currentNonce.toString();
+
+    const { redeems } = this.chainConfig;
+
+    redeems[messageHash] = redeemRequest;
+
     logger.info('Redeem initiated');
+    return { messageHash, hashLock };
+  }
+
+  async progressRedeem(messageHash) {
+    logger.info('Redeem progress started');
+    const redeemRequest = this.chainConfig.redeems[messageHash];
+
+    // logger.info('redeemrequest :- ', redeemRequest);
+    if (!redeemRequest) {
+      logger.error('No stake request found');
+      return Promise.reject(new Error('No stake request found.'));
+    }
+
+    const txOptionAuxiliary = {
+      gasPrice: this.chainConfig.auxiliaryGasPrice,
+      from: this.chainConfig.auxiliaryDeployerAddress,
+    };
+
+    const txOptionOrigin = {
+      gasPrice: this.chainConfig.originGasPrice,
+      from: this.chainConfig.originDeployerAddress,
+    };
+
+    await this.mosaicFacilitator.progressRedeem(
+      redeemRequest.redeemer,
+      redeemRequest.nonce.toString(),
+      redeemRequest.beneficiary,
+      redeemRequest.amount,
+      redeemRequest.gasPrice,
+      redeemRequest.gasLimit,
+      redeemRequest.hashLock,
+      redeemRequest.unlockSecret,
+      txOptionAuxiliary, // FixMe https://github.com/OpenSTFoundation/mosaic.js/issues/141
+      txOptionOrigin,
+    );
+
+    const { redeems } = this.chainConfig;
+    delete redeems[messageHash];
+
+    logger.info('Redeem progress success');
   }
 }
 

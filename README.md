@@ -91,8 +91,8 @@ node src/bin/facilitator.js stake path_to_config.json stakerAddress stakeAmount 
 
 ```
 
- *  Replace `path_to_config.json` with a file location where config must be stored. 
- *  Replace `stakeAddress` with an address holding `eip20TokenAddress` balance.
+ * Replace `path_to_config.json` with a file location where config must be stored. 
+ * Replace `stakeAddress` with an address holding `eip20TokenAddress` balance.
  * Replace `stakeAmount` with number representing stake amount in wei.
  * Replace `beneficiaryAddress` with an address on auxiliary chain where token will be minted. 
  
@@ -103,7 +103,7 @@ node src/bin/facilitator.js stake path_to_config.json stakerAddress stakeAmount 
 ## Progress Stake Facilitator 
 
 Prerequisite:
- 1. `originGatewayAddress` , `eip20TokenAddress` and `stakeRequest` generated in previous step in the config file.
+ 1. `originGatewayAddress` , `eip20TokenAddress` and `stakes` generated in previous step in the config file.
  2. Run anchor state root after stake facilitator step.
 
 ```bash
@@ -112,7 +112,8 @@ node src/bin/facilitator.js progressStake path_to_config.json messageHash
 
 ```
 
- *  Replace `messageHash` with a hash generated in stake facilitator step. 
+* Replace `path_to_config.json` with a file location where config must be stored.
+* Replace `messageHash` with a hash generated in stake facilitator step. 
 . 
  
  This step will mint tokens in auxiliary chain.
@@ -142,3 +143,60 @@ node src/bin/ost.js unwrap <config.json> <address> <amount>
 In wrapping, it will transfer OST to the OSTPrime contract from `address`.
 
 In unwrapping, it will transfer OST from the OSTPrime contract to `address`.
+
+
+## Setup Branded Token
+
+Prerequisite: `eip20TokenAddress`in config file. Optionally, you can run EIP20 Token setup step mentioned above. 
+
+```bash
+# Help: 
+node src/bin/bt.js --help
+
+node src/bin/bt.js brandedToken <config.json> <symbol> <name> <decimal> <conversionRate> <conversionDecimal>
+
+```
+
+## Setup Utility Branded Token
+
+Prerequisite: Branded token config in config file.
+
+```bash
+# Help: 
+node src/bin/bt.js --help
+
+node src/bin/bt.js setupUtilityBrandedToken <config.json>
+
+```
+
+ 
+ ## Redeem Facilitator 
+ 
+ Prerequiste: 
+ 1. `auxiliaryGatewayAddress` and `eip20TokenAddress` generated in your config file.
+ 
+ ```bash
+ 
+ node src/bin/facilitator.js redeem path_to_config.json redeemerAddress redeemAmount beneficiaryAddress
+ 
+ ```
+ 
+  * Replace `path_to_config.json` with a file location where config is stored. 
+  * Replace `redeemerAddress` with an address holding `eip20TokenAddress` balance.
+  * Replace `redeemAmount` with number representing redeem amount in wei.
+  * Replace `beneficiaryAddress` with an address on auxiliary chain where token will be minted. 
+
+ It will write redeem request details in the config file, which will be needed for progress redeem(Next step).
+ 
+ ## Progress Redeem Facilitator 
+ 
+ 1. `auxiliaryGatewayAddress` , `eip20TokenAddress` and `redeems` generated in previous step in the config file.
+ 2. Run anchor state root after `redeem` facilitator step.
+
+```bash
+
+node src/bin/facilitator.js progressRedeem path_to_config.json messageHash
+
+```
+
+  * `messageHash` generated in redeem facilitator step.
