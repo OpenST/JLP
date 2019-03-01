@@ -151,7 +151,7 @@ Prerequisite: `eip20TokenAddress`in config file. Optionally, you can run EIP20 T
 # Help: 
 node src/bin/bt.js --help
 
-node src/bin/bt.js brandedToken <config.json> <symbol> <name> <decimal> <conversionRate> <conversionDecimal>
+node src/bin/bt.js setupBrandedToken <config.json> <symbol> <name> <decimal> <conversionRate> <conversionDecimal>
 
 ```
 
