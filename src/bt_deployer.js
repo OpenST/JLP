@@ -34,7 +34,7 @@ class BTDeployer {
   }
 
   _deployOriginOrganization() {
-    return Setup.Organization.setup(
+    return Setup.organization(
       this.origin.web3,
       {
         deployer: this.origin.deployer,
