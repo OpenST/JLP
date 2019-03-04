@@ -133,10 +133,20 @@ node src/bin/ost.js unwrap <config.json> <address> <amount>
 
 ```
 
+## Deploy TokenRules
+
+Prerequisite: `eip20Token` and `organization` in your config file.
+
+```bash
+# Help:
+./src/bin/tokenrules -h
+
+# Deploy TokenRules token:
+./src/bin/tokenrules.js config.json JLP eip20Token organization
+```
+
+It will write `tokenRulesAddress` to your config file.
+
 * Replace `config.json` with the path to the configuration file.
-* Replace `address` with an unlocked address with OST on the auxiliary chain to wrap or unwrap.
-* Replace `amount` with an amount of OST to wrap or unwrap in wei.
-
-In wrapping, it will transfer OST to the OSTPrime contract from `address`.
-
-In unwrapping, it will transfer OST from the OSTPrime contract to `address`.
+* Replace `eip20Token` with eip20Token address.
+* Replace `organization` with an organization contract address.
