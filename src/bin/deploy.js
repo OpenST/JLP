@@ -21,7 +21,7 @@ program
       const connection = await Connection.open(chainConfig);
 
       try {
-        const deployer = await Deployer.create(chainConfig, connection);
+        const deployer = new Deployer(chainConfig, connection);
         const contractInstances = await deployer.deployUtilityToken();
         chainConfig.update({
           originOrganizationAddress: contractInstances.originOrganization.address,
