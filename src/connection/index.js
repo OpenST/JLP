@@ -2,11 +2,23 @@
 
 const Web3 = require('web3');
 
-const Account = require('./account');
+const Account = require('../account');
 const Provider = require('./provider');
 
 class Connection {
-  static async init(chainConfig) {
+  constructor(
+    originWeb3,
+    auxiliaryWeb3,
+    originAccount,
+    auxiliaryAccount,
+  ) {
+    this.originWeb3 = originWeb3;
+    this.auxiliaryWeb3 = auxiliaryWeb3;
+    this.originAccount = originAccount;
+    this.auxiliaryAccount = auxiliaryAccount;
+  }
+
+  static async open(chainConfig) {
     const originWeb3 = new Web3();
     const auxiliaryWeb3 = new Web3();
     const originAccount = await Account.unlock('origin', originWeb3);
@@ -16,12 +28,17 @@ class Connection {
     originWeb3.setProvider(originProvider);
     auxiliaryWeb3.setProvider(auxiliaryProvider);
 
-    return {
+    return new Connection(
       originWeb3,
       auxiliaryWeb3,
       originAccount,
       auxiliaryAccount,
-    };
+    );
+  }
+
+  close() {
+    this.originWeb3.currentProvider.stop();
+    this.auxiliaryWeb3.currentProvider.stop();
   }
 }
 

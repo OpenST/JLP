@@ -20,57 +20,64 @@ program
   .action(
     async (config, direction, delay, options) => {
       const chainConfig = new ChainConfig(config);
+      const connection = await Connection.open(chainConfig);
 
       const {
         originWeb3,
         auxiliaryWeb3,
         originAccount,
         auxiliaryAccount,
-      } = await Connection.init(chainConfig);
+      } = connection;
 
-      let sourceWeb3;
-      let targetWeb3;
-      let anchorAddress;
-      let targetTxOptions;
+      try {
+        let sourceWeb3;
+        let targetWeb3;
+        let anchorAddress;
+        let targetTxOptions;
 
-      if (direction === 'origin') {
-        sourceWeb3 = auxiliaryWeb3;
-        targetWeb3 = originWeb3;
-        anchorAddress = chainConfig.originAnchorAddress;
-        targetTxOptions = {
-          from: originAccount.address,
-          gasPrice: chainConfig.originGasPrice,
-        };
-      } else if (direction === 'auxiliary') {
-        sourceWeb3 = originWeb3;
-        targetWeb3 = auxiliaryWeb3;
-        anchorAddress = chainConfig.auxiliaryAnchorAddress;
-        targetTxOptions = {
-          from: auxiliaryAccount.address,
-          gasPrice: chainConfig.auxiliaryGasPrice,
-        };
-      } else {
-        logger.error('`direction` argument must be one of: "origin", "auxiliary"');
-        process.exit(1);
+        if (direction === 'origin') {
+          sourceWeb3 = auxiliaryWeb3;
+          targetWeb3 = originWeb3;
+          anchorAddress = chainConfig.originAnchorAddress;
+          targetTxOptions = {
+            from: originAccount.address,
+            gasPrice: chainConfig.originGasPrice,
+          };
+        } else if (direction === 'auxiliary') {
+          sourceWeb3 = originWeb3;
+          targetWeb3 = auxiliaryWeb3;
+          anchorAddress = chainConfig.auxiliaryAnchorAddress;
+          targetTxOptions = {
+            from: auxiliaryAccount.address,
+            gasPrice: chainConfig.auxiliaryGasPrice,
+          };
+        } else {
+          logger.error('`direction` argument must be one of: "origin", "auxiliary"');
+          process.exit(1);
+        }
+
+        let timeout;
+        if (options.timeout) {
+          timeout = options.timeout * 1000;
+        } else {
+          timeout = 1000;
+        }
+
+        const stateRootAnchorService = new StateRootAnchorService(
+          Number.parseInt(delay, 10),
+          sourceWeb3,
+          targetWeb3,
+          anchorAddress,
+          targetTxOptions,
+          timeout,
+        );
+
+        await stateRootAnchorService.start();
+      } catch (error) {
+        logger.error(error);
+      } finally {
+        connection.close();
       }
-
-      let timeout;
-      if (options.timeout) {
-        timeout = options.timeout * 1000;
-      } else {
-        timeout = 1000;
-      }
-
-      const stateRootAnchorService = new StateRootAnchorService(
-        Number.parseInt(delay, 10),
-        sourceWeb3,
-        targetWeb3,
-        anchorAddress,
-        targetTxOptions,
-        timeout,
-      );
-
-      stateRootAnchorService.start();
     },
   )
   .on(

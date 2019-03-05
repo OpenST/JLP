@@ -46,11 +46,11 @@ class ChainConfig {
     fs.writeFileSync(filePath, JSON.stringify(this, null, '  '));
   }
 
-  async toMosaic() {
+  toMosaic(connection) {
     const {
       originWeb3,
       auxiliaryWeb3,
-    } = await Connection.init(this);
+    } = connection;
 
     const originChain = new Mosaic.Chain(
       originWeb3,

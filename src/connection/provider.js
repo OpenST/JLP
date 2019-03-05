@@ -1,10 +1,7 @@
 'use strict';
 
-const ProviderEngine = require('web3-provider-engine');
-const HookedWalletSubprovider = require('web3-provider-engine/subproviders/hooked-wallet.js');
-const WebsocketSubprovider = require('web3-provider-engine/subproviders/websocket.js');
-
-const logger = require('./logger');
+const logger = require('../logger');
+const ZeroClientProvider = require('./zero_client_provider');
 
 class Provider {
   /**
@@ -35,25 +32,16 @@ class Provider {
    */
   static _initEngine(chain, account, chainConfig) {
     const webSocket = Provider._readWebSocket(chain, chainConfig);
-
-    const engine = new ProviderEngine();
-
-    engine.addProvider(
-      new HookedWalletSubprovider({
-        getAccounts: cb => cb(null, [account.address]),
-        signTransaction: (tx, cb) => {
-          const myCb = (err, res) => {
-            cb(err, res.rawTransaction);
-          };
-          account.signTransaction(tx, myCb);
-        },
-      }),
-    );
-    engine.addProvider(
-      new WebsocketSubprovider({
-        rpcUrl: webSocket,
-      }),
-    );
+    const engine = ZeroClientProvider({
+      rpcUrl: webSocket,
+      getAccounts: callback => callback(null, [account.address]),
+      signTransaction: (tx, cb) => {
+        const extractRawTx = (error, response) => {
+          cb(error, response.rawTransaction);
+        };
+        account.signTransaction(tx, extractRawTx);
+      },
+    });
 
     return engine;
   }

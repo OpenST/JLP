@@ -5,6 +5,7 @@
 const program = require('commander');
 
 const ChainConfig = require('../config/chain_config');
+const Connection = require('../connection');
 const Deployer = require('../deployer.js');
 
 const { version } = require('../../package.json');
@@ -17,18 +18,26 @@ program
   .action(
     async (configPath) => {
       const chainConfig = new ChainConfig(configPath);
-      const deployer = await Deployer.create(chainConfig);
-      const contractInstances = await deployer.deployUtilityToken();
-      chainConfig.update({
-        originOrganizationAddress: contractInstances.originOrganization.address,
-        auxiliaryOrganizationAddress: contractInstances.auxiliaryOrganization.address,
-        originAnchorAddress: contractInstances.originAnchor.address,
-        auxiliaryAnchorAddress: contractInstances.auxiliaryAnchor.address,
-        originGatewayAddress: contractInstances.originGateway.address,
-        auxiliaryCoGatewayAddress: contractInstances.auxiliaryCoGateway.address,
-        auxiliaryUtilityTokenAddress: contractInstances.auxiliaryUtilityToken.address,
-      });
-      chainConfig.write(configPath);
+      const connection = await Connection.open(chainConfig);
+
+      try {
+        const deployer = await Deployer.create(chainConfig, connection);
+        const contractInstances = await deployer.deployUtilityToken();
+        chainConfig.update({
+          originOrganizationAddress: contractInstances.originOrganization.address,
+          auxiliaryOrganizationAddress: contractInstances.auxiliaryOrganization.address,
+          originAnchorAddress: contractInstances.originAnchor.address,
+          auxiliaryAnchorAddress: contractInstances.auxiliaryAnchor.address,
+          originGatewayAddress: contractInstances.originGateway.address,
+          auxiliaryCoGatewayAddress: contractInstances.auxiliaryCoGateway.address,
+          auxiliaryUtilityTokenAddress: contractInstances.auxiliaryUtilityToken.address,
+        });
+        chainConfig.write(configPath);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        connection.close();
+      }
     },
   )
   .on(

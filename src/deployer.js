@@ -1,51 +1,33 @@
 const { Setup, ContractInteract } = require('@openstfoundation/mosaic.js');
 const OpenST = require('@openstfoundation/openst.js');
 
-const Connection = require('./connection');
 const logger = require('./logger');
 
 class Deployer {
-  constructor(chainConfig, originWeb3, auxiliaryWeb3, originAccount, auxiliaryAccount) {
+  constructor(chainConfig, connection) {
     this.origin = {
-      web3: originWeb3,
+      web3: connection.originWeb3,
       chainId: chainConfig.originChainId,
-      deployer: originAccount.address,
+      deployer: connection.originAccount.address,
       txOptions: {
         gasPrice: chainConfig.originGasPrice,
       },
       token: chainConfig.eip20TokenAddress,
       baseToken: chainConfig.simpleTokenAddress,
       burner: chainConfig.originBurnerAddress,
-      masterKey: originAccount.address,
+      masterKey: connection.originAccount.address,
     };
 
     this.auxiliary = {
-      web3: auxiliaryWeb3,
+      web3: connection.auxiliaryWeb3,
       chainId: chainConfig.auxiliaryChainId,
-      deployer: auxiliaryAccount.address,
+      deployer: connection.auxiliaryAccount.address,
       txOptions: {
         gasPrice: chainConfig.auxiliaryGasPrice,
       },
       burner: chainConfig.auxiliaryBurnerAddress,
-      masterKey: auxiliaryAccount.address,
+      masterKey: connection.auxiliaryAccount.address,
     };
-  }
-
-  static async create(chainConfig) {
-    const {
-      originWeb3,
-      auxiliaryWeb3,
-      originAccount,
-      auxiliaryAccount,
-    } = await Connection.init(chainConfig);
-
-    return new Deployer(
-      chainConfig,
-      originWeb3,
-      auxiliaryWeb3,
-      originAccount,
-      auxiliaryAccount,
-    );
   }
 
   _deployOrganization() {

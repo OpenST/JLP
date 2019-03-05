@@ -19,42 +19,51 @@ program
   .action(
     async (config, symbol, name, totalSupply, decimals) => {
       const chainConfig = new ChainConfig(config);
+      const connection = await Connection.open(chainConfig);
+
       const {
         originWeb3,
         originAccount,
-      } = await Connection.init(chainConfig);
-      const txOptions = {
-        gasPrice: chainConfig.originGasPrice,
-        from: originAccount.address,
-      };
-      const contract = new originWeb3.eth.Contract(EIP20Token.abi, undefined, txOptions);
+      } = connection;
 
-      await contract
-        .deploy(
-          {
-            data: EIP20Token.bin,
-            arguments: [
-              symbol,
-              name,
-              totalSupply,
-              decimals,
-            ],
-          },
-          txOptions,
-        )
-        .send(txOptions)
-        .on('receipt', (receipt) => {
-          logger.info(`Deployed EIP20 token "${symbol}" to ${receipt.contractAddress}`);
+      try {
+        const txOptions = {
+          gasPrice: chainConfig.originGasPrice,
+          from: originAccount.address,
+        };
+        const contract = new originWeb3.eth.Contract(EIP20Token.abi, undefined, txOptions);
 
-          chainConfig.update({
-            eip20TokenAddress: receipt.contractAddress,
+        await contract
+          .deploy(
+            {
+              data: EIP20Token.bin,
+              arguments: [
+                symbol,
+                name,
+                totalSupply,
+                decimals,
+              ],
+            },
+            txOptions,
+          )
+          .send(txOptions)
+          .on('receipt', (receipt) => {
+            logger.info(`Deployed EIP20 token "${symbol}" to ${receipt.contractAddress}`);
+
+            chainConfig.update({
+              eip20TokenAddress: receipt.contractAddress,
+            });
+            chainConfig.write(config);
+          })
+          .on('error', (error) => {
+            logger.error(`Could not deploy EIP20Token: ${error}`);
+            process.exit(1);
           });
-          chainConfig.write(config);
-        })
-        .on('error', (error) => {
-          logger.error(`Could not deploy EIP20Token: ${error}`);
-          process.exit(1);
-        });
+      } catch (error) {
+        logger.error(error);
+      } finally {
+        connection.close();
+      }
     },
   )
   .on(
