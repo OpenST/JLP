@@ -1,5 +1,5 @@
 const { Setup, ContractInteract } = require('@openstfoundation/mosaic.js');
-const { OpenstSetup } = require('@openstfoundation/openst.js');
+const OpenST = require('@openstfoundation/openst.js');
 
 const Web3 = require('web3');
 
@@ -185,12 +185,12 @@ class Deployer {
   }
 
   async deployTokenRules(auxiliaryEIP20Token, auxiliaryOrganization) {
-    logger.info('Deploying TokenRules ');
-    const tokenRulesSetup = new OpenstSetup.TokenRules(this.auxiliary.web3);
+    logger.info('Deploying TokenRules');
+    const tokenRulesSetup = new OpenST.Setup.TokenRules(this.auxiliary.web3);
     const response = await tokenRulesSetup.deploy(
       auxiliaryOrganization,
       auxiliaryEIP20Token,
-      this.auxiliary.txOptions
+      this.auxiliary.txOptions,
     );
     return response.receipt.contractAddress;
   }

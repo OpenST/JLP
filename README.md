@@ -207,10 +207,10 @@ node src/bin/facilitator.js progressRedeem path_to_config.json messageHash
  
  ```bash
  # Help:
- node /src/bin/tokenrules --help
+ node ./src/bin/tokenrules.js --help
  
  # Deploy TokenRules token:
- node /src/bin/tokenrules.js config.json JLP eip20Token organization
+ node ./src/bin/tokenrules.js config.json eip20Token organization
  ```
  
  It will write `tokenRulesAddress` to your config file.
