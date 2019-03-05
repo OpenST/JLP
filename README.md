@@ -200,3 +200,21 @@ node src/bin/facilitator.js progressRedeem path_to_config.json messageHash
 ```
 
   * `messageHash` generated in redeem facilitator step.
+  
+ ## Deploy TokenRules
+ 
+ Prerequisite: `eip20Token` and `organization` in your config file.
+ 
+ ```bash
+ # Help:
+ node ./src/bin/tokenrules.js --help
+ 
+ # Deploy TokenRules token:
+ node ./src/bin/tokenrules.js config.json eip20Token organization
+ ```
+ 
+ It will write `tokenRulesAddress` to your config file.
+ 
+ * Replace `config.json` with the path to the configuration file.
+ * Replace `eip20Token` with eip20Token address.
+ * Replace `organization` with an organization contract address. 
