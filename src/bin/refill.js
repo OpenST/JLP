@@ -3,12 +3,10 @@
 'use strict';
 
 const program = require('commander');
-const Web3 = require('web3');
 
-const Account = require('../account');
 const ChainConfig = require('../config/chain_config');
+const Connection = require('../connection');
 const logger = require('../logger');
-const Provider = require('../provider');
 
 const { version } = require('../../package.json');
 
@@ -22,10 +20,16 @@ program
       const chainConfig = new ChainConfig(configPath);
 
       const chainWeb3 = async (chain) => {
-        const account = await Account.unlock(chain);
-        const provider = Provider.create(chain, account, chainConfig);
+        const {
+          originWeb3,
+          auxiliaryWeb3,
+        } = await Connection.init(chainConfig);
 
-        return new Web3(provider);
+        if (chain === 'origin') {
+          return originWeb3;
+        }
+
+        return auxiliaryWeb3;
       };
 
       const ensureAccount = async (accountName, chain) => {

@@ -3,12 +3,10 @@
 'use strict';
 
 const program = require('commander');
-const Web3 = require('web3');
 
-const Account = require('../account');
+const Connection = require('../connection');
 const ChainConfig = require('../config/chain_config');
 const logger = require('../logger');
-const Provider = require('../provider');
 const StateRootAnchorService = require('../state_root_anchor_service.js');
 
 const { version } = require('../../package.json');
@@ -23,10 +21,12 @@ program
     async (config, direction, delay, options) => {
       const chainConfig = new ChainConfig(config);
 
-      const originAccount = await Account.unlock('origin');
-      const auxiliaryAccount = await Account.unlock('auxiliary');
-      const originProvider = Provider.create('origin', originAccount, chainConfig);
-      const auxiliaryProvider = Provider.create('auxiliary', auxiliaryAccount, chainConfig);
+      const {
+        originWeb3,
+        auxiliaryWeb3,
+        originAccount,
+        auxiliaryAccount,
+      } = await Connection.init(chainConfig);
 
       let sourceWeb3;
       let targetWeb3;
@@ -34,16 +34,16 @@ program
       let targetTxOptions;
 
       if (direction === 'origin') {
-        sourceWeb3 = new Web3(auxiliaryProvider);
-        targetWeb3 = new Web3(originProvider);
+        sourceWeb3 = auxiliaryWeb3;
+        targetWeb3 = originWeb3;
         anchorAddress = chainConfig.originAnchorAddress;
         targetTxOptions = {
           from: originAccount.address,
           gasPrice: chainConfig.originGasPrice,
         };
       } else if (direction === 'auxiliary') {
-        sourceWeb3 = new Web3(originProvider);
-        targetWeb3 = new Web3(auxiliaryProvider);
+        sourceWeb3 = originWeb3;
+        targetWeb3 = auxiliaryWeb3;
         anchorAddress = chainConfig.auxiliaryAnchorAddress;
         targetTxOptions = {
           from: auxiliaryAccount.address,

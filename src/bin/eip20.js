@@ -3,13 +3,11 @@
 'use strict';
 
 const program = require('commander');
-const Web3 = require('web3');
 
-const Account = require('../account');
 const ChainConfig = require('../config/chain_config');
+const Connection = require('../connection');
 const EIP20Token = require('../../contracts/EIP20Token');
 const logger = require('../logger');
-const Provider = require('../provider');
 
 const { version } = require('../../package.json');
 
@@ -21,15 +19,15 @@ program
   .action(
     async (config, symbol, name, totalSupply, decimals) => {
       const chainConfig = new ChainConfig(config);
-      const originAccount = await Account.unlock('origin');
-      const originProvider = Provider.create('origin', originAccount, chainConfig);
-
-      const web3 = new Web3(originProvider);
+      const {
+        originWeb3,
+        originAccount,
+      } = await Connection.init(chainConfig);
       const txOptions = {
         gasPrice: chainConfig.originGasPrice,
         from: originAccount.address,
       };
-      const contract = new web3.eth.Contract(EIP20Token.abi, undefined, txOptions);
+      const contract = new originWeb3.eth.Contract(EIP20Token.abi, undefined, txOptions);
 
       await contract
         .deploy(

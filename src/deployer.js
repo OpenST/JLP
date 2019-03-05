@@ -1,16 +1,13 @@
 const { Setup, ContractInteract } = require('@openstfoundation/mosaic.js');
 const OpenST = require('@openstfoundation/openst.js');
 
-const Web3 = require('web3');
-
-const Account = require('./account');
+const Connection = require('./connection');
 const logger = require('./logger');
-const Provider = require('./provider');
 
 class Deployer {
-  constructor(chainConfig, originProvider, auxiliaryProvider, originAccount, auxiliaryAccount) {
+  constructor(chainConfig, originWeb3, auxiliaryWeb3, originAccount, auxiliaryAccount) {
     this.origin = {
-      web3: new Web3(originProvider),
+      web3: originWeb3,
       chainId: chainConfig.originChainId,
       deployer: originAccount.address,
       txOptions: {
@@ -23,7 +20,7 @@ class Deployer {
     };
 
     this.auxiliary = {
-      web3: new Web3(auxiliaryProvider),
+      web3: auxiliaryWeb3,
       chainId: chainConfig.auxiliaryChainId,
       deployer: auxiliaryAccount.address,
       txOptions: {
@@ -35,15 +32,17 @@ class Deployer {
   }
 
   static async create(chainConfig) {
-    const originAccount = await Account.unlock('origin');
-    const auxiliaryAccount = await Account.unlock('auxiliary');
-    const originProvider = Provider.create('origin', originAccount, chainConfig);
-    const auxiliaryProvider = Provider.create('auxiliary', auxiliaryAccount, chainConfig);
+    const {
+      originWeb3,
+      auxiliaryWeb3,
+      originAccount,
+      auxiliaryAccount,
+    } = await Connection.init(chainConfig);
 
     return new Deployer(
       chainConfig,
-      originProvider,
-      auxiliaryProvider,
+      originWeb3,
+      auxiliaryWeb3,
       originAccount,
       auxiliaryAccount,
     );

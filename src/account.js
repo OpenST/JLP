@@ -3,7 +3,6 @@
 const fs = require('fs');
 const inquirer = require('inquirer');
 const path = require('path');
-const Web3 = require('web3');
 
 const logger = require('./logger');
 
@@ -20,10 +19,10 @@ class Account {
    *
    * @param {string} chain Chain identifier to read and write the accounts file.
    */
-  static async create(chain) {
+  static async create(chain, web3) {
     const accounts = Account._readAccountsFromDisk();
-    const account = Account._newWeb3Account();
-    const encryptedAccount = await Account._encrypt(account);
+    const account = Account._newWeb3Account(web3);
+    const encryptedAccount = await Account._encrypt(account, web3);
 
     accounts[chain] = encryptedAccount;
 
@@ -36,7 +35,7 @@ class Account {
    *
    * @param {string} chain 'origin' or 'auxiliary'.
    */
-  static async unlock(chain) {
+  static async unlock(chain, web3) {
     if (unlockedAccounts[chain]) {
       return unlockedAccounts[chain];
     }
@@ -49,7 +48,7 @@ class Account {
       return {};
     }
 
-    const decrypted = await Account._decrypt(account, chain);
+    const decrypted = await Account._decrypt(account, chain, web3);
     logger.info(`Decrypted account ${decrypted.address}`);
 
     unlockedAccounts[chain] = decrypted;
@@ -96,8 +95,7 @@ class Account {
    * @private
    * @returns {Object} A Web3 account object.
    */
-  static _newWeb3Account() {
-    const web3 = new Web3();
+  static _newWeb3Account(web3) {
     const account = web3.eth.accounts.create();
 
     return account;
@@ -110,7 +108,7 @@ class Account {
    *
    * @returns {Object} A Web3 keyStore object.
    */
-  static async _encrypt(account) {
+  static async _encrypt(account, web3) {
     const { password } = await inquirer.prompt({
       type: 'password',
       name: 'password',
@@ -131,20 +129,18 @@ class Account {
       ),
     });
 
-    const web3 = new Web3();
     const encrypted = web3.eth.accounts.encrypt(account.privateKey, password);
 
     return encrypted;
   }
 
-  static async _decrypt(account, name) {
+  static async _decrypt(account, name, web3) {
     const { password } = await inquirer.prompt({
       type: 'password',
       name: 'password',
       message: `Input your account password to unlock ${name}:`,
     });
 
-    const web3 = new Web3();
     const decrypted = web3.eth.accounts.decrypt(account, password);
 
     return decrypted;

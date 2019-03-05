@@ -1,9 +1,7 @@
 const fs = require('fs');
-const Web3 = require('web3');
 const Mosaic = require('@openstfoundation/mosaic.js');
 
-const Account = require('../account');
-const Provider = require('../provider');
+const Connection = require('../connection');
 
 class ChainConfig {
   /**
@@ -49,13 +47,13 @@ class ChainConfig {
   }
 
   async toMosaic() {
-    const originAccount = await Account.unlock('origin');
-    const auxiliaryAccount = await Account.unlock('auxiliary');
-    const originProvider = Provider.create('origin', originAccount, this);
-    const auxiliaryProvider = Provider.create('auxiliary', auxiliaryAccount, this);
+    const {
+      originWeb3,
+      auxiliaryWeb3,
+    } = await Connection.init(this);
 
     const originChain = new Mosaic.Chain(
-      new Web3(originProvider),
+      originWeb3,
       {
         Organization: this.originOrganizationAddress,
         EIP20Gateway: this.originGatewayAddress,
@@ -64,7 +62,7 @@ class ChainConfig {
       },
     );
     const auxiliaryChain = new Mosaic.Chain(
-      new Web3(auxiliaryProvider),
+      auxiliaryWeb3,
       {
         Organization: this.auxiliaryOrganizationAddress,
         EIP20CoGateway: this.auxiliaryCoGatewayAddress,

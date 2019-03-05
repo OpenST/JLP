@@ -39,14 +39,19 @@ class Provider {
     const engine = new ProviderEngine();
 
     engine.addProvider(
-      new WebsocketSubprovider({
-        rpcUrl: webSocket,
+      new HookedWalletSubprovider({
+        getAccounts: cb => cb(null, [account.address]),
+        signTransaction: (tx, cb) => {
+          const myCb = (err, res) => {
+            cb(err, res.rawTransaction);
+          };
+          account.signTransaction(tx, myCb);
+        },
       }),
     );
     engine.addProvider(
-      new HookedWalletSubprovider({
-        getAccounts: () => [account.address],
-        signTransaction: account.signTransaction,
+      new WebsocketSubprovider({
+        rpcUrl: webSocket,
       }),
     );
 
