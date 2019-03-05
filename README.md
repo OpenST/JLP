@@ -210,7 +210,7 @@ node src/bin/facilitator.js progressRedeem path_to_config.json messageHash
  node ./src/bin/tokenrules.js --help
  
  # Deploy TokenRules token:
- node ./src/bin/tokenrules.js config.json eip20Token organization
+ node ./src/bin/tokenrules.js config.json organization eip20Token 
  ```
  
  It will write `tokenRulesAddress` to your config file.
