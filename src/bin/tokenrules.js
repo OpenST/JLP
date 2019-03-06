@@ -18,10 +18,7 @@ program
     async (config, organization, eip20Token) => {
       const chainConfig = new ChainConfig(config);
       const openstDeployer = new OpenSTDeployer(chainConfig);
-      const tokenRulesAddress = await openstDeployer.deployTokenRules(organization, eip20Token);
-      chainConfig.update({
-        tokenRulesAddress,
-      });
+      await openstDeployer.deployTokenRules(organization, eip20Token);
       chainConfig.write(config);
     },
   )

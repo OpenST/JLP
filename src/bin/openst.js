@@ -11,15 +11,13 @@ const { version } = require('../../package.json');
 program
   .version(version)
   .name('bt')
-  .description('An executable to setup OpenST.');
-
-
-program.command('openstSetup <config>')
+  .arguments('openst <config>')
+  .description('An executable to setup OpenST.')
   .action(
     async (config) => {
       const chainConfig = new ChainConfig(config);
       const openstDeployer = new OpenSTDeployer(chainConfig);
-      await openstDeployer.setupOpenST();
+      await openstDeployer.setupOpenst();
       chainConfig.write(config);
     },
   );
@@ -28,15 +26,15 @@ program.on(
   '--help',
   () => {
     console.log('');
-    console.log('openstSetup Arguments:');
-    console.log('  config   Path to a config file');
+    console.log('openst Arguments:');
+    console.log('  config  Path to a config file');
     console.log('');
     console.log('Examples:');
     console.log('  Deployment of openst contracts:');
     console.log('  $ openst.js config.json');
     console.log('');
     console.log('  openst setup for JLP');
-    console.log('  $ openst.js openstSetup config.json');
+    console.log('  $ openst.js openst config.json');
   },
 );
 

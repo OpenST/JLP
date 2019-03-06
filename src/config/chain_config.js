@@ -8,23 +8,24 @@ class ChainConfig {
    * @param {string} [filePath] An optional config file to overwrite any defaults or env variables.
    */
   constructor(filePath) {
-    this.originWeb3Provider = process.env.ORIGIN_WEB3_PROVIDER || 'http://localhost:8545';
-    this.auxiliaryWeb3Provider = process.env.AUXILIARY_WEB3_PROVIDER || 'http://localhost:8547';
+    this.originWeb3Provider = process.env.ORIGIN_WEB3_PROVIDER || 'http://localhost:8546';
+    this.auxiliaryWeb3Provider = process.env.AUXILIARY_WEB3_PROVIDER || 'http://localhost:8545';
     this.originChainId = process.env.ORIGIN_CHAIN_ID || 3;
-    this.auxiliaryChainId = process.env.ORIGIN_CHAIN_ID || 200;
+    this.auxiliaryChainId = process.env.AUXILIARY_CHAIN_ID || 200;
     this.simpleTokenAddress = process.env.SIMPLE_TOKEN_ADDRESS || '0xca954C91BE676cBC4D5Ab5F624b37402E5f0d957';
     this.originMasterKey = process.env.ORIGIN_MASTER_KEY || '0x6d4e5f5ca54b88fdb68a5d0e6ea5aa3869f88116';
     this.auxiliaryMasterKey = process.env.AUXILIARY_MASTER_KEY || '0x490cc731b076e58509e1f7cee6c68b39cfe5ad62';
     this.originBurnerAddress = process.env.ORIGIN_BURNER_ADDRESS || '0x0000000000000000000000000000000000000000';
     this.auxiliaryBurnerAddress = process.env.AUXILIARY_BURNER_ADDRESS || '0x0000000000000000000000000000000000000000';
     this.originDeployerAddress = process.env.ORIGIN_DEPLOYER_ADDRESS || '0x6d4e5f5ca54b88fdb68a5d0e6ea5aa3869f88116';
-    this.auxiliaryDeployerAddress = process.env.AUXILIARY_DEPLOYER_ADDRESS || '0x490cc731b076e58509e1f7cee6c68b39cfe5ad62';
+    this.auxiliaryDeployerAddress = process.env.AUXILIARY_DEPLOYER_ADDRESS || '0x18d7f5b8dfa0354073925fc32f3f3a3446556fcc';
     this.originGasPrice = process.env.ORIGIN_GAS_PRICE || '13000000000';
     this.auxiliaryGasPrice = process.env.AUXILIARY_GAS_PRICE || '1000000000';
-    this.password = process.env.PASSWORD || 'hunter2';
+    this.password = process.env.PASSWORD || '12345678';
     this.stakes = {};
     this.redeems = {};
     this.utilityBrandedTokens = [];
+    this.openst = {};
 
     // If a file path is given, config from the file will overwrite config from ENV or default.
     this.parseFile(filePath);
