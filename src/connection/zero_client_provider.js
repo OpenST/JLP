@@ -3,7 +3,7 @@
  * Content taken from https://github.com/MetaMask/provider-engine under MIT license.
  * File content: https://github.com/MetaMask/provider-engine/blob/77a3b99b1312e2c381925e84c73181d26f1d4370/zero.js
  *
- * Slightly modified. Mainly removed other providers besides Websockets and Infura fallback.
+ * Slightly modified. Mainly removed other providers besides Websockets and removed Infura fallback.
  *
  * MIT License
  *

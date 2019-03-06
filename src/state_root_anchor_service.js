@@ -29,7 +29,8 @@ class StateRootAnchorService {
 
     assert(targetWeb3.utils.isAddress(anchorAddress));
     this.anchorContract = new ContractInteract.Anchor(
-      targetWeb3, anchorAddress,
+      targetWeb3,
+      anchorAddress,
     );
 
     this.source = sourceWeb3;
@@ -89,13 +90,29 @@ class StateRootAnchorService {
   }
 
   async start() {
-    interval(async () => {
-      try {
+    this.run = true;
+
+    process
+      .on('SIGINT', this.stop.bind(this));
+
+    await interval(async (_, stop) => {
+      if (this.run === false) {
+        logger.info('Stopped.');
+        stop();
+      } else {
         await this.commit();
-      } catch (error) {
-        logger.error(error);
       }
-    }, this.timeout, { stopOnError: true });
+    }, this.timeout);
+  }
+
+  stop() {
+    if (this.run === false) {
+      logger.info('Forcefully shutting down after repeated SIGINT.');
+      process.exit(137);
+    }
+
+    logger.info('Received SIGINT, shutting down after current anchoring is done. (Repeat to abort immediately.)');
+    this.run = false;
   }
 }
 
