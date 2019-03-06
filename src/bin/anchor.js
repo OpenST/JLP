@@ -3,9 +3,8 @@
 'use strict';
 
 const program = require('commander');
-const Web3 = require('web3');
 
-const ChainConfig = require('../config/chain_config');
+const connected = require('../connected');
 const logger = require('../logger');
 const StateRootAnchorService = require('../state_root_anchor_service.js');
 
@@ -18,51 +17,62 @@ program
   .option('-t, --timeout <t>', 'Wait time between checking for new state root in seconds', parseInt)
   .description('An executable to anchor state roots across chains.')
   .action(
-    (config, direction, delay, options) => {
-      const chainConfig = new ChainConfig(config);
-      let sourceWeb3;
-      let targetWeb3;
-      let anchorAddress;
-      let targetTxOptions;
+    async (config, direction, delay, options) => {
+      await connected.run(
+        config,
+        async (chainConfig, connection) => {
+          const {
+            originWeb3,
+            auxiliaryWeb3,
+            originAccount,
+            auxiliaryAccount,
+          } = connection;
 
-      if (direction === 'origin') {
-        sourceWeb3 = new Web3(chainConfig.auxiliaryWeb3Provider);
-        targetWeb3 = new Web3(chainConfig.originWeb3Provider);
-        anchorAddress = chainConfig.originAnchorAddress;
-        targetTxOptions = {
-          from: chainConfig.originMasterKey,
-          gasPrice: chainConfig.originGasPrice,
-        };
-      } else if (direction === 'auxiliary') {
-        sourceWeb3 = new Web3(chainConfig.originWeb3Provider);
-        targetWeb3 = new Web3(chainConfig.auxiliaryWeb3Provider);
-        anchorAddress = chainConfig.auxiliaryAnchorAddress;
-        targetTxOptions = {
-          from: chainConfig.auxiliaryMasterKey,
-          gasPrice: chainConfig.auxiliaryGasPrice,
-        };
-      } else {
-        logger.error('`direction` argument must be one of: "origin", "auxiliary"');
-        process.exit(1);
-      }
+          let sourceWeb3;
+          let targetWeb3;
+          let anchorAddress;
+          let targetTxOptions;
 
-      let timeout;
-      if (options.timeout) {
-        timeout = options.timeout * 1000;
-      } else {
-        timeout = 1000;
-      }
+          if (direction === 'origin') {
+            sourceWeb3 = auxiliaryWeb3;
+            targetWeb3 = originWeb3;
+            anchorAddress = chainConfig.originAnchorAddress;
+            targetTxOptions = {
+              from: originAccount.address,
+              gasPrice: chainConfig.originGasPrice,
+            };
+          } else if (direction === 'auxiliary') {
+            sourceWeb3 = originWeb3;
+            targetWeb3 = auxiliaryWeb3;
+            anchorAddress = chainConfig.auxiliaryAnchorAddress;
+            targetTxOptions = {
+              from: auxiliaryAccount.address,
+              gasPrice: chainConfig.auxiliaryGasPrice,
+            };
+          } else {
+            logger.error('`direction` argument must be one of: "origin", "auxiliary"');
+            process.exit(1);
+          }
 
-      const stateRootAnchorService = new StateRootAnchorService(
-        Number.parseInt(delay, 10),
-        sourceWeb3,
-        targetWeb3,
-        anchorAddress,
-        targetTxOptions,
-        timeout,
+          let timeout;
+          if (options.timeout) {
+            timeout = options.timeout * 1000;
+          } else {
+            timeout = 1000;
+          }
+
+          const stateRootAnchorService = new StateRootAnchorService(
+            Number.parseInt(delay, 10),
+            sourceWeb3,
+            targetWeb3,
+            anchorAddress,
+            targetTxOptions,
+            timeout,
+          );
+
+          await stateRootAnchorService.start();
+        },
       );
-
-      stateRootAnchorService.start();
     },
   )
   .on(

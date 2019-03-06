@@ -1,37 +1,34 @@
 const { Setup, ContractInteract } = require('@openstfoundation/mosaic.js');
 const OpenST = require('@openstfoundation/openst.js');
 
-const Web3 = require('web3');
-
 const logger = require('./logger');
 
 class Deployer {
-  constructor(chainConfig) {
+  constructor(chainConfig, connection) {
     this.origin = {
-      web3: new Web3(chainConfig.originWeb3Provider),
+      web3: connection.originWeb3,
       chainId: chainConfig.originChainId,
-      deployer: chainConfig.originDeployerAddress,
+      deployer: connection.originAccount.address,
       txOptions: {
         gasPrice: chainConfig.originGasPrice,
       },
       token: chainConfig.eip20TokenAddress,
       baseToken: chainConfig.simpleTokenAddress,
       burner: chainConfig.originBurnerAddress,
-      masterKey: chainConfig.originMasterKey,
+      masterKey: connection.originAccount.address,
     };
 
     this.auxiliary = {
-      web3: new Web3(chainConfig.auxiliaryWeb3Provider),
+      web3: connection.auxiliaryWeb3,
       chainId: chainConfig.auxiliaryChainId,
-      deployer: chainConfig.auxiliaryDeployerAddress,
+      deployer: connection.auxiliaryAccount.address,
       txOptions: {
         gasPrice: chainConfig.auxiliaryGasPrice,
       },
       burner: chainConfig.auxiliaryBurnerAddress,
-      masterKey: chainConfig.auxiliaryMasterKey,
+      masterKey: connection.auxiliaryAccount.address,
     };
   }
-
 
   _deployOrganization() {
     return Setup.organizations(

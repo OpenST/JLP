@@ -3,9 +3,8 @@
 'use strict';
 
 const program = require('commander');
-const Web3 = require('web3');
 
-const ChainConfig = require('../config/chain_config');
+const connected = require('../connected');
 const EIP20Token = require('../../contracts/EIP20Token');
 const logger = require('../logger');
 
@@ -18,40 +17,47 @@ program
   .description('An executable to deploy an EIP20 token.')
   .action(
     async (config, symbol, name, totalSupply, decimals) => {
-      const chainConfig = new ChainConfig(config);
-      const web3 = new Web3(chainConfig.originWeb3Provider);
-      const txOptions = {
-        gasPrice: chainConfig.originGasPrice,
-        from: chainConfig.originMasterKey,
-      };
-      const contract = new web3.eth.Contract(EIP20Token.abi, undefined, txOptions);
+      await connected.run(
+        config,
+        async (chainConfig, connection) => {
+          const {
+            originWeb3,
+            originAccount,
+          } = connection;
+          const txOptions = {
+            gasPrice: chainConfig.originGasPrice,
+            from: originAccount.address,
+          };
+          const contract = new originWeb3.eth.Contract(EIP20Token.abi, undefined, txOptions);
 
-      await contract
-        .deploy(
-          {
-            data: EIP20Token.bin,
-            arguments: [
-              symbol,
-              name,
-              totalSupply,
-              decimals,
-            ],
-          },
-          txOptions,
-        )
-        .send(txOptions)
-        .on('receipt', (receipt) => {
-          logger.info(`Deployed EIP20 token "${symbol}" to ${receipt.contractAddress}`);
+          await contract
+            .deploy(
+              {
+                data: EIP20Token.bin,
+                arguments: [
+                  symbol,
+                  name,
+                  totalSupply,
+                  decimals,
+                ],
+              },
+              txOptions,
+            )
+            .send(txOptions)
+            .on('receipt', (receipt) => {
+              logger.info(`Deployed EIP20 token "${symbol}" to ${receipt.contractAddress}`);
 
-          chainConfig.update({
-            eip20TokenAddress: receipt.contractAddress,
-          });
-          chainConfig.write(config);
-        })
-        .on('error', (error) => {
-          logger.error(`Could not deploy EIP20Token: ${error}`);
-          process.exit(1);
-        });
+              chainConfig.update({
+                eip20TokenAddress: receipt.contractAddress,
+              });
+              chainConfig.write(config);
+            })
+            .on('error', (error) => {
+              logger.error(`Could not deploy EIP20Token: ${error}`);
+              process.exit(1);
+            });
+        },
+      );
     },
   )
   .on(
