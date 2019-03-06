@@ -2,7 +2,6 @@
 
 'use strict';
 
-
 const program = require('commander');
 
 const Account = require('../account');
@@ -31,7 +30,7 @@ program
       console.log('Will backup any existing file. Always stores to accounts.json.');
       console.log('');
       console.log('Arguments:');
-      console.log('  chain     \'origin\' or \'auxiliary\'');
+      console.log('  chain  \'origin\' or \'auxiliary\'');
     },
   )
   .parse(process.argv);

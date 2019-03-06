@@ -19,8 +19,6 @@ class Provider {
       logger.error(`Provider: ${err.stack}`);
     });
 
-    engine.start();
-
     return engine;
   }
 
@@ -29,6 +27,8 @@ class Provider {
    *
    * @param {string} chain 'origin' or 'auxiliary'.
    * @param {Object} account An unlocked Web3 account.
+   *
+   * @returns {ProviderEngine} A running engine.
    */
   static _initEngine(chain, account, chainConfig) {
     const webSocket = Provider._readWebSocket(chain, chainConfig);

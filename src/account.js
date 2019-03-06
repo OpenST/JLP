@@ -12,6 +12,9 @@ const accountsFile = path.join(__dirname, '../accounts.json');
 // times.
 const unlockedAccounts = {};
 
+/**
+ * Manages encrypted Web3 accounts.
+ */
 class Account {
   /**
    * Creates a new account for the given chain and stores it in the accounts.json file.

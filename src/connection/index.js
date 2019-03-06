@@ -5,7 +5,19 @@ const Web3 = require('web3');
 const Account = require('../account');
 const Provider = require('./provider');
 
+/**
+ * A Connection handles the connections to ethereum nodes.
+ */
 class Connection {
+  /**
+   * Construct a connection with existing Web3 and account objects.
+   * Use {@link Connection#open} to open a new connection with new Web3 instances.
+   *
+   * @param {Web3} originWeb3 A web3 instance that points to origin.
+   * @param {Web3} auxiliaryWeb3 A web3 instance that points to auxiliary.
+   * @param {Account} originAccount The account to use on origin.
+   * @param {Account} auxiliaryAccount The account to use on auxiliary.
+   */
   constructor(
     originWeb3,
     auxiliaryWeb3,
@@ -18,6 +30,11 @@ class Connection {
     this.auxiliaryAccount = auxiliaryAccount;
   }
 
+  /**
+   * Opens a new connection with new Web3 instances.
+   *
+   * @param {ChainConfig} chainConfig JLP chain configuration.
+   */
   static async open(chainConfig) {
     const originWeb3 = new Web3();
     const auxiliaryWeb3 = new Web3();
@@ -36,6 +53,9 @@ class Connection {
     );
   }
 
+  /**
+   * Closes an open connection.
+   */
   close() {
     this.originWeb3.currentProvider.stop();
     this.auxiliaryWeb3.currentProvider.stop();
