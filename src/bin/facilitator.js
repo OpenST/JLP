@@ -4,8 +4,7 @@
 
 const program = require('commander');
 
-const ChainConfig = require('../config/chain_config');
-const Connection = require('../connection');
+const connected = require('../connected');
 const Facilitator = require('../facilitator.js');
 const logger = require('../logger');
 
@@ -20,70 +19,70 @@ program
 program.command('stake <config> <staker> <amount> <beneficiary>')
   .action(
     async (configPath, staker, amount, beneficiary) => {
-      const chainConfig = new ChainConfig(configPath);
-      const connection = await Connection.open(chainConfig);
+      await connected.run(
+        configPath,
+        async (chainConfig, connection) => {
+          const facilitator = new Facilitator(chainConfig, connection);
+          const {
+            messageHash,
+            unlockSecret,
+          } = await facilitator.stake(staker, amount, beneficiary);
 
-      try {
-        const facilitator = new Facilitator(chainConfig, connection);
-        const {
-          messageHash,
-          unlockSecret,
-        } = await facilitator.stake(staker, amount, beneficiary);
-
-        logger.info(`  messageHash ${messageHash}`);
-        logger.info(`  unlockSecret ${unlockSecret}`);
-        chainConfig.write(configPath);
-      } catch (error) {
-        logger.error(error);
-      } finally {
-        connection.close();
-      }
+          logger.info(`  messageHash ${messageHash}`);
+          logger.info(`  unlockSecret ${unlockSecret}`);
+          chainConfig.write(configPath);
+        },
+      );
     },
   );
 
 program.command('progressStake <config> <messageHash>')
   .action(
     async (configPath, messageHash) => {
-      const chainConfig = new ChainConfig(configPath);
-      const connection = await Connection.open(chainConfig);
+      await connected.run(
+        configPath,
+        async (chainConfig, connection) => {
+          const facilitator = new Facilitator(chainConfig, connection);
 
-      try {
-        const facilitator = new Facilitator(chainConfig, connection);
-
-        await facilitator.progressStake(messageHash);
-        chainConfig.write(configPath);
-      } catch (error) {
-        logger.error(error);
-      } finally {
-        connection.close();
-      }
+          await facilitator.progressStake(messageHash);
+          chainConfig.write(configPath);
+        },
+      );
     },
   );
 
 program.command('redeem <config> <redeemer> <amount> <beneficiary>')
   .action(
     async (configPath, redeemer, amount, beneficiary) => {
-      const chainConfig = new ChainConfig(configPath);
-      const facilitator = new Facilitator(chainConfig);
+      await connected.run(
+        configPath,
+        async (chainConfig, connection) => {
+          const facilitator = new Facilitator(chainConfig, connection);
 
-      const {
-        messageHash,
-        unlockSecret,
-      } = await facilitator.redeem(redeemer, amount, beneficiary);
+          const {
+            messageHash,
+            unlockSecret,
+          } = await facilitator.redeem(redeemer, amount, beneficiary);
 
-      logger.info(`  messageHash ${messageHash}`);
-      logger.info(`  unlockSecret ${unlockSecret}`);
-      chainConfig.write(configPath);
+          logger.info(`  messageHash ${messageHash}`);
+          logger.info(`  unlockSecret ${unlockSecret}`);
+          chainConfig.write(configPath);
+        },
+      );
     },
   );
 
 program.command('progressRedeem <config> <messageHash>')
   .action(
     async (configPath, messageHash) => {
-      const chainConfig = new ChainConfig(configPath);
-      const facilitator = new Facilitator(chainConfig);
+      await connected.run(
+        configPath,
+        async (chainConfig, connection) => {
+          const facilitator = new Facilitator(chainConfig, connection);
 
-      await facilitator.progressRedeem(messageHash);
+          await facilitator.progressRedeem(messageHash);
+        },
+      );
     },
   );
 

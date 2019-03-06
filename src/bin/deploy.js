@@ -4,8 +4,7 @@
 
 const program = require('commander');
 
-const ChainConfig = require('../config/chain_config');
-const Connection = require('../connection');
+const connected = require('../connected');
 const Deployer = require('../deployer.js');
 
 const { version } = require('../../package.json');
@@ -17,27 +16,23 @@ program
   .arguments('<config>')
   .action(
     async (configPath) => {
-      const chainConfig = new ChainConfig(configPath);
-      const connection = await Connection.open(chainConfig);
-
-      try {
-        const deployer = new Deployer(chainConfig, connection);
-        const contractInstances = await deployer.deployUtilityToken();
-        chainConfig.update({
-          originOrganizationAddress: contractInstances.originOrganization.address,
-          auxiliaryOrganizationAddress: contractInstances.auxiliaryOrganization.address,
-          originAnchorAddress: contractInstances.originAnchor.address,
-          auxiliaryAnchorAddress: contractInstances.auxiliaryAnchor.address,
-          originGatewayAddress: contractInstances.originGateway.address,
-          auxiliaryCoGatewayAddress: contractInstances.auxiliaryCoGateway.address,
-          auxiliaryUtilityTokenAddress: contractInstances.auxiliaryUtilityToken.address,
-        });
-        chainConfig.write(configPath);
-      } catch (error) {
-        console.log(error);
-      } finally {
-        connection.close();
-      }
+      await connected.run(
+        configPath,
+        async (chainConfig, connection) => {
+          const deployer = new Deployer(chainConfig, connection);
+          const contractInstances = await deployer.deployUtilityToken();
+          chainConfig.update({
+            originOrganizationAddress: contractInstances.originOrganization.address,
+            auxiliaryOrganizationAddress: contractInstances.auxiliaryOrganization.address,
+            originAnchorAddress: contractInstances.originAnchor.address,
+            auxiliaryAnchorAddress: contractInstances.auxiliaryAnchor.address,
+            originGatewayAddress: contractInstances.originGateway.address,
+            auxiliaryCoGatewayAddress: contractInstances.auxiliaryCoGateway.address,
+            auxiliaryUtilityTokenAddress: contractInstances.auxiliaryUtilityToken.address,
+          });
+          chainConfig.write(configPath);
+        },
+      );
     },
   )
   .on(
