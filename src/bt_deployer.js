@@ -1,4 +1,3 @@
-const Web3 = require('web3');
 const { Setup } = require('@openstfoundation/brandedtoken.js');
 
 const logger = require('./logger');
@@ -12,7 +11,7 @@ class BTDeployer {
       deployer: connection.originAccount.address,
       txOptions: {
         gasPrice: chainConfig.originGasPrice,
-        from: chainConfig.originDeployerAddress,
+        from: connection.originAccount.address,
       },
       token: chainConfig.eip20TokenAddress,
       baseToken: chainConfig.simpleTokenAddress,
@@ -26,7 +25,7 @@ class BTDeployer {
       deployer: connection.auxiliaryAccount.address,
       txOptions: {
         gasPrice: chainConfig.auxiliaryGasPrice,
-        from: chainConfig.auxiliaryDeployerAddress,
+        from: connection.auxiliaryAccount.address,
       },
       burner: chainConfig.auxiliaryBurnerAddress,
       masterKey: connection.auxiliaryAccount.address,
