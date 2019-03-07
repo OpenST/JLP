@@ -235,10 +235,10 @@ node src/bin/facilitator.js progressRedeem path_to_config.json messageHash
   
   ```bash
   # Help:
-  node ./src/bin/register_rule.js --help
+  node ./src/bin/registerRule.js --help
   
   # Register rule to TokenRules:
-  node ./src/bin/register_rule.js config.json ruleName ruleAddress ruleAbi
+  node ./src/bin/registerRule.js config.json ruleName ruleAddress ruleAbi
   ```
   
   * Replace `config.json` with the path to the configuration file.
