@@ -4,12 +4,12 @@ const { Setup } = require('@openstfoundation/brandedtoken.js');
 const logger = require('./logger');
 
 class BTDeployer {
-  constructor(chainConfig) {
+  constructor(chainConfig, connection) {
     this.chainConfig = chainConfig;
     this.origin = {
-      web3: new Web3(chainConfig.originWeb3Provider),
+      web3: connection.originWeb3,
       chainId: chainConfig.originChainId,
-      deployer: chainConfig.originDeployerAddress,
+      deployer: connection.originAccount.address,
       txOptions: {
         gasPrice: chainConfig.originGasPrice,
         from: chainConfig.originDeployerAddress,
@@ -17,19 +17,19 @@ class BTDeployer {
       token: chainConfig.eip20TokenAddress,
       baseToken: chainConfig.simpleTokenAddress,
       burner: chainConfig.originBurnerAddress,
-      masterKey: chainConfig.originMasterKey,
+      masterKey: connection.originAccount.address,
     };
 
     this.auxiliary = {
-      web3: new Web3(chainConfig.auxiliaryWeb3Provider),
+      web3: connection.auxiliaryWeb3,
       chainId: chainConfig.auxiliaryChainId,
-      deployer: chainConfig.auxiliaryDeployerAddress,
+      deployer: connection.auxiliaryAccount.address,
       txOptions: {
         gasPrice: chainConfig.auxiliaryGasPrice,
         from: chainConfig.auxiliaryDeployerAddress,
       },
       burner: chainConfig.auxiliaryBurnerAddress,
-      masterKey: chainConfig.auxiliaryMasterKey,
+      masterKey: connection.auxiliaryAccount.address,
     };
   }
 

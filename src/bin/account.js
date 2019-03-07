@@ -3,6 +3,7 @@
 'use strict';
 
 const program = require('commander');
+const Web3 = require('web3');
 
 const Account = require('../account');
 const logger = require('../logger');
@@ -20,7 +21,7 @@ program
         process.exit(1);
       }
 
-      await Account.create(chain);
+      await Account.create(chain, new Web3());
     },
   )
   .on(

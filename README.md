@@ -179,29 +179,29 @@ node src/bin/bt.js setupUtilityBrandedToken <config.json>
 
 ```
 
- 
- ## Redeem Facilitator 
- 
- Prerequiste: 
- 1. `auxiliaryGatewayAddress` and `eip20TokenAddress` generated in your config file.
- 
- ```bash
- 
- node src/bin/facilitator.js redeem path_to_config.json redeemerAddress redeemAmount beneficiaryAddress
- 
- ```
- 
-  * Replace `path_to_config.json` with a file location where config is stored. 
-  * Replace `redeemerAddress` with an address holding `eip20TokenAddress` balance.
-  * Replace `redeemAmount` with number representing redeem amount in wei.
-  * Replace `beneficiaryAddress` with an address on auxiliary chain where token will be minted. 
 
- It will write redeem request details in the config file, which will be needed for progress redeem(Next step).
- 
- ## Progress Redeem Facilitator 
- 
- 1. `auxiliaryGatewayAddress` , `eip20TokenAddress` and `redeems` generated in previous step in the config file.
- 2. Run anchor state root after `redeem` facilitator step.
+## Redeem Facilitator
+
+Prerequiste:
+1. `auxiliaryGatewayAddress` and `eip20TokenAddress` generated in your config file.
+
+```bash
+
+node src/bin/facilitator.js redeem path_to_config.json redeemerAddress redeemAmount beneficiaryAddress
+
+```
+
+ * Replace `path_to_config.json` with a file location where config is stored. 
+ * Replace `redeemerAddress` with an address holding `eip20TokenAddress` balance.
+ * Replace `redeemAmount` with number representing redeem amount in wei.
+ * Replace `beneficiaryAddress` with an address on auxiliary chain where token will be minted. 
+
+It will write redeem request details in the config file, which will be needed for progress redeem(Next step).
+
+## Progress Redeem Facilitator
+
+1. `auxiliaryGatewayAddress` , `eip20TokenAddress` and `redeems` generated in previous step in the config file.
+2. Run anchor state root after `redeem` facilitator step.
 
 ```bash
 
@@ -245,3 +245,30 @@ node src/bin/facilitator.js progressRedeem path_to_config.json messageHash
   * Replace `ruleName` with name of the rule.
   * Replace `ruleAddress` with address of the rule. 
   * Replace `ruleAbi` with abi of the rule. 
+
+## Helpers
+
+**Send**
+
+Send base tokens from the local account to an address.
+
+```bash
+# Help:
+node ./src/bin/send.js --help
+
+# Deploy TokenRules token:
+node ./src/bin/send.js config.json auxiliary 0xab3778bfa8edc02c290ccf192a5bbe3bba21e9a2 26346717769700000000
+```
+
+**Balance**
+
+Get the base token balance of a local account.
+
+```bash
+# Help:
+node ./src/bin/balance.js --help
+
+# Deploy TokenRules token:
+node ./src/bin/balance.js config.json auxiliary
+```
+  

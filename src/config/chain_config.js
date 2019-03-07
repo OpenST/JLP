@@ -1,8 +1,6 @@
 const fs = require('fs');
 const Mosaic = require('@openstfoundation/mosaic.js');
 
-const Connection = require('../connection');
-
 class ChainConfig {
   /**
    * Config file > ENV > default.
