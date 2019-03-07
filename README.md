@@ -239,7 +239,7 @@ Send base tokens from the local account to an address.
 # Help:
 node ./src/bin/send.js --help
 
-# Deploy TokenRules token:
+# Send funds:
 node ./src/bin/send.js config.json auxiliary 0xab3778bfa8edc02c290ccf192a5bbe3bba21e9a2 26346717769700000000
 ```
 
@@ -251,6 +251,6 @@ Get the base token balance of a local account.
 # Help:
 node ./src/bin/balance.js --help
 
-# Deploy TokenRules token:
+# Check balance:
 node ./src/bin/balance.js config.json auxiliary
 ```
