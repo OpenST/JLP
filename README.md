@@ -201,40 +201,25 @@ node src/bin/facilitator.js progressRedeem path_to_config.json messageHash
 
   * `messageHash` generated in redeem facilitator step.
   
- ## Deploy TokenRules
- 
- Prerequisite: `eip20Token` and `organization` in your config file.
- 
+ ## Setup OpenST
+    
  ```bash
  # Help:
- node ./src/bin/tokenrules.js --help
- 
- # Deploy TokenRules token:
- node ./src/bin/tokenrules.js config.json organization eip20Token 
+ node ./src/bin/openst.js --help
+    
+ # Setup OpenST:
+ node ./src/bin/openst.js config.json organization eip20Token
  ```
- 
- It will write `tokenRulesAddress` to your config file.
- 
+    
+ It will write below contract address to your config file:
+ * TokenHolder master copy address.
+ * Gnosis master copy address.
+ * Recovery master copy address.
+ * UserWalletFactory contract address.
+ * ProxyFactory contract address.
+ * CreateAndAddModule helper contract address.
+ * TokenRules contract address.
+    
  * Replace `config.json` with the path to the configuration file.
- * Replace `eip20Token` with eip20Token address.
  * Replace `organization` with an organization contract address. 
- 
- ## Setup OpenST
-  
-  ```bash
-  # Help:
-  node ./src/bin/openst.js --help
-  
-  # Setup OpenST:
-  node ./src/bin/openst.js config.json
-  ```
-  
-  It will write below contract address to your config file:
-  * TokenHolder master copy address.
-  * Gnosis master copy address.
-  * Recovery master copy address.
-  * UserWalletFactory contract address.
-  * ProxyFactory contract address.
-  * CreateAndAddModule helper contract address.
-  
-  * Replace `config.json` with the path to the configuration file.
+ * Replace `eip20Token` with eip20Token address.

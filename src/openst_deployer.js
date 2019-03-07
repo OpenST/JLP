@@ -19,28 +19,21 @@ class OpenSTDeployer {
 
   async deployTokenRules(auxiliaryOrganization, auxiliaryEIP20Token) {
     logger.info('Deploying TokenRules');
-    const tokenRulesSetup = new Package.Setup.TokenRules(this.auxiliary.web3);
-    const { txOptions } = this.auxiliary;
-    // TODO Remove below hardcoding after tokenrules deploy does gas estimation.
-    txOptions.gas = 10000000;
-    const response = await tokenRulesSetup.deploy(
+    const tokenRules = Package.ContractInteract.TokenRules;
+    const tokenRulesTxOptions = this.auxiliary.options;
+    const response = await tokenRules.deploy(
+      tokenRulesTxOptions,
       auxiliaryOrganization,
       auxiliaryEIP20Token,
-      txOptions,
-    );
-    Object.assign(
-      this.chainConfig.openst,
-      { tokenRulesAddress: response.receipt.contractAddress },
+      tokenRulesTxOptions,
     );
     logger.info(`Deployed TokenRules address: ${response.receipt.contractAddress}`);
+    return response.receipt.contractAddress;
   }
 
-  async setupOpenst() {
+  async setupOpenst(auxiliaryOrganization, auxiliaryEIP20Token) {
     logger.info('Starting Setup of OpenST');
     const openst = new Package.Setup.OpenST(this.auxiliary.web3);
-    const { txOptions } = this.auxiliary;
-    // TODO Remove below hardcoding after estimateGas issue is fixed.
-    txOptions.gas = 60000000;
     const tokenHolderTxOptions = this.auxiliary.txOptions;
     const gnosisTxOptions = this.auxiliary.txOptions;
     const recoveryTxOptions = this.auxiliary.txOptions;
@@ -64,6 +57,11 @@ class OpenSTDeployer {
       createAndAddModulesTxOptions,
     );
 
+    const tokenRulesAddress = await this.deployTokenRules(
+      auxiliaryOrganization,
+      auxiliaryEIP20Token,
+    );
+
     const setupData = {
       tokenHolderMasterCopy: tokenHolder.address,
       gnosisSafeMasterCopy: gnosisSafe.address,
@@ -71,6 +69,7 @@ class OpenSTDeployer {
       userWalletFactory: userWalletFactory.address,
       proxyFactory: proxyFactory.address,
       createAndAddModules: createAndAddModules.address,
+      tokenRules: tokenRulesAddress,
     };
     Object.assign(this.chainConfig.openst, setupData);
     logger.info('Completed Setup of OpenST');
