@@ -18,7 +18,6 @@ class OpenSTDeployer {
   }
 
   async deployTokenRules(auxiliaryOrganization, auxiliaryEIP20Token) {
-    logger.info('Deploying TokenRules');
     const { TokenRules } = Package.ContractInteract;
     const tokenRulesTxOptions = this.auxiliary.txOptions;
     const tokenRules = await TokenRules.deploy(
@@ -27,7 +26,6 @@ class OpenSTDeployer {
       auxiliaryEIP20Token,
       tokenRulesTxOptions,
     );
-    logger.info(`Deployed TokenRules address: ${tokenRules.address}`);
     return tokenRules.address;
   }
 
