@@ -35,13 +35,13 @@ Accounts are stored as encrypted Web3 key-vaults.
 
 ```bash
 # Help:
-./src/bin/accounts.js -h
+./src/bin/account.js -h
 
 # Create a new origin account
-./src/bin/accounts.js origin
+./src/bin/account.js origin
 
 # Create a new auxiliary account
-./src/bin/accounts.js auxiliary
+./src/bin/account.js auxiliary
 ```
 
 ## EIP20 Token
@@ -63,14 +63,18 @@ It will write `eip20TokenAddress` to your config file.
 
 Prerequisite: `eip20TokenAddress` in your config file.
 
-If you want to deploy gateways, use the `deploy` executable:
+If you want to deploy contracts to the chains, use the `deploy` executable:
 
 ```bash
 # Help:
 ./src/bin/deploy.js -h
 
-# Deployment:
-./src/bin/deploy.js config.json
+# Deployment of utility token with gateways (requires anchor addresses in your config):
+./src/bin/deploy.js utilityToken config.json
+
+# If you don't have anchor addresses, yet, you must deploy anchors first.
+# Deployment of anchors:
+./src/bin/deploy.js anchors config.json
 ```
 
 It will write contract addresses to your config file.
