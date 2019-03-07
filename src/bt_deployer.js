@@ -110,8 +110,8 @@ class BTDeployer {
       deployer: this.auxiliary.deployer,
       owner: this.auxiliary.masterKey,
       admin: this.auxiliary.masterKey,
-      workers: [],
-      workerExpirationHeight: '0',
+      workers: [this.auxiliary.masterKey],
+      workerExpirationHeight: '10000000000000',
     };
 
     const auxiliaryUBTConfig = {

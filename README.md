@@ -228,3 +228,20 @@ node src/bin/facilitator.js progressRedeem path_to_config.json messageHash
  * Replace `config.json` with the path to the configuration file.
  * Replace `eip20Token` with eip20Token address.
  * Replace `organization` with an organization contract address. 
+ 
+ ## Register Rule to TokenRules
+  
+  Prerequisite: `tokenRules` and `worker` in your config file.
+  
+  ```bash
+  # Help:
+  node ./src/bin/register_rule.js --help
+  
+  # Register rule to TokenRules:
+  node ./src/bin/register_rule.js config.json ruleName ruleAddress ruleAbi
+  ```
+  
+  * Replace `config.json` with the path to the configuration file.
+  * Replace `ruleName` with name of the rule.
+  * Replace `ruleAddress` with address of the rule. 
+  * Replace `ruleAbi` with abi of the rule. 
