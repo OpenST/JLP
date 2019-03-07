@@ -85,9 +85,11 @@ class Account {
    * @param {Object} accounts The object that holds the accounts.
    */
   static _writeAccountsToDisk(accounts) {
-    const newFilename = `accounts-backup-${Date.now()}.json`;
-    logger.info(`Backing up accounts to ${newFilename}`);
-    fs.copyFileSync(accountsFile, path.join(__dirname, `../${newFilename}`));
+    if (fs.existsSync(accountsFile)) {
+      const newFilename = `accounts-backup-${Date.now()}.json`;
+      logger.info(`Backing up accounts to ${newFilename}`);
+      fs.copyFileSync(accountsFile, path.join(__dirname, `../${newFilename}`));
+    }
 
     logger.info(`Writing encrypted accounts to ${accountsFile}`);
     fs.writeFileSync(accountsFile, JSON.stringify(accounts, null, '  '));
