@@ -229,6 +229,36 @@ It will write `tokenRulesAddress` to your config file.
 * Replace `eip20Token` with eip20Token address.
 * Replace `organization` with an organization contract address. 
 
+## Create User
+
+   Prerequisite: 
+   * `tokenHolderMasterCopy` master copy in your config file.
+   * `gnosisSafeMasterCopy` master copy in your config file.
+   * `recoveryMasterCopy` master copy in your config file.
+   * `ProxyFactory` contract address in your config file.
+   * `userWalletFactory` contract address in your config file.
+   * `proxyFactory` contract address in your config file.
+   * `createAndAddModules` contract address in your config file.
+   * `tokenRules` contract address in your config file.
+   * `recoveryOwnerAddress` recoveryOwner address in your config file.
+   * `recoveryControllerAddress` recoveryController address in your config file.
+   *  `recoveryBlockDelay` recovery block delay in your config file
+
+   ```bash
+  # Help:
+  node ./src/bin/create_user.js --help
+  
+  # Create User:
+  node ./src/bin/create_user.js <config.json> <owners> <threshold> <sessionKeys> <sessionKeysSpendingLimits> <sessionKeyExpirationHeights>
+  ```
+
+  * Replace `config.json` with the path to the configuration file.
+  * Replace `owners` with comma separated owner addresses.
+  * Replace `threshold` with gnosis requirement. 
+  * Replace `sessionKeys` comma separated ephemeral keys. 
+  * Replace `sessionKeysSpendingLimits` comma separated spending limits corresponding to ephemeral keys. 
+  * Replace `sessionKeyExpirationHeights` comma separated expiration heights corresponding to ephemeral keys. 
+
 ## Helpers
 
 **Send**
