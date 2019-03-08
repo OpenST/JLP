@@ -23,4 +23,10 @@ if (process.env.NODE_ENV !== 'production') {
   }));
 }
 
+logger.exceptions.handle(
+  new transports.Console({
+    format: format.simple(),
+  }),
+);
+
 module.exports = logger;

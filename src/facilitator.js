@@ -4,6 +4,7 @@ const logger = require('./logger');
 
 class Facilitator {
   constructor(chainConfig, connection) {
+    this.connection = connection;
     this.chainConfig = chainConfig;
     this.mosaic = chainConfig.toMosaic(connection);
     this.mosaicFacilitator = new MosaicFacilitator(this.mosaic);
@@ -73,15 +74,21 @@ class Facilitator {
     const stakeRequest = this.chainConfig.stakes[messageHash];
 
     if (!stakeRequest) {
+      console.log("stupid stupid");
       logger.error('No stake request found');
       return Promise.reject(new Error('No stake request found.'));
     }
 
     const txOptionAuxiliary = {
       gasPrice: this.chainConfig.auxiliaryGasPrice,
-      from: this.chainConfig.auxiliaryDeployerAddress,
+      from: this.connection.auxiliaryAccount.address,
     };
 
+    const txOptionOrigin = {
+      gasPrice: this.chainConfig.originGasPrice,
+      from: this.connection.originAccount.address,
+    };
+    console.log("progress stake called");
     await this.mosaicFacilitator.progressStake(
       stakeRequest.staker,
       stakeRequest.amount,
@@ -91,7 +98,7 @@ class Facilitator {
       stakeRequest.nonce.toString(),
       stakeRequest.hashLock,
       stakeRequest.unlockSecret,
-      stakeRequest.txOptions,
+      txOptionOrigin,
       txOptionAuxiliary,
     );
 

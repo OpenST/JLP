@@ -49,6 +49,48 @@ program.command('setupUtilityBrandedToken <config>')
     },
   );
 
+program.command('gatewayComposer <config> ')
+  .action(
+    async (config) => {
+      // const chainConfig = new ChainConfig(config);
+      // const btDeployer = new BTDeployer(chainConfig);
+      // await btDeployer.deployGatewayComposer();
+      // chainConfig.write(config);
+      await connected.run(config,
+        async (chainConfig, connection) => {
+          const btDeployer = new BTDeployer(chainConfig, connection);
+          await btDeployer.deployGatewayComposer();
+          chainConfig.write(config);
+        });
+    },
+  );
+
+program.command('requestStake <config> <stakeVT> <beneficiary> ')
+  .action(
+    async (config, stakeVT, beneficiary) => {
+      await connected.run(config,
+        async (chainConfig, connection) => {
+          const btDeployer = new BTDeployer(chainConfig, connection);
+          const nonce = '1';
+          await btDeployer.requestStake(stakeVT, beneficiary, '0', '0', nonce);
+          chainConfig.write(config);
+        });
+    },
+  );
+
+
+program.command('acceptStake <config> <stakeRequestHash> ')
+  .action(
+    async (config, stakeRequestHash) => {
+      await connected.run(config,
+        async (chainConfig, connection) => {
+          const btDeployer = new BTDeployer(chainConfig, connection);
+          await btDeployer.acceptStake(stakeRequestHash);
+          chainConfig.write(config);
+        });
+    },
+  );
+
 program.on(
   '--help',
   () => {
