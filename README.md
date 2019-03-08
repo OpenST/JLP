@@ -242,7 +242,7 @@ It will write `tokenRulesAddress` to your config file.
    * `tokenRules` contract address in your config file.
    * `recoveryOwnerAddress` recoveryOwner address in your config file.
    * `recoveryControllerAddress` recoveryController address in your config file.
-   *  `recoveryBlockDelay` recovery block delay in your config file
+   * `recoveryBlockDelay` recovery block delay in your config file.
 
    ```bash
   # Help:

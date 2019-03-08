@@ -24,19 +24,34 @@ program
         gasPrice: chainConfig.auxiliaryGasPrice,
       };
       const auxiliaryWeb3 = new Web3(chainConfig.auxiliaryWeb3Provider);
-      const userWalletFactory = new OpenST.ContractInteract.UserWalletFactory(
-        auxiliaryWeb3,
+      const userHelper = new OpenST.Helpers.User(
+        chainConfig.openst.tokenHolderMasterCopy,
+        chainConfig.openst.gnosisSafeMasterCopy,
+        chainConfig.openst.recoveryMasterCopy,
+        chainConfig.openst.createAndAddModules,
+        chainConfig.utilityBrandedTokenAddress, // TODO Update
+        chainConfig.openst.tokenRules,
         chainConfig.openst.userWalletFactory,
+        chainConfig.openst.proxyFactory,
+        auxiliaryWeb3,
       );
-      await userWalletFactory.createUserWallet(
-        owners,
+      const ownersArray = owners.split(',').map(item => item.trim());
+      const sessionKeysArray = sessionKeys.split(',').map(item => item.trim());
+      const sessionKeysSpendingLimitsArray = sessionKeysSpendingLimits.split(',').map(item => item.trim());
+      const sessionKeyExpirationHeightsArray = sessionKeyExpirationHeights.split(',').map(item => item.trim());
+      const response = await userHelper.createUserWallet(
+        ownersArray,
         threshold,
-        sessionKeys,
-        sessionKeysSpendingLimits,
-        sessionKeyExpirationHeights,
+        chainConfig.openst.recoveryOwnerAddress,
+        chainConfig.openst.recoveryControllerAddress,
+        chainConfig.openst.recoveryBlockDelay,
+        sessionKeysArray,
+        sessionKeysSpendingLimitsArray,
+        sessionKeyExpirationHeightsArray,
         createUserTxOptions,
       );
-      logger.info("User created!");
+      logger.info(`response: ${response}`);
+      logger.info('User created!');
     },
   )
   .on(
