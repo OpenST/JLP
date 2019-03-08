@@ -32,7 +32,7 @@ program
       logger.info(`Rule ${ruleName} registered!`);
       logger.info('Validating registered rule...');
       const rule = await tokenRules.getRuleByName(ruleName);
-      if (!rule || rule.ruleAddress !== web3.utils.toChecksumAddress(ruleAddress)) {
+      if (!rule || (rule.ruleAddress !== auxiliaryWeb3.utils.toChecksumAddress(ruleAddress))) {
         logger.info(`Failure in registration of rule: ${ruleName}.`);
         Promise.reject(new Error(`Failure in registration of rule: ${ruleName}.`));
       } else {
