@@ -3,9 +3,10 @@
 'use strict';
 
 const program = require('commander');
+const Web3 = require('web3');
+const OpenST = require('@openstfoundation/openst.js');
 
 const ChainConfig = require('../config/chain_config');
-const OpenST = require('@openstfoundation/openst.js');
 const logger = require('../logger');
 
 const { version } = require('../../package.json');
@@ -19,16 +20,19 @@ program
     async (config, ruleName, ruleAddress, ruleAbi) => {
       const chainConfig = new ChainConfig(config);
       const registerRuleTxOptions = {
-        from: chainConfig.auxiliaryMasterKey,
+        from: chainConfig.auxiliaryMasterKey, // MasterKey is Worker address
         gasPrice: chainConfig.auxiliaryGasPrice,
       };
+      const auxiliaryWeb3 = new Web3(chainConfig.auxiliaryWeb3Provider);
       const tokenRules = new OpenST.ContractInteract.TokenRules(
-        chainConfig.auxiliaryWeb3Provider,
+        auxiliaryWeb3,
         chainConfig.openst.tokenRules,
       );
       await tokenRules.registerRule(ruleName, ruleAddress, ruleAbi, registerRuleTxOptions);
+      logger.info(`Rule ${ruleName} registered!`);
+      logger.info('Validating registered rule...');
       const rule = await tokenRules.getRuleByName(ruleName);
-      if (!rule || (rule.address !== ruleAddress)) {
+      if (!rule || rule.ruleAddress !== web3.utils.toChecksumAddress(ruleAddress)) {
         logger.info(`Failure in registration of rule: ${ruleName}.`);
         Promise.reject(new Error(`Failure in registration of rule: ${ruleName}.`));
       } else {

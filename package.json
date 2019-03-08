@@ -28,7 +28,7 @@
   "dependencies": {
     "@openstfoundation/mosaic.js": "^0.10.0-beta.4",
     "@openstfoundation/brandedtoken.js": "https://github.com/sarvesh-ost/brandedtoken.js.git#Branded_token_setup",
-    "@openstfoundation/openst.js": "^0.10.0-alpha.5",
+    "@openstfoundation/openst.js": "https://github.com/abhayks1/openst.js.git#openst_setup",
     "bn.js": "4.11.8",
     "inquirer": "^6.2.2",
     "js-scrypt": "0.2.0",
