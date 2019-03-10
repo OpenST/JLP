@@ -6,13 +6,13 @@ const program = require('commander');
 
 const connected = require('../connected');
 const BTDeployer = require('../bt_deployer');
+const BTStakeMint = require('../bt_stake_mint');
 const { version } = require('../../package.json');
 
 program
   .version(version)
   .name('bt')
   .description('An executable to deploy an EIP20 token.');
-
 
 program.command('setupBrandedToken <config> <symbol> <name> <decimals>'
   + ' <conversionRate> <conversionDecimal>')
@@ -52,10 +52,6 @@ program.command('setupUtilityBrandedToken <config>')
 program.command('gatewayComposer <config> ')
   .action(
     async (config) => {
-      // const chainConfig = new ChainConfig(config);
-      // const btDeployer = new BTDeployer(chainConfig);
-      // await btDeployer.deployGatewayComposer();
-      // chainConfig.write(config);
       await connected.run(config,
         async (chainConfig, connection) => {
           const btDeployer = new BTDeployer(chainConfig, connection);
@@ -65,27 +61,31 @@ program.command('gatewayComposer <config> ')
     },
   );
 
-program.command('requestStake <config> <stakeVT> <beneficiary> ')
+program.command('requestStake <config> <originGatewayAddress> <stakeVT> <beneficiary> <gasPrice> <gasLimit>')
   .action(
-    async (config, stakeVT, beneficiary) => {
+    async (config, originGatewayAddress, stakeVT, beneficiary, gasPrice, gasLimit) => {
       await connected.run(config,
         async (chainConfig, connection) => {
-          const btDeployer = new BTDeployer(chainConfig, connection);
-          const nonce = '1';
-          await btDeployer.requestStake(stakeVT, beneficiary, '0', '0', nonce);
+          const btStakeMint = new BTStakeMint(chainConfig, connection);
+          await btStakeMint.requestStake(
+            originGatewayAddress,
+            stakeVT,
+            beneficiary,
+            gasPrice,
+            gasLimit,
+          );
           chainConfig.write(config);
         });
     },
   );
-
 
 program.command('acceptStake <config> <stakeRequestHash> ')
   .action(
     async (config, stakeRequestHash) => {
       await connected.run(config,
         async (chainConfig, connection) => {
-          const btDeployer = new BTDeployer(chainConfig, connection);
-          await btDeployer.acceptStake(stakeRequestHash);
+          const btStakeMint = new BTStakeMint(chainConfig, connection);
+          await btStakeMint.acceptStake(stakeRequestHash);
           chainConfig.write(config);
         });
     },
@@ -105,6 +105,21 @@ program.on(
     console.log('setupUtilityBrandedToken Arguments:');
     console.log('  config       Path to a config file');
     console.log('');
+    console.log('gatewayComposer Arguments:');
+    console.log('  config                Path to a config file');
+    console.log('');
+    console.log('requestStake Arguments:');
+    console.log('  config       Path to a config file');
+    console.log('  originGatewayAddress  Origin chain gateway address');
+    console.log('  stakeVT               Value tokens to be staked');
+    console.log('  beneficiary           Beneficiary address which will receive minted tokens');
+    console.log('  gasPrice              Gas price for the request');
+    console.log('  gasLimit              Gas limit for the request');
+    console.log('');
+    console.log('acceptStake Arguments:');
+    console.log('  config            Path to a config file');
+    console.log('  stakeRequestHash  Hash received from requestStake process');
+    console.log('');
     console.log('Examples:');
     console.log('  Setup JLP branded token with a total supply of 10 mio.:');
     console.log('  $ bt.js setupBrandedToken config.json JLP "Jean-Luc'
@@ -113,6 +128,13 @@ program.on(
     console.log('');
     console.log('  Setup Utility branded token for JLP');
     console.log('  $ bt.js setupUtilityBrandedToken config.json');
+    console.log('');
+    console.log('  Deploy gateway composer');
+    console.log('  $ bt.js setupUtilityBrandedToken config.json');
+    console.log('  Request stake');
+    console.log('  $ bt.js requestStake config.json 0x542478e47a576Dd359178Dc760E51A2b50da4761 10000 0x595dd34b760b0462bb2043cbe98ded01234d9f85 0 0');
+    console.log('  Accept stake');
+    console.log('  $ bt.js acceptStake config.json 0x8c8a68c8dc43c9378e5bb7d997d3e7bd425921c536706be14db4347f0815ddfc');
   },
 );
 

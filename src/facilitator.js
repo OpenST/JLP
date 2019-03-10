@@ -74,7 +74,6 @@ class Facilitator {
     const stakeRequest = this.chainConfig.stakes[messageHash];
 
     if (!stakeRequest) {
-      console.log("stupid stupid");
       logger.error('No stake request found');
       return Promise.reject(new Error('No stake request found.'));
     }
@@ -88,7 +87,6 @@ class Facilitator {
       gasPrice: this.chainConfig.originGasPrice,
       from: this.connection.originAccount.address,
     };
-    console.log("progress stake called");
     await this.mosaicFacilitator.progressStake(
       stakeRequest.staker,
       stakeRequest.amount,
