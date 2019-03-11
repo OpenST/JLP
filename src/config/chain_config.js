@@ -75,6 +75,41 @@ class ChainConfig {
 
     return new Mosaic(originChain, auxiliaryChain);
   }
+
+  toMosaicFromMessageHash(connection, messageHash) {
+    const {
+      originWeb3,
+      auxiliaryWeb3,
+    } = connection;
+
+    const stake = this.stakes[messageHash];
+
+    if (!stake) {
+      throw new Error(`Stake request doesn't exist for message Hash ${messageHash}`);
+    }
+
+    const originChain = new Mosaic.Chain(
+      originWeb3,
+      {
+        Organization: stake.originOrganizationAddress,
+        EIP20Gateway: stake.originGatewayAddress,
+        Anchor: this.originAnchorAddress,
+        EIP20Token: this.eip20TokenAddress,
+      },
+    );
+    const auxiliaryChain = new Mosaic.Chain(
+      auxiliaryWeb3,
+      {
+        Organization: stake.auxiliaryOrganizationAddress,
+        EIP20CoGateway: stake.auxiliaryCoGatewayAddress,
+        Anchor: this.auxiliaryAnchorAddress,
+        UtilityToken: stake.auxiliaryUtilityTokenAddress,
+        OSTPrime: this.auxiliaryOSTPrimeAddress || '0x05cd5fcd2aeca6aea1a554fae9fac76ce52dc5d6',
+      },
+    );
+
+    return new Mosaic(originChain, auxiliaryChain);
+  }
 }
 
 module.exports = ChainConfig;

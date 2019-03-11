@@ -22,7 +22,8 @@ program.command('stake <config> <staker> <amount> <beneficiary>')
       await connected.run(
         configPath,
         async (chainConfig, connection) => {
-          const facilitator = new Facilitator(chainConfig, connection);
+          const mosaic = chainConfig.toMosaic(connection);
+          const facilitator = new Facilitator(chainConfig, connection, mosaic);
           const {
             messageHash,
             unlockSecret,
@@ -42,7 +43,8 @@ program.command('progressStake <config> <messageHash>')
       await connected.run(
         configPath,
         async (chainConfig, connection) => {
-          const facilitator = new Facilitator(chainConfig, connection);
+          const mosaic = chainConfig.toMosaicFromMessageHash(connection, messageHash);
+          const facilitator = new Facilitator(chainConfig, connection, mosaic);
 
           await facilitator.progressStake(messageHash);
           chainConfig.write(configPath);

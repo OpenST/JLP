@@ -108,6 +108,8 @@ class BTDeployer {
       decimal,
       conversionRate,
       conversionDecimal,
+      originOrganization: originOrganization.address,
+      valueToken: this.origin.token,
     };
     return { originOrganization, brandedToken };
   }
@@ -298,7 +300,8 @@ class BTDeployer {
   }
 
   async acceptStake(stakeRequestHash) {
-    const originGateway = this.chainConfig.utilityBrandedTokens[0].originGatewayAddress; // take as parameter
+    const utilityBrandedTokenConfig = this.chainConfig.utilityBrandedTokens[0];
+    const originGateway = utilityBrandedTokenConfig.originGatewayAddress; // take as parameter
 
     const eip20Gateway = new MosaicContractInteract.EIP20Gateway(this.origin.web3, originGateway);
     const bounty = await eip20Gateway.getBounty();
@@ -410,7 +413,14 @@ class BTDeployer {
       gasLimit: stakeRequest.gasLimit,
       hashLock,
       unlockSecret,
+      auxiliaryUtilityTokenAddress: utilityBrandedTokenConfig.address,
+      auxiliaryOrganizationAddress: utilityBrandedTokenConfig.organizationAddress,
+      originGatewayAddress: utilityBrandedTokenConfig.originGatewayAddress,
+      auxiliaryCoGatewayAddress: utilityBrandedTokenConfig.auxiliaryCoGatewayAddress,
+      originBrandedTokenAddress: this.chainConfig.brandedToken,
+      originOrganizationAddress: this.chainConfig.brandedToken,
     };
+
     const { stakes, stakeRequests } = this.chainConfig;
 
     stakes[messageHash] = gatewayStakeRequest;
