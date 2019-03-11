@@ -15,12 +15,12 @@ const { GnosisSafe } = OpenST.ContractInteract;
 program
   .version(version)
   .name('Create Wallet User')
-  .arguments('<config> <utilityBrandedTokenAddress> <owners> <threshold> <sessionKeys> <sessionKeySpendingLimits> <sessionKeyExpirationHeights>')
+  .arguments('<config> <eip20Token> <owners> <threshold> <sessionKeys> <sessionKeySpendingLimits> <sessionKeyExpirationHeights>')
   .description('An executable to register rules in tokenrules.')
   .action(
     async (
       config,
-      utilityBrandedTokenAddress,
+      eip20Token,
       owners,
       threshold,
       sessionKeys,
@@ -38,7 +38,7 @@ program
         chainConfig.openst.gnosisSafeMasterCopy,
         chainConfig.openst.recoveryMasterCopy,
         chainConfig.openst.createAndAddModules,
-        utilityBrandedTokenAddress,
+        eip20Token,
         chainConfig.openst.tokenRules,
         chainConfig.openst.userWalletFactory,
         chainConfig.openst.proxyFactory,
@@ -74,7 +74,7 @@ program
       console.log('');
       console.log('Arguments:');
       console.log('  config                       path to a config file.');
-      console.log('  utilityBrandedTokenAddress   UtilityBrandedToken address of an economy.');
+      console.log('  eip20Token                   EIP20Token address of an economy.');
       console.log('  owners                       comma separated owners.');
       console.log('  threshold                    gnosis requirement.');
       console.log('  sessionKeys                  comma separated ephemeral keys.');
@@ -83,7 +83,7 @@ program
       console.log('');
       console.log('Examples:');
       console.log('  Creating user:');
-      console.log('  $ create_user.js config.json utilityBrandedTokenAddress owners threshold sessionKeys sessionKeySpendingLimits sessionKeyExpirationHeights');
+      console.log('  $ create_user.js config.json eip20Token owners threshold sessionKeys sessionKeySpendingLimits sessionKeyExpirationHeights');
     },
   )
   .parse(process.argv);
