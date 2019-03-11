@@ -249,14 +249,15 @@ It will write `tokenRulesAddress` to your config file.
   node ./src/bin/create_user.js --help
   
   # Create User:
-  node ./src/bin/create_user.js <config.json> <owners> <threshold> <sessionKeys> <sessionKeysSpendingLimits> <sessionKeyExpirationHeights>
+  node ./src/bin/create_user.js <config.json> <utilityBrandedTokenAddress> <owners> <threshold> <sessionKeys> <sessionKeySpendingLimits> <sessionKeyExpirationHeights>
   ```
 
   * Replace `config.json` with the path to the configuration file.
+  * Replace `utilityBrandedTokenAddress` with the UBT address of the economy.
   * Replace `owners` with comma separated owner addresses.
   * Replace `threshold` with gnosis requirement. 
   * Replace `sessionKeys` comma separated ephemeral keys. 
-  * Replace `sessionKeysSpendingLimits` comma separated spending limits corresponding to ephemeral keys. 
+  * Replace `sessionKeySpendingLimits` comma separated spending limits corresponding to ephemeral keys. 
   * Replace `sessionKeyExpirationHeights` comma separated expiration heights corresponding to ephemeral keys. 
 
 ## Helpers
