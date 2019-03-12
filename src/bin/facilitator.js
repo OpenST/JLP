@@ -22,16 +22,20 @@ program.command('stake <config> <staker> <amount> <beneficiary>')
       await connected.run(
         configPath,
         async (chainConfig, connection) => {
-          const mosaic = chainConfig.toMosaic(connection);
-          const facilitator = new Facilitator(chainConfig, connection, mosaic);
-          const {
-            messageHash,
-            unlockSecret,
-          } = await facilitator.stake(staker, amount, beneficiary);
+          try {
+            const mosaic = chainConfig.toMosaic(connection);
+            const facilitator = new Facilitator(chainConfig, connection, mosaic);
+            const {
+              messageHash,
+              unlockSecret,
+            } = await facilitator.stake(staker, amount, beneficiary);
 
-          logger.info(`  messageHash ${messageHash}`);
-          logger.info(`  unlockSecret ${unlockSecret}`);
-          chainConfig.write(configPath);
+            logger.info(`  messageHash ${messageHash}`);
+            logger.info(`  unlockSecret ${unlockSecret}`);
+            chainConfig.write(configPath);
+          } catch (e) {
+            console.error('Error in stake ', e);
+          }
         },
       );
     },
@@ -43,11 +47,15 @@ program.command('progressStake <config> <messageHash>')
       await connected.run(
         configPath,
         async (chainConfig, connection) => {
-          const mosaic = chainConfig.toMosaicFromMessageHash(connection, messageHash);
-          const facilitator = new Facilitator(chainConfig, connection, mosaic);
+          try {
+            const mosaic = chainConfig.toMosaicFromMessageHash(connection, messageHash);
+            const facilitator = new Facilitator(chainConfig, connection, mosaic);
 
-          await facilitator.progressStake(messageHash);
-          chainConfig.write(configPath);
+            await facilitator.progressStake(messageHash);
+            chainConfig.write(configPath);
+          } catch (e) {
+            console.error('Error in progress stake ', e);
+          }
         },
       );
     },

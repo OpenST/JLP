@@ -30,11 +30,11 @@ class Facilitator {
       hashLock,
       txOptions,
       unlockSecret,
-      auxiliaryUtilityTokenAddress: this.chainConfig.this.auxiliaryUtilityTokenAddress,
-      auxiliaryOrganizationAddress: this.chainConfig.this.auxiliaryOrganizationAddress,
-      originGatewayAddress: this.chainConfig.this.originGatewayAddress,
-      originOrganizationAddress: this.chainConfig.this.originOrganizationAddress,
-      auxiliaryCoGatewayAddress: this.chainConfig.this.auxiliaryCoGatewayAddress,
+      auxiliaryUtilityTokenAddress: this.chainConfig.auxiliaryUtilityTokenAddress,
+      auxiliaryOrganizationAddress: this.chainConfig.auxiliaryOrganizationAddress,
+      originGatewayAddress: this.chainConfig.originGatewayAddress,
+      originOrganizationAddress: this.chainConfig.originOrganizationAddress,
+      auxiliaryCoGatewayAddress: this.chainConfig.auxiliaryCoGatewayAddress,
     };
 
     await this.mosaicFacilitator.stake(
