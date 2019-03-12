@@ -200,7 +200,7 @@ class BTDeployer {
 
     console.log('lift restriction  done');
     this.chainConfig.utilityBrandedTokens.push({
-      address: auxiliaryOrganization.address,
+      address: utilityBrandedToken.address,
       organizationAddress: auxiliaryOrganization.address,
       originGatewayAddress: originGateway.address,
       auxiliaryCoGatewayAddress: auxiliaryCoGateway.address,

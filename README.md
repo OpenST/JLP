@@ -124,7 +124,7 @@ node src/bin/facilitator.js progressStake path_to_config.json messageHash
 
 * Replace `path_to_config.json` with a file location where config must be stored.
 * Replace `messageHash` with a hash generated in stake facilitator step. 
-. 
+
  
  This step will mint tokens in auxiliary chain.
 

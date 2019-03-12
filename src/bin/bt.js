@@ -41,9 +41,13 @@ program.command('setupUtilityBrandedToken <config>')
       await connected.run(
         config,
         async (chainConfig, connection) => {
-          const btDeployer = new BTDeployer(chainConfig, connection);
-          await btDeployer.deployUtilityBrandedToken();
-          chainConfig.write(config);
+          try {
+            const btDeployer = new BTDeployer(chainConfig, connection);
+            await btDeployer.deployUtilityBrandedToken();
+            chainConfig.write(config);
+          } catch (e) {
+            console.log('the exception is :- ', e);
+          }
         },
       );
     },
@@ -54,9 +58,13 @@ program.command('gatewayComposer <config> ')
     async (config) => {
       await connected.run(config,
         async (chainConfig, connection) => {
-          const btDeployer = new BTDeployer(chainConfig, connection);
-          await btDeployer.deployGatewayComposer();
-          chainConfig.write(config);
+          try {
+            const btDeployer = new BTDeployer(chainConfig, connection);
+            await btDeployer.deployGatewayComposer();
+            chainConfig.write(config);
+          } catch (e) {
+            console.error(e);
+          }
         });
     },
   );
@@ -66,15 +74,19 @@ program.command('requestStake <config> <originGatewayAddress> <stakeVT> <benefic
     async (config, originGatewayAddress, stakeVT, beneficiary, gasPrice, gasLimit) => {
       await connected.run(config,
         async (chainConfig, connection) => {
-          const btStakeMint = new BTStakeMint(chainConfig, connection);
-          await btStakeMint.requestStake(
-            originGatewayAddress,
-            stakeVT,
-            beneficiary,
-            gasPrice,
-            gasLimit,
-          );
-          chainConfig.write(config);
+          try {
+            const btStakeMint = new BTStakeMint(chainConfig, connection);
+            await btStakeMint.requestStake(
+              originGatewayAddress,
+              stakeVT,
+              beneficiary,
+              gasPrice,
+              gasLimit,
+            );
+            chainConfig.write(config);
+          } catch (e) {
+            console.error('the exception is :- ', e);
+          }
         });
     },
   );
@@ -84,9 +96,13 @@ program.command('acceptStake <config> <stakeRequestHash> ')
     async (config, stakeRequestHash) => {
       await connected.run(config,
         async (chainConfig, connection) => {
-          const btStakeMint = new BTStakeMint(chainConfig, connection);
-          await btStakeMint.acceptStake(stakeRequestHash);
-          chainConfig.write(config);
+          try {
+            const btStakeMint = new BTStakeMint(chainConfig, connection);
+            await btStakeMint.acceptStake(stakeRequestHash);
+            chainConfig.write(config);
+          } catch (e) {
+            console.error(e);
+          }
         });
     },
   );
