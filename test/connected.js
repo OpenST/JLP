@@ -5,7 +5,7 @@ const { assert } = require('chai');
 const ChainConfig = require('../src/config/chain_config');
 const Connection = require('../src/connection');
 
-const { CONFIG_FILE_PATH } = require('./const');
+const { CONFIG_FILE_PATH } = require('./constants');
 
 /**
  * Run a function with a connection to nodes.

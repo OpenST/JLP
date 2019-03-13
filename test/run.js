@@ -15,7 +15,7 @@ const EXIT_CODE_FAILED_TESTS = 1;
 const {
   CONFIG_FILE_PATH,
   CONFIG_INIT_FILE_PATH,
-} = require('./const');
+} = require('./constants');
 
 const setup = () => {
   try {
