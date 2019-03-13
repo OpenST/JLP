@@ -6,3 +6,5 @@ package-lock.json
 log/
 config.json
 accounts*
+test/config.json
+test/config_init.json

@@ -233,6 +233,14 @@ It will write `tokenRulesAddress` to your config file.
 * Replace `eip20Token` with eip20Token address.
 * Replace `organization` with an organization contract address. 
 
+## Tests
+
+To run the tests:
+
+1. Copy `./test/config_init.json.dist` to `./test/config_init.json`
+2. Set your configuration in `./test/config_init.json`
+3. Run `npm run test`
+
 ## Helpers
 
 **Send**

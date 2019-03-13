@@ -17,17 +17,20 @@ class Connection {
    * @param {Web3} auxiliaryWeb3 A web3 instance that points to auxiliary.
    * @param {Account} originAccount The account to use on origin.
    * @param {Account} auxiliaryAccount The account to use on auxiliary.
+   * @param {ChainConfig} chainConfig A chain configuration object.
    */
   constructor(
     originWeb3,
     auxiliaryWeb3,
     originAccount,
     auxiliaryAccount,
+    chainConfig,
   ) {
     this.originWeb3 = originWeb3;
     this.auxiliaryWeb3 = auxiliaryWeb3;
     this.originAccount = originAccount;
     this.auxiliaryAccount = auxiliaryAccount;
+    this.chainConfig = chainConfig;
   }
 
   /**
@@ -50,6 +53,7 @@ class Connection {
       auxiliaryWeb3,
       originAccount,
       auxiliaryAccount,
+      chainConfig,
     );
   }
 
