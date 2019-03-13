@@ -32,7 +32,7 @@ const { CONFIG_FILE_PATH } = require('./constants');
  * @param {function} execute The callback that will be executed once the connection is established.
  */
 const run = async (execute) => {
-  let connection;
+  let connection = null;
 
   try {
     const chainConfig = new ChainConfig(CONFIG_FILE_PATH);
