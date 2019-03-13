@@ -11,7 +11,6 @@ const { version } = require('../package.json');
 
 const EXIT_CODE_OK = 0;
 const EXIT_CODE_FAILED_TESTS = 1;
-const EXIT_CODE_NO_CONFIG = 2;
 
 const {
   CONFIG_FILE_PATH,
@@ -22,8 +21,11 @@ const setup = () => {
   try {
     fs.accessSync(CONFIG_INIT_FILE_PATH, fs.constants.F_OK);
   } catch (error) {
-    console.error(`Could not find ${CONFIG_INIT_FILE_PATH}. Please make sure you have copied './test/config_init.json.dist' to './test/config_init.jsen' and set your parameters (${error}).`);
-    process.exit(EXIT_CODE_NO_CONFIG);
+    console.info(`Could not find ${CONFIG_INIT_FILE_PATH}. Copying './test/config_init.json.dist' with default values.`);
+    fs.copyFileSync(
+      `${CONFIG_INIT_FILE_PATH}.dist`,
+      CONFIG_INIT_FILE_PATH,
+    );
   }
 
   fs.copyFileSync(

@@ -235,11 +235,10 @@ It will write `tokenRulesAddress` to your config file.
 
 ## Tests
 
-To run the tests:
+To run the tests run `npm run test`.
 
-1. Copy `./test/config_init.json.dist` to `./test/config_init.json`
-2. Set your configuration in `./test/config_init.json`
-3. Run `npm run test`
+If you don't have a `./test/config_init.json` file, it will be copied with the default values.
+If you need a different config, you should update the file before running the tests again.
 
 ## Helpers
 
