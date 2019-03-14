@@ -100,6 +100,7 @@ class BTStakeMint {
 
     const { originGateway } = stakeRequest;
 
+    const utilityBrandedTokenConfig = this.getUtilityBrandedTokenConfig(originGateway);
     const eip20Gateway = new MosaicContractInteract.EIP20Gateway(this.origin.web3, originGateway);
     const bounty = await eip20Gateway.getBounty();
 
@@ -179,6 +180,12 @@ class BTStakeMint {
       gasLimit: stakeRequest.gasLimit,
       hashLock,
       unlockSecret,
+      auxiliaryUtilityTokenAddress: utilityBrandedTokenConfig.address,
+      auxiliaryOrganizationAddress: utilityBrandedTokenConfig.organizationAddress,
+      originGatewayAddress: utilityBrandedTokenConfig.originGatewayAddress,
+      auxiliaryCoGatewayAddress: utilityBrandedTokenConfig.auxiliaryCoGatewayAddress,
+      originBrandedTokenAddress: this.chainConfig.brandedToken.address,
+      originOrganizationAddress: this.chainConfig.brandedToken.originOrganization,
     };
     const { stakes, stakeRequests } = this.chainConfig;
 
@@ -187,6 +194,12 @@ class BTStakeMint {
 
     logger.info('Stake successful');
     logger.info(`Please use faciliator agent to progressStake and use this message hash : ${messageHash}`);
+  }
+
+  getUtilityBrandedTokenConfig(originGateway) {
+    return this.chainConfig.utilityBrandedTokens.find(
+      ut => ut.originGatewayAddress === originGateway,
+    );
   }
 }
 
