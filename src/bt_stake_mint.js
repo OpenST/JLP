@@ -104,16 +104,30 @@ class BTStakeMint {
     const eip20Gateway = new MosaicContractInteract.EIP20Gateway(this.origin.web3, originGateway);
     const bounty = await eip20Gateway.getBounty();
 
-    const ubtContractInstance = new ContractInteract.UtilityBrandedToken(this.auxiliary.web3, utilityBrandedTokenConfig.address);
+    const ubtContractInstance = new ContractInteract.UtilityBrandedToken(
+      this.auxiliary.web3,
+      utilityBrandedTokenConfig.address,
+    );
 
     const registerInternalActorTxOptions = {
       from: this.auxiliary.masterKey,
       gasPrice: this.auxiliary.txOptions.gasPrice,
     };
 
-    await ubtContractInstance.registerInternalActor([stakeRequest.beneficiary], registerInternalActorTxOptions);
+    const isAlreadyRegistered = await ubtContractInstance.contract.methods.isInternalActor(
+      stakeRequest.beneficiary,
+    ).call();
 
-    logger.info(`${stakeRequest.beneficiary} address registered as Internal actor`);
+    if (isAlreadyRegistered) {
+      logger.info(`Beneficiary address ${stakeRequest.beneficiary} already registered as Internal actor`);
+    } else {
+      await ubtContractInstance.registerInternalActor(
+        [stakeRequest.beneficiary],
+        registerInternalActorTxOptions,
+      );
+      logger.info(`${stakeRequest.beneficiary} address registered as Internal actor`);
+    }
+
 
     const staker = this.chainConfig.gatewayComposerAddress;
 
