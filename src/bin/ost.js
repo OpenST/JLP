@@ -6,7 +6,7 @@ const program = require('commander');
 
 const { ContractInteract: { OSTPrime } } = require('@openstfoundation/mosaic.js');
 
-const ChainConfig = require('../config/chain_config');
+const connected = require('../connected');
 const logger = require('../logger');
 
 const { version } = require('../../package.json');
@@ -18,39 +18,54 @@ program
 
 program.command('wrap <config> <address> <amount>')
   .action(
-    async(configPath, address, amount) => {
-      const ostPrime = getOSTPrime(configPath);
+    async (configPath, address, amount) => {
+      await connected.run(
+        configPath,
+        async (chainConfig, connection) => {
+          const ostPrime = new OSTPrime(
+            connection.auxiliaryWeb3,
+            chainConfig.auxiliaryOSTPrimeAddress,
+          );
 
-      const txOptions = {
-        from: address,
-        value: amount,
-      };
+          const txOptions = {
+            from: address,
+            value: amount,
+          };
 
-    await ostPrime
-      .wrap(txOptions)
-      .then(receipt => {
-        logger.info(`Wrapped ${amount} wei for ${address}, txHash: ${receipt.transactionHash}`);
-        }
-      )
-    }
+          await ostPrime
+            .wrap(txOptions)
+            .then(
+              receipt => logger.info(`Wrapped ${amount} wei for ${address}, txHash: ${receipt.transactionHash}`),
+            );
+        },
+      );
+    },
   );
 
 program.command('unwrap <config> <address> <amount>')
   .action(
-    async(configPath, address, amount) => {
-      const ostPrime = getOSTPrime(configPath);
+    async (configPath, address, amount) => {
+      await connected.run(
+        configPath,
+        async (chainConfig, connection) => {
+          const ostPrime = new OSTPrime(
+            connection.auxiliaryWeb3,
+            chainConfig.auxiliaryOSTPrimeAddress,
+          );
 
-      const txOptions = {
-        from: address,
-      };
 
-    await ostPrime
-      .unwrap(amount, txOptions)
-      .then(receipt => {
-        logger.info(`Unwrapped ${amount} wei for ${address}, txHash: ${receipt.transactionHash}`);
-        }
-      )
-    }
+          const txOptions = {
+            from: address,
+          };
+
+          await ostPrime
+            .unwrap(amount, txOptions)
+            .then(
+              receipt => logger.info(`Unwrapped ${amount} wei for ${address}, txHash: ${receipt.transactionHash}`),
+            );
+        },
+      );
+    },
   );
 
 program.on(
@@ -66,10 +81,3 @@ program.on(
 );
 
 program.parse(process.argv);
-
-function getOSTPrime(configPath) {
-  const chainConfig = new ChainConfig(configPath);
-  const mosaic = chainConfig.toMosaic();
-
-  return new OSTPrime(mosaic.auxiliary.web3, mosaic.auxiliary.contractAddresses.OSTPrime);
-}

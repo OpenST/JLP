@@ -1,13 +1,20 @@
-# Jean-Luc Picards Star Fleet training academy
+# 🚀 Jean-Luc Picards Star Fleet training academy
 
 ## getting started (on testnet)
 
 You'll need RPC access to a full node for Ropsten and a full node running the test sidechain.
-If you need to set up your nodes, you can use the scripts in [chains](./chains) docker to run these nodes.  To install docker visit [https://docs.docker.com/install/](https://docs.docker.com/install/).
+If you need to set up your nodes, you can use [mosaic-chains](https://github.com/OpenST/mosaic-chains) to run these nodes.
+You need docker. To install docker visit [https://docs.docker.com/install/](https://docs.docker.com/install/).
+
+All transactions will be signed locally.
+You must generate and fund addresses on origin and auxiliary in order to use JLP!
+See [Accounts](#accounts) for details.
 
 ## Configuration
 
 Copy the `config.json.dist` example to `config.json`.
+
+⚠️ You may need to change the web3 provider ports.
 
 ⚠️ You have to put in your `{origin,auxiliary}masterKey`!
 You also may want to change other parameters.
@@ -16,20 +23,25 @@ If you don't put in the `{origin/auxiliary}deployerAddress`, you need to run the
 ⚠️ Other commands will overwrite your config, for example when they deploy contracts.
 You may want to store different config files for different tests.
 
-## Funding of Addresses
+## Accounts
 
-Prerequisite: `originMasterKey` and `auxiliaryMasterKey` in your config file have funds.
+JLP will use accounts that you locally keep to send signed transactions to ethereum nodes.
+This means that you need to provide local accounts.
+If you don't have a local account, you can use `account.js` to generate one.
+`account.js` always writes to `./accounts.json` and JLP will always read the accounts from that location.
+`account.js` will backup any existing file.
 
-To ensure that all the addresses in your config file are funded, you can use the
-`refill` executable. It will transfer funds from the `{origin,auxiliary}MasterKey` addresses
-to the addresses in your config file to refill them to a balance of 1 (currency of the chain).
+Accounts are stored as encrypted Web3 key-vaults.
 
 ```bash
 # Help:
-./src/bin/refill -h
+./src/bin/account.js -h
 
-# Refill addresses
-./src/bin/refill.js config.json
+# Create a new origin account
+./src/bin/account.js origin
+
+# Create a new auxiliary account
+./src/bin/account.js auxiliary
 ```
 
 ## EIP20 Token
@@ -39,7 +51,7 @@ Use the eip20 executable for that:
 
 ```bash
 # Help:
-./src/bin/eip20 -h
+./src/bin/eip20.js -h
 
 # Deploy JLP token:
 ./src/bin/eip20.js config.json JLP "Jean-Luc Picard Token" 10000000000000000000000000 18
@@ -51,14 +63,18 @@ It will write `eip20TokenAddress` to your config file.
 
 Prerequisite: `eip20TokenAddress` in your config file.
 
-If you want to deploy gateways, use the `deploy` executable:
+If you want to deploy contracts to the chains, use the `deploy` executable:
 
 ```bash
 # Help:
 ./src/bin/deploy.js -h
 
-# Deployment:
-./src/bin/deploy.js config.json
+# Deployment of utility token with gateways (requires anchor addresses in your config):
+./src/bin/deploy.js utilityToken config.json
+
+# If you don't have anchor addresses, yet, you must deploy anchors first.
+# Deployment of anchors:
+./src/bin/deploy.js anchors config.json
 ```
 
 It will write contract addresses to your config file.
@@ -77,7 +93,7 @@ If you want to anchor state roots, use the `anchor` executable:
 ./src/bin/anchor.js config.json auxiliary 20
 ```
 
-It will keep on running and anchoring until you kill it.
+It will keep on running and anchoring until you send `SIGINT` (`^C`).
 
 ## Stake Facilitator 
 
@@ -167,29 +183,29 @@ node src/bin/bt.js setupUtilityBrandedToken <config.json>
 
 ```
 
- 
- ## Redeem Facilitator 
- 
- Prerequiste: 
- 1. `auxiliaryGatewayAddress` and `eip20TokenAddress` generated in your config file.
- 
- ```bash
- 
- node src/bin/facilitator.js redeem path_to_config.json redeemerAddress redeemAmount beneficiaryAddress
- 
- ```
- 
-  * Replace `path_to_config.json` with a file location where config is stored. 
-  * Replace `redeemerAddress` with an address holding `eip20TokenAddress` balance.
-  * Replace `redeemAmount` with number representing redeem amount in wei.
-  * Replace `beneficiaryAddress` with an address on auxiliary chain where token will be minted. 
 
- It will write redeem request details in the config file, which will be needed for progress redeem(Next step).
- 
- ## Progress Redeem Facilitator 
- 
- 1. `auxiliaryGatewayAddress` , `eip20TokenAddress` and `redeems` generated in previous step in the config file.
- 2. Run anchor state root after `redeem` facilitator step.
+## Redeem Facilitator
+
+Prerequiste:
+1. `auxiliaryGatewayAddress` and `eip20TokenAddress` generated in your config file.
+
+```bash
+
+node src/bin/facilitator.js redeem path_to_config.json redeemerAddress redeemAmount beneficiaryAddress
+
+```
+
+ * Replace `path_to_config.json` with a file location where config is stored. 
+ * Replace `redeemerAddress` with an address holding `eip20TokenAddress` balance.
+ * Replace `redeemAmount` with number representing redeem amount in wei.
+ * Replace `beneficiaryAddress` with an address on auxiliary chain where token will be minted. 
+
+It will write redeem request details in the config file, which will be needed for progress redeem(Next step).
+
+## Progress Redeem Facilitator
+
+1. `auxiliaryGatewayAddress` , `eip20TokenAddress` and `redeems` generated in previous step in the config file.
+2. Run anchor state root after `redeem` facilitator step.
 
 ```bash
 
@@ -197,4 +213,57 @@ node src/bin/facilitator.js progressRedeem path_to_config.json messageHash
 
 ```
 
-  * `messageHash` generated in redeem facilitator step.
+ * `messageHash` generated in redeem facilitator step.
+
+## Deploy TokenRules
+
+Prerequisite: `eip20Token` and `organization` in your config file.
+
+```bash
+# Help:
+node ./src/bin/tokenrules.js --help
+
+# Deploy TokenRules token:
+node ./src/bin/tokenrules.js config.json eip20Token organization
+```
+
+It will write `tokenRulesAddress` to your config file.
+
+* Replace `config.json` with the path to the configuration file.
+* Replace `eip20Token` with eip20Token address.
+* Replace `organization` with an organization contract address. 
+
+## Tests
+
+To run the tests run `npm run test`.
+
+If you don't have a `./test/config_init.json` file, it will be copied with the default values.
+If you need a different config, you should update the file before running the tests again.
+
+For more details see [the test README](./test/README.md).
+
+## Helpers
+
+**Send**
+
+Send base tokens from the local account to an address.
+
+```bash
+# Help:
+node ./src/bin/send.js --help
+
+# Send funds:
+node ./src/bin/send.js config.json auxiliary 0xab3778bfa8edc02c290ccf192a5bbe3bba21e9a2 26346717769700000000
+```
+
+**Balance**
+
+Get the base token balance of a local account.
+
+```bash
+# Help:
+node ./src/bin/balance.js --help
+
+# Check balance:
+node ./src/bin/balance.js config.json auxiliary
+```

@@ -3,9 +3,9 @@ const { Facilitator: MosaicFacilitator, Utils, ContractInteract } = require('@op
 const logger = require('./logger');
 
 class Facilitator {
-  constructor(chainConfig) {
+  constructor(chainConfig, connection) {
     this.chainConfig = chainConfig;
-    this.mosaic = chainConfig.toMosaic();
+    this.mosaic = chainConfig.toMosaic(connection);
     this.mosaicFacilitator = new MosaicFacilitator(this.mosaic);
   }
 
@@ -99,6 +99,7 @@ class Facilitator {
     delete stakes[messageHash];
 
     logger.info('Stake progress success');
+    return Promise.resolve(true);
   }
 
   async redeem(redeemer, amount, beneficiary) {
@@ -191,6 +192,8 @@ class Facilitator {
     delete redeems[messageHash];
 
     logger.info('Redeem progress success');
+
+    return Promise.resolve(true);
   }
 }
 

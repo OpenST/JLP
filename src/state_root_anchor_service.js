@@ -6,6 +6,9 @@ const { ContractInteract } = require('@openstfoundation/mosaic.js');
 
 const logger = require('./logger');
 
+/**
+ * Repeatedly anchors state roots in {@link StateRootAnchorService#start}.
+ */
 class StateRootAnchorService {
   /**
    * @param {number} anchorBlockDelay The number of block to wait before anchoring the state root.
@@ -29,7 +32,8 @@ class StateRootAnchorService {
 
     assert(targetWeb3.utils.isAddress(anchorAddress));
     this.anchorContract = new ContractInteract.Anchor(
-      targetWeb3, anchorAddress,
+      targetWeb3,
+      anchorAddress,
     );
 
     this.source = sourceWeb3;
@@ -40,6 +44,13 @@ class StateRootAnchorService {
     this.run = false;
   }
 
+  /**
+   * Gets info on a block on the source chain.
+   *
+   * @param {(string|number)} blockIdentifier Web3-compatible block identifier.
+   *
+   * @returns {Object} Info on the source block.
+   */
   async getSourceInfo(blockIdentifier) {
     const block = await this.source.eth.getBlock(blockIdentifier);
 
@@ -50,6 +61,12 @@ class StateRootAnchorService {
     };
   }
 
+  /**
+   * Actually anchors a state root in the anchor contract.
+   *
+   * @param {Object} anchorInfo Info on the source block.
+   * @param {Object} txOptions Transaction options for the anchoring transaction.
+   */
   async anchor(anchorInfo, txOptions) {
     logger.info('anchoring state root', anchorInfo);
     try {
@@ -64,6 +81,11 @@ class StateRootAnchorService {
     }
   }
 
+  /**
+   * Returns the latest source block number that has been anchored on the target anchor.
+   *
+   * @returns {number} The block number as base-10 integer.
+   */
   async getLatestAnchoredBlockNumber() {
     const blockNumber = await this.anchorContract
       .contract
@@ -76,6 +98,10 @@ class StateRootAnchorService {
     );
   }
 
+  /**
+   * Checks for the latest source blocks and target anchor details.
+   * Calls {@link StateRootAnchorService#anchor} if a newer state root can be anchored.
+   */
   async commit() {
     const latestSourceInfo = await this.getSourceInfo('latest');
     const latestAnchoredBlockNumber = await this.getLatestAnchoredBlockNumber();
@@ -88,29 +114,37 @@ class StateRootAnchorService {
     }
   }
 
+  /**
+   * Initiates an endless loop that repeatedly anchors state roots.
+   */
   async start() {
     this.run = true;
 
     process
-      .on('SIGTERM', this.stop)
-      .on('SIGINT', this.stop)
-      .on('SIGQUIT', this.stop);
+      .on('SIGINT', this.stop.bind(this));
 
-    interval(async (_, stop) => {
+    await interval(async (_, stop) => {
       if (this.run === false) {
-        stop();
         logger.info('Stopped.');
+        stop();
+      } else {
+        await this.commit();
       }
-      await this.commit();
-    }, this.timeout, { stopOnError: true });
+    }, this.timeout);
   }
 
+  /**
+   * Stops the current process after the currently running anchoring is done.
+   * Stops immediately if called more than once.
+   */
   stop() {
-    this.run = false;
+    if (this.run === false) {
+      logger.info('Forcefully shutting down after repeated SIGINT.');
+      process.exit(137);
+    }
 
-    process.removeListener('SIGTERM', this.stop);
-    process.removeListener('SIGINT', this.stop);
-    process.removeListener('SIGQUIT', this.stop);
+    logger.info('Received SIGINT, shutting down after current anchoring is done. (Repeat to abort immediately.)');
+    this.run = false;
   }
 }
 

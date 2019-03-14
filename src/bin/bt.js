@@ -4,7 +4,7 @@
 
 const program = require('commander');
 
-const ChainConfig = require('../config/chain_config');
+const connected = require('../connected');
 const BTDeployer = require('../bt_deployer');
 const { version } = require('../../package.json');
 
@@ -18,26 +18,34 @@ program.command('setupBrandedToken <config> <symbol> <name> <decimals>'
   + ' <conversionRate> <conversionDecimal>')
   .action(
     async (config, symbol, name, decimal, conversionRate, conversionDecimal) => {
-      const chainConfig = new ChainConfig(config);
-      const btDeployer = new BTDeployer(chainConfig);
-      await btDeployer.deployBrandedToken(
-        symbol,
-        name,
-        decimal,
-        parseInt(conversionRate, 10),
-        parseInt(conversionDecimal, 10),
+      await connected.run(
+        config,
+        async (chainConfig, connection) => {
+          const btDeployer = new BTDeployer(chainConfig, connection);
+          await btDeployer.deployBrandedToken(
+            symbol,
+            name,
+            decimal,
+            parseInt(conversionRate, 10),
+            parseInt(conversionDecimal, 10),
+          );
+          chainConfig.write(config);
+        },
       );
-      chainConfig.write(config);
     },
   );
 
 program.command('setupUtilityBrandedToken <config>')
   .action(
     async (config) => {
-      const chainConfig = new ChainConfig(config);
-      const btDeployer = new BTDeployer(chainConfig);
-      await btDeployer.deployUtilityBrandedToken();
-      chainConfig.write(config);
+      await connected.run(
+        config,
+        async (chainConfig, connection) => {
+          const btDeployer = new BTDeployer(chainConfig, connection);
+          await btDeployer.deployUtilityBrandedToken();
+          chainConfig.write(config);
+        },
+      );
     },
   );
 
