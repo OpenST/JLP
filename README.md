@@ -218,6 +218,7 @@ node src/bin/facilitator.js progressRedeem path_to_config.json messageHash
  ## Deploy TokenRules
  
  Prerequisite: `eip20Token` and `organization` in your config file.
+ These contracts  should be deployed on auxiliary chain.
  
  ```bash
  # Help:

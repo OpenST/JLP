@@ -7,7 +7,6 @@ const Web3 = require('web3');
 const OpenST = require('@openstfoundation/openst.js');
 
 const connected = require('../connected');
-const ChainConfig = require('../config/chain_config');
 const logger = require('../logger');
 
 const { version } = require('../../package.json');
