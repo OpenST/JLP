@@ -1,5 +1,4 @@
-const { Setup } = require('@openstfoundation/brandedtoken.js');
-
+const { Setup, ContractInteract } = require('@openstfoundation/brandedtoken.js');
 const logger = require('./logger');
 
 class BTDeployer {
@@ -39,8 +38,11 @@ class BTDeployer {
         deployer: this.origin.deployer,
         owner: this.origin.masterKey,
         admin: this.origin.masterKey,
-        workers: [],
-        workerExpirationHeight: '0',
+        workers: [
+          this.origin.web3.utils.toChecksumAddress(this.chainConfig.workerAddress),
+          this.origin.web3.utils.toChecksumAddress(this.origin.masterKey),
+        ],
+        workerExpirationHeight: '20000000',
       },
       this.origin.txOptions,
     );
@@ -76,7 +78,6 @@ class BTDeployer {
     const originOrganization = await this._deployOriginOrganization();
     logger.info(`origin organization address ${originOrganization.address}`);
 
-
     logger.info('Deploying branded token  ');
     const brandedToken = await this._deployBrandedToken(
       symbol,
@@ -98,6 +99,8 @@ class BTDeployer {
       decimal,
       conversionRate,
       conversionDecimal,
+      originOrganization: originOrganization.address,
+      valueToken: this.origin.token,
     };
     return { originOrganization, brandedToken };
   }
@@ -109,7 +112,10 @@ class BTDeployer {
       deployer: this.auxiliary.deployer,
       owner: this.auxiliary.masterKey,
       admin: this.auxiliary.masterKey,
-      workers: [this.auxiliary.masterKey],
+      workers: [
+        this.origin.web3.utils.toChecksumAddress(this.chainConfig.workerAddress),
+        this.origin.web3.utils.toChecksumAddress(this.auxiliary.masterKey),
+      ],
       workerExpirationHeight: '10000000000000',
     };
 
@@ -173,18 +179,53 @@ class BTDeployer {
     logger.info(`originGateway address ${originGateway.address}`);
     logger.info(`auxiliaryCoGateway address ${auxiliaryCoGateway.address}`);
 
+
+    const brandedToken = new ContractInteract.BrandedToken(
+      this.origin.web3,
+      this.chainConfig.brandedToken.address,
+    );
+
+    const liftRestrictionTxOptions = {
+      gasPrice: this.origin.txOptions.gasPrice,
+      from: this.origin.masterKey,
+    };
+    const stakeVaultAddress = await originGateway.getStakeVault();
+
+    await brandedToken.liftRestriction(
+      [originGateway.address, stakeVaultAddress],
+      liftRestrictionTxOptions,
+    );
+
     this.chainConfig.utilityBrandedTokens.push({
       address: utilityBrandedToken.address,
       organizationAddress: auxiliaryOrganization.address,
       originGatewayAddress: originGateway.address,
       auxiliaryCoGatewayAddress: auxiliaryCoGateway.address,
     });
+
     return {
       auxiliaryOrganization,
       utilityBrandedToken,
       originGateway,
       auxiliaryCoGateway,
     };
+  }
+
+  async deployGatewayComposer() {
+    const txOptions = {};
+    txOptions.from = this.origin.deployer;
+    txOptions.gasPrice = this.chainConfig.originGasPrice;
+    const gatewayComposer = await ContractInteract.GatewayComposer.deploy(
+      this.origin.web3,
+      this.origin.masterKey,
+      this.chainConfig.eip20TokenAddress,
+      this.chainConfig.brandedToken.address,
+      txOptions,
+    );
+
+    logger.info('Gateway composer deployed');
+
+    this.chainConfig.gatewayComposerAddress = gatewayComposer.address;
   }
 }
 

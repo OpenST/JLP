@@ -20,16 +20,22 @@ program.command('utilityToken <config>')
       await connected.run(
         configPath,
         async (chainConfig, connection) => {
-          const deployer = new Deployer(chainConfig, connection);
-          const contractInstances = await deployer.deployUtilityToken();
-          chainConfig.update({
-            originOrganizationAddress: contractInstances.originOrganization.address,
-            auxiliaryOrganizationAddress: contractInstances.auxiliaryOrganization.address,
-            originGatewayAddress: contractInstances.originGateway.address,
-            auxiliaryCoGatewayAddress: contractInstances.auxiliaryCoGateway.address,
-            auxiliaryUtilityTokenAddress: contractInstances.auxiliaryUtilityToken.address,
-          });
-          chainConfig.write(configPath);
+          try {
+            const deployer = new Deployer(chainConfig, connection);
+            const contractInstances = await deployer.deployUtilityToken();
+            chainConfig.update({
+              originOrganizationAddress: contractInstances.originOrganization.address,
+              auxiliaryOrganizationAddress: contractInstances.auxiliaryOrganization.address,
+              originAnchorAddress: contractInstances.originAnchor.address,
+              auxiliaryAnchorAddress: contractInstances.auxiliaryAnchor.address,
+              originGatewayAddress: contractInstances.originGateway.address,
+              auxiliaryCoGatewayAddress: contractInstances.auxiliaryCoGateway.address,
+              auxiliaryUtilityTokenAddress: contractInstances.auxiliaryUtilityToken.address,
+            });
+            chainConfig.write(configPath);
+          } catch (e) {
+            console.error('Error while deploying ', e);
+          }
         },
       );
     },

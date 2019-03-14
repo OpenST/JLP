@@ -128,7 +128,7 @@ node src/bin/facilitator.js progressStake path_to_config.json messageHash
 
 * Replace `path_to_config.json` with a file location where config must be stored.
 * Replace `messageHash` with a hash generated in stake facilitator step. 
-. 
+
  
  This step will mint tokens in auxiliary chain.
 
@@ -167,7 +167,7 @@ Prerequisite: `eip20TokenAddress`in config file. Optionally, you can run EIP20 T
 # Help: 
 node src/bin/bt.js --help
 
-node src/bin/bt.js brandedToken <config.json> <symbol> <name> <decimal> <conversionRate> <conversionDecimal>
+node src/bin/bt.js setupBrandedToken <config.json> <symbol> <name> <decimal> <conversionRate> <conversionDecimal>
 
 ```
 
@@ -183,6 +183,54 @@ node src/bin/bt.js setupUtilityBrandedToken <config.json>
 
 ```
 
+## Setup GatewayComposer
+
+Prerequisite: `eip20TokenAddress` and `brandedToken` address in the config file.
+
+```bash
+# Help: 
+node src/bin/bt.js --help
+
+node src/bin/bt.js gatewayComposer path_to_config.json
+
+```
+
+* Replace `path_to_config.json` with a file location where config is stored.
+
+## Request Stake for BT
+
+Prerequisite: `eip20TokenAddress` and `brandedToken` address in the config file.
+
+```bash
+# Help: 
+node src/bin/bt.js --help
+
+node src/bin/bt.js requestStake path_to_config.json originGatewayAddress stakeVT beneficiary gasPrice gasLimit
+
+```
+
+* Replace `path_to_config.json` with a file location where config is stored.
+* Replace `originGatewayAddress` with the address of origin gateway contract address.
+* Replace `stakeVT` with amount of value tokens to be staked.
+* Replace `beneficiary` with the address for minting tokens.
+* Replace `gasPrice` with the number representing the gas price for the request.
+* Replace `gasLimit` with the number representing the gas limit for the request.
+
+## Accept Stake for BT
+
+Prerequisite: `stakeRequestHash` in `stakeRequests` in the config file. 
+
+```bash
+# Help: 
+node src/bin/bt.js --help
+
+node src/bin/bt.js acceptStake path_to_config.json stakeRequestHash
+
+```
+
+* Replace `path_to_config.json` with a file location where config is stored.
+* Replace `stakeRequestHash` with the hash received from `requestStake` process.
+* Use `facilitator` agent to progress.
 
 ## Redeem Facilitator
 

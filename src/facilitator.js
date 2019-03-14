@@ -3,9 +3,10 @@ const { Facilitator: MosaicFacilitator, Utils, ContractInteract } = require('@op
 const logger = require('./logger');
 
 class Facilitator {
-  constructor(chainConfig, connection) {
+  constructor(chainConfig, connection, mosaic) {
+    this.connection = connection;
     this.chainConfig = chainConfig;
-    this.mosaic = chainConfig.toMosaic(connection);
+    this.mosaic = mosaic;
     this.mosaicFacilitator = new MosaicFacilitator(this.mosaic);
   }
 
@@ -29,6 +30,11 @@ class Facilitator {
       hashLock,
       txOptions,
       unlockSecret,
+      auxiliaryUtilityTokenAddress: this.chainConfig.auxiliaryUtilityTokenAddress,
+      auxiliaryOrganizationAddress: this.chainConfig.auxiliaryOrganizationAddress,
+      originGatewayAddress: this.chainConfig.originGatewayAddress,
+      originOrganizationAddress: this.chainConfig.originOrganizationAddress,
+      auxiliaryCoGatewayAddress: this.chainConfig.auxiliaryCoGatewayAddress,
     };
 
     await this.mosaicFacilitator.stake(
@@ -60,6 +66,7 @@ class Facilitator {
     stakeRequest.messageHash = messageHash;
     stakeRequest.nonce = currentNonce.toString();
 
+
     const { stakes } = this.chainConfig;
 
     stakes[messageHash] = stakeRequest;
@@ -79,9 +86,13 @@ class Facilitator {
 
     const txOptionAuxiliary = {
       gasPrice: this.chainConfig.auxiliaryGasPrice,
-      from: this.chainConfig.auxiliaryDeployerAddress,
+      from: this.connection.auxiliaryAccount.address,
     };
 
+    const txOptionOrigin = {
+      gasPrice: this.chainConfig.originGasPrice,
+      from: this.connection.originAccount.address,
+    };
     await this.mosaicFacilitator.progressStake(
       stakeRequest.staker,
       stakeRequest.amount,
@@ -91,7 +102,7 @@ class Facilitator {
       stakeRequest.nonce.toString(),
       stakeRequest.hashLock,
       stakeRequest.unlockSecret,
-      stakeRequest.txOptions,
+      txOptionOrigin,
       txOptionAuxiliary,
     );
 
