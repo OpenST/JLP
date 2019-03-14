@@ -1,4 +1,3 @@
-const Web3 = require('web3');
 const Package = require('@openstfoundation/openst.js');
 
 const logger = require('./logger');
@@ -31,7 +30,6 @@ class OpenST {
 
   async setupOpenst(auxiliaryOrganization, auxiliaryEIP20Token) {
     logger.info('Starting Setup of OpenST');
-    const openst = new Package.Setup.OpenST(this.auxiliary.web3);
     const tokenHolderTxOptions = this.auxiliary.txOptions;
     const gnosisTxOptions = this.auxiliary.txOptions;
     const recoveryTxOptions = this.auxiliary.txOptions;
@@ -46,7 +44,8 @@ class OpenST {
       userWalletFactory,
       proxyFactory,
       createAndAddModules,
-    } = await openst.setup(
+    } = await Package.SetupOpenst(
+      this.auxiliary.web3,
       tokenHolderTxOptions,
       gnosisTxOptions,
       recoveryTxOptions,

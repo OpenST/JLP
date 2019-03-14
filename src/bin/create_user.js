@@ -3,8 +3,7 @@
 'use strict';
 
 const program = require('commander');
-const Web3 = require('web3');
-const { GnosisSafe, Helpers } = require('@openstfoundation/openst.js');
+const { ContractInteract, Helpers } = require('@openstfoundation/openst.js');
 
 const connected = require('../connected');
 const logger = require('../logger');
@@ -63,7 +62,7 @@ program
           const gnosisSafeProxy = returnValues._gnosisSafeProxy;
           const tokenHolderProxy = returnValues._tokenHolderProxy;
           logger.info('User created!');
-          const gnosisSafe = new GnosisSafe(web3, gnosisSafeProxy);
+          const gnosisSafe = new ContractInteract.GnosisSafe(web3, gnosisSafeProxy);
           const modules = await gnosisSafe.getModules();
           const recoveryProxy = modules[0];
           logger.info(`gnosisSafeProxy: ${gnosisSafeProxy}\n tokenHolderProxy: ${tokenHolderProxy}\n recoveryProxy: ${recoveryProxy}`);

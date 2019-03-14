@@ -270,6 +270,8 @@ Prerequisite:
 * `recoveryControllerAddress` recoveryController address in your config file.
 * `recoveryBlockDelay` recovery block delay in your config file.
 
+Don't forget to update config.openst with recoveryOwnerAddress, recoveryControllerAddress and recoveryBlockDelay.
+
 ```bash
 # Help:
 node ./src/bin/create_user.js --help

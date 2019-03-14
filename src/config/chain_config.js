@@ -7,8 +7,8 @@ class ChainConfig {
    * @param {string} [filePath] An optional config file to overwrite any defaults or env variables.
    */
   constructor(filePath) {
-    this.originWeb3Provider = process.env.ORIGIN_WEB3_PROVIDER || 'http://localhost:8545';
-    this.auxiliaryWeb3Provider = process.env.AUXILIARY_WEB3_PROVIDER || 'http://localhost:8547';
+    this.originWeb3Provider = process.env.ORIGIN_WEB3_PROVIDER || 'ws://localhost:8647';
+    this.auxiliaryWeb3Provider = process.env.AUXILIARY_WEB3_PROVIDER || 'ws://localhost:8646';
     this.originChainId = process.env.ORIGIN_CHAIN_ID || 3;
     this.auxiliaryChainId = process.env.AUXILIARY_CHAIN_ID || 200;
     this.simpleTokenAddress = process.env.SIMPLE_TOKEN_ADDRESS || '0xca954C91BE676cBC4D5Ab5F624b37402E5f0d957';
