@@ -46,7 +46,7 @@ program.command('setupUtilityBrandedToken <config>')
             await btDeployer.deployUtilityBrandedToken();
             chainConfig.write(config);
           } catch (e) {
-            console.log(e);
+            console.error(e);
           }
         },
       );

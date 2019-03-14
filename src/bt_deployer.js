@@ -155,7 +155,7 @@ class BTDeployer {
       gasPrice: this.auxiliary.txOptions.gasPrice,
       from: this.auxiliary.masterKey,
     };
-    console.log('deploying UBT things');
+
     const {
       auxiliaryOrganization,
       utilityBrandedToken,
@@ -191,14 +191,12 @@ class BTDeployer {
       from: this.origin.masterKey,
     };
     const stakeVaultAddress = await originGateway.getStakeVault();
-    console.log('lift restriction  for ', [originGateway.address, stakeVaultAddress]);
 
     await brandedToken.liftRestriction(
       [originGateway.address, stakeVaultAddress],
       liftRestrictionTxOptions,
     );
 
-    console.log('lift restriction  done');
     this.chainConfig.utilityBrandedTokens.push({
       address: utilityBrandedToken.address,
       organizationAddress: auxiliaryOrganization.address,
