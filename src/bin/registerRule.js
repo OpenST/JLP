@@ -6,6 +6,7 @@ const program = require('commander');
 const Web3 = require('web3');
 const OpenST = require('@openstfoundation/openst.js');
 
+const connected = require('../connected');
 const ChainConfig = require('../config/chain_config');
 const logger = require('../logger');
 
@@ -18,26 +19,30 @@ program
   .description('An executable to register rules in tokenrules.')
   .action(
     async (config, ruleName, ruleAddress, ruleAbi) => {
-      const chainConfig = new ChainConfig(config);
-      const registerRuleTxOptions = {
-        from: chainConfig.auxiliaryMasterKey, // MasterKey is Worker address
-        gasPrice: chainConfig.auxiliaryGasPrice,
-      };
-      const auxiliaryWeb3 = new Web3(chainConfig.auxiliaryWeb3Provider);
-      const tokenRules = new OpenST.ContractInteract.TokenRules(
-        auxiliaryWeb3,
-        chainConfig.openst.tokenRules,
+      await connected.run(
+        config,
+        async (chainConfig, connection) => {
+          const registerRuleTxOptions = {
+            from: connection.auxiliaryAccount.address, // MasterKey is Worker address
+            gasPrice: chainConfig.auxiliaryGasPrice,
+          };
+          const auxiliaryWeb3 = new Web3(connection.auxiliaryWeb3);
+          const tokenRules = new OpenST.ContractInteract.TokenRules(
+            auxiliaryWeb3,
+            chainConfig.openst.tokenRules,
+          );
+          await tokenRules.registerRule(ruleName, ruleAddress, ruleAbi, registerRuleTxOptions);
+          logger.info(`Rule ${ruleName} registered!`);
+          logger.info('Validating registered rule...');
+          const rule = await tokenRules.getRuleByName(ruleName);
+          if (!rule || (rule.ruleAddress !== auxiliaryWeb3.utils.toChecksumAddress(ruleAddress))) {
+            logger.info(`Failure in registration of rule: ${ruleName}.`);
+            Promise.reject(new Error(`Failure in registration of rule: ${ruleName}.`));
+          } else {
+            logger.info(`Rule: ${ruleName} successfully registered.`);
+          }
+        },
       );
-      await tokenRules.registerRule(ruleName, ruleAddress, ruleAbi, registerRuleTxOptions);
-      logger.info(`Rule ${ruleName} registered!`);
-      logger.info('Validating registered rule...');
-      const rule = await tokenRules.getRuleByName(ruleName);
-      if (!rule || (rule.ruleAddress !== auxiliaryWeb3.utils.toChecksumAddress(ruleAddress))) {
-        logger.info(`Failure in registration of rule: ${ruleName}.`);
-        Promise.reject(new Error(`Failure in registration of rule: ${ruleName}.`));
-      } else {
-        logger.info(`Rule: ${ruleName} successfully registered.`);
-      }
     },
   )
   .on(

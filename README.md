@@ -245,10 +245,10 @@ node src/bin/facilitator.js progressRedeem path_to_config.json messageHash
   node ./src/bin/registerRule.js config.json ruleName ruleAddress ruleAbi
   ```
   
-  * Replace `config.json` with the path to the configuration file.
-  * Replace `ruleName` with name of the rule.
-  * Replace `ruleAddress` with address of the rule. 
-  * Replace `ruleAbi` with abi of the rule. 
+* Replace `config.json` with the path to the configuration file.
+* Replace `ruleName` with name of the rule.
+* Replace `ruleAddress` with address of the rule. 
+* Replace `ruleAbi` with abi of the rule. 
 
 ## Tests
 
