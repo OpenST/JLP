@@ -1,4 +1,4 @@
-# Jean-Luc Picards Star Fleet training academy
+# 🚀 Jean-Luc Picards Star Fleet training academy
 
 ## getting started (on testnet)
 
@@ -35,13 +35,13 @@ Accounts are stored as encrypted Web3 key-vaults.
 
 ```bash
 # Help:
-./src/bin/accounts.js -h
+./src/bin/account.js -h
 
 # Create a new origin account
-./src/bin/accounts.js origin
+./src/bin/account.js origin
 
 # Create a new auxiliary account
-./src/bin/accounts.js auxiliary
+./src/bin/account.js auxiliary
 ```
 
 ## EIP20 Token
@@ -63,14 +63,18 @@ It will write `eip20TokenAddress` to your config file.
 
 Prerequisite: `eip20TokenAddress` in your config file.
 
-If you want to deploy gateways, use the `deploy` executable:
+If you want to deploy contracts to the chains, use the `deploy` executable:
 
 ```bash
 # Help:
 ./src/bin/deploy.js -h
 
-# Deployment:
-./src/bin/deploy.js config.json
+# Deployment of utility token with gateways (requires anchor addresses in your config):
+./src/bin/deploy.js utilityToken config.json
+
+# If you don't have anchor addresses, yet, you must deploy anchors first.
+# Deployment of anchors:
+./src/bin/deploy.js anchors config.json
 ```
 
 It will write contract addresses to your config file.
@@ -231,34 +235,43 @@ It will write `tokenRulesAddress` to your config file.
 
 ## Create User
 
-   Prerequisite: 
-   * `tokenHolderMasterCopy` master copy in your config file.
-   * `gnosisSafeMasterCopy` master copy in your config file.
-   * `recoveryMasterCopy` master copy in your config file.
-   * `ProxyFactory` contract address in your config file.
-   * `userWalletFactory` contract address in your config file.
-   * `proxyFactory` contract address in your config file.
-   * `createAndAddModules` contract address in your config file.
-   * `tokenRules` contract address in your config file.
-   * `recoveryOwnerAddress` recoveryOwner address in your config file.
-   * `recoveryControllerAddress` recoveryController address in your config file.
-   * `recoveryBlockDelay` recovery block delay in your config file.
+Prerequisite: 
+* `tokenHolderMasterCopy` master copy in your config file.
+* `gnosisSafeMasterCopy` master copy in your config file.
+* `recoveryMasterCopy` master copy in your config file.
+* `ProxyFactory` contract address in your config file.
+* `userWalletFactory` contract address in your config file.
+* `proxyFactory` contract address in your config file.
+* `createAndAddModules` contract address in your config file.
+* `tokenRules` contract address in your config file.
+* `recoveryOwnerAddress` recoveryOwner address in your config file.
+* `recoveryControllerAddress` recoveryController address in your config file.
+* `recoveryBlockDelay` recovery block delay in your config file.
 
-   ```bash
-  # Help:
-  node ./src/bin/create_user.js --help
+```bash
+# Help:
+node ./src/bin/create_user.js --help
   
-  # Create User:
-  node ./src/bin/create_user.js <config.json> <eip20Token> <owners> <threshold> <sessionKeys> <sessionKeySpendingLimits> <sessionKeyExpirationHeights>
-  ```
+# Create User:
+node ./src/bin/create_user.js <config.json> <eip20Token> <owners> <threshold> <sessionKeys> <sessionKeySpendingLimits> <sessionKeyExpirationHeights>
+```
 
-  * Replace `config.json` with the path to the configuration file.
-  * Replace `eip20Token` with the UBT address of the economy.
-  * Replace `owners` with comma separated owner addresses.
-  * Replace `threshold` with gnosis requirement. 
-  * Replace `sessionKeys` comma separated ephemeral keys. 
-  * Replace `sessionKeySpendingLimits` comma separated spending limits corresponding to ephemeral keys. 
-  * Replace `sessionKeyExpirationHeights` comma separated expiration heights corresponding to ephemeral keys. 
+* Replace `config.json` with the path to the configuration file.
+* Replace `eip20Token` with the UBT address of the economy.
+* Replace `owners` with comma separated owner addresses.
+* Replace `threshold` with gnosis requirement. 
+* Replace `sessionKeys` comma separated ephemeral keys. 
+* Replace `sessionKeySpendingLimits` comma separated spending limits corresponding to ephemeral keys. 
+* Replace `sessionKeyExpirationHeights` comma separated expiration heights corresponding to ephemeral keys. 
+
+## Tests
+
+To run the tests run `npm run test`.
+
+If you don't have a `./test/config_init.json` file, it will be copied with the default values.
+If you need a different config, you should update the file before running the tests again.
+
+For more details see [the test README](./test/README.md).
 
 ## Helpers
 
