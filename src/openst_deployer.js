@@ -3,16 +3,16 @@ const Package = require('@openstfoundation/openst.js');
 
 const logger = require('./logger');
 
-class OpenSTDeployer {
-  constructor(chainConfig) {
+class OpenST {
+  constructor(chainConfig, connection) {
     this.chainConfig = chainConfig;
     this.auxiliary = {
-      web3: new Web3(chainConfig.auxiliaryWeb3Provider),
+      web3: connection.auxiliaryWeb3,
       chainId: chainConfig.auxiliaryChainId,
-      deployer: chainConfig.auxiliaryDeployerAddress,
+      deployer: connection.auxiliaryAccount.address,
       txOptions: {
         gasPrice: chainConfig.auxiliaryGasPrice,
-        from: chainConfig.auxiliaryDeployerAddress,
+        from: connection.auxiliaryAccount.address,
       },
     };
   }
@@ -74,4 +74,4 @@ class OpenSTDeployer {
   }
 }
 
-module.exports = OpenSTDeployer;
+module.exports = OpenST;

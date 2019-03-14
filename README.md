@@ -215,40 +215,40 @@ node src/bin/facilitator.js progressRedeem path_to_config.json messageHash
 
   * `messageHash` generated in redeem facilitator step.
   
- ## Setup OpenST
+## Setup OpenST
     
- ```bash
- # Help:
- node ./src/bin/openst.js --help
+```bash
+# Help:
+node ./src/bin/openst.js --help
     
- # Setup OpenST:
- node ./src/bin/openst.js config.json organization eip20Token
- ```
+# Setup OpenST:
+node ./src/bin/openst.js config.json organization eip20Token
+```
     
- It will write below contract address to your config file:
- * TokenHolder master copy address.
- * Gnosis master copy address.
- * Recovery master copy address.
- * UserWalletFactory contract address.
- * ProxyFactory contract address.
- * CreateAndAddModule helper contract address.
- * TokenRules contract address.
-    
- * Replace `config.json` with the path to the configuration file.
- * Replace `organization` with an organization contract address. 
- * Replace `eip20Token` with eip20Token address.
+It will write below contract address to your config file:
+* TokenHolder master copy address.
+* Gnosis master copy address.
+* Recovery master copy address.
+* UserWalletFactory contract address.
+* ProxyFactory contract address.
+* CreateAndAddModule helper contract address.
+* TokenRules contract address.
+
+* Replace `config.json` with the path to the configuration file.
+* Replace `organization` with an organization contract address. 
+* Replace `eip20Token` with eip20Token address.
  
 ## Register Rule to TokenRules
   
-  Prerequisite: `tokenRules` and `worker` in your config file.
-  
-  ```bash
-  # Help:
-  node ./src/bin/registerRule.js --help
-  
-  # Register rule to TokenRules:
-  node ./src/bin/registerRule.js config.json ruleName ruleAddress ruleAbi
-  ```
+Prerequisite: `tokenRules` and `worker` in your config file.
+
+```bash
+# Help:
+node ./src/bin/registerRule.js --help
+
+# Register rule to TokenRules:
+node ./src/bin/registerRule.js config.json ruleName ruleAddress ruleAbi
+```
   
 * Replace `config.json` with the path to the configuration file.
 * Replace `ruleName` with name of the rule.

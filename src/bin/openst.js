@@ -4,8 +4,8 @@
 
 const program = require('commander');
 
-const ChainConfig = require('../config/chain_config');
-const OpenSTDeployer = require('../openst_deployer');
+const connected = require('../connected');
+const OpenST = require('../openst_deployer');
 const { version } = require('../../package.json');
 
 program
@@ -15,10 +15,14 @@ program
   .description('An executable to setup OpenST.')
   .action(
     async (config, organization, eip20Token) => {
-      const chainConfig = new ChainConfig(config);
-      const openstDeployer = new OpenSTDeployer(chainConfig);
-      await openstDeployer.setupOpenst(organization, eip20Token);
-      chainConfig.write(config);
+      await connected.run(
+        config,
+        async (chainConfig, connection) => {
+          const openst = new OpenST(chainConfig, connection);
+          await openst.setupOpenst(organization, eip20Token);
+          chainConfig.write(config);
+        },
+      );
     },
   );
 

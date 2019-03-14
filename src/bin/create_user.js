@@ -32,7 +32,7 @@ program
             from: connection.auxiliaryAccount.address,
             gasPrice: chainConfig.auxiliaryGasPrice,
           };
-          const auxiliaryWeb3 = new Web3(connection.auxiliaryWeb3);
+          const web3 = connection.auxiliaryWeb3;
           const userHelper = new Helpers.User(
             chainConfig.openst.tokenHolderMasterCopy,
             chainConfig.openst.gnosisSafeMasterCopy,
@@ -42,7 +42,7 @@ program
             chainConfig.openst.tokenRules,
             chainConfig.openst.userWalletFactory,
             chainConfig.openst.proxyFactory,
-            auxiliaryWeb3,
+            web3,
           );
           const ownersArray = owners.split(',').map(item => item.trim());
           const sessionKeysArray = sessionKeys.split(',').map(item => item.trim());
@@ -63,7 +63,7 @@ program
           const gnosisSafeProxy = returnValues._gnosisSafeProxy;
           const tokenHolderProxy = returnValues._tokenHolderProxy;
           logger.info('User created!');
-          const gnosisSafe = new GnosisSafe(auxiliaryWeb3, gnosisSafeProxy);
+          const gnosisSafe = new GnosisSafe(web3, gnosisSafeProxy);
           const modules = await gnosisSafe.getModules();
           const recoveryProxy = modules[0];
           logger.info(`gnosisSafeProxy: ${gnosisSafeProxy}\n tokenHolderProxy: ${tokenHolderProxy}\n recoveryProxy: ${recoveryProxy}`);
