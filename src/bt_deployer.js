@@ -110,7 +110,7 @@ class BTDeployer {
       owner: this.auxiliary.masterKey,
       admin: this.auxiliary.masterKey,
       workers: [this.auxiliary.masterKey],
-      workerExpirationHeight: '100000000000000',
+      workerExpirationHeight: '10000000000000',
     };
 
     const auxiliaryUBTConfig = {
@@ -174,7 +174,7 @@ class BTDeployer {
     logger.info(`auxiliaryCoGateway address ${auxiliaryCoGateway.address}`);
 
     this.chainConfig.utilityBrandedTokens.push({
-      address: auxiliaryOrganization.address,
+      address: utilityBrandedToken.address,
       organizationAddress: auxiliaryOrganization.address,
       originGatewayAddress: originGateway.address,
       auxiliaryCoGatewayAddress: auxiliaryCoGateway.address,
