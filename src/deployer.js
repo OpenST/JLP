@@ -1,4 +1,5 @@
 const { Setup, ContractInteract } = require('@openstfoundation/mosaic.js');
+const OpenST = require('@openstfoundation/openst.js');
 
 const logger = require('./logger');
 
@@ -13,6 +14,7 @@ class Deployer {
       },
       token: chainConfig.eip20TokenAddress,
       baseToken: chainConfig.simpleTokenAddress,
+      anchor: chainConfig.originAnchorAddress,
       burner: chainConfig.originBurnerAddress,
       masterKey: connection.originAccount.address,
     };
@@ -24,9 +26,102 @@ class Deployer {
       txOptions: {
         gasPrice: chainConfig.auxiliaryGasPrice,
       },
+      anchor: chainConfig.auxiliaryAnchorAddress,
       burner: chainConfig.auxiliaryBurnerAddress,
       masterKey: connection.auxiliaryAccount.address,
     };
+  }
+
+  /**
+   * Deploys two anchors, one each on origin and auxiliary.
+   *
+   * @returns {Anchor[]} An array, where the first item is the origin anchor and the second item is
+   *                     the auxiliary anchor.
+   */
+  async deployAnchors() {
+    const [originOrganization, auxiliaryOrganization] = await this._deployOrganization();
+
+    return Setup.anchors(
+      this.origin.web3,
+      this.auxiliary.web3,
+      {
+        remoteChainId: this.auxiliary.chainId,
+        // Anchors use ring buffers to limit the number of state roots they store:
+        maxStateRoots: '10',
+        organization: originOrganization.address,
+        organizationOwner: this.origin.masterKey,
+        deployer: this.origin.deployer,
+      },
+      {
+        // The chain id of the chain that is tracked by this anchor:
+        remoteChainId: this.origin.chainId,
+        // Anchors use ring buffers to limit the number of state roots they store:
+        maxStateRoots: '10',
+        organization: auxiliaryOrganization.address,
+        organizationOwner: this.auxiliary.masterKey,
+        deployer: this.auxiliary.deployer,
+      },
+      this.origin.txOptions,
+      this.auxiliary.txOptions,
+    );
+  }
+
+  /**
+   * Deploys organizations on both chains, a utility token on auxiliary, and gateways on both
+   * chains. Also sets the co-gateway in the utility token.
+   *
+   * @returns {Object} originOrganization, auxiliaryOrganization, originGateway, auxiliaryCoGateway,
+   *                   and auxiliaryUtilityToken.
+   */
+  async deployUtilityToken() {
+    logger.info('Deploying organization ');
+    const [originOrganization, auxiliaryOrganization] = await this._deployOrganization();
+
+    logger.info(`origin organization address: ${originOrganization.address}`);
+    logger.info(`auxiliary organization address:  ${auxiliaryOrganization.address}`);
+
+    logger.info('Deploying utility token ');
+    const auxiliaryUtilityToken = await this._deployUtilityToken(auxiliaryOrganization);
+
+    logger.info(`auxiliary utilityToken address ${auxiliaryUtilityToken.address}`);
+
+    logger.info('Deploying gateways');
+    const [originGateway, auxiliaryCoGateway] = await this._deployGateways(
+      originOrganization,
+      auxiliaryOrganization,
+      auxiliaryUtilityToken,
+    );
+
+    logger.info(`origin gateway address ${originGateway.address}`);
+    logger.info(`auxiliary coGateway address ${auxiliaryCoGateway.address}`);
+
+    logger.info('Setting cogateway in utility token');
+    // Fix me https://github.com/OpenSTFoundation/mosaic.js/issues/129
+    await auxiliaryUtilityToken.setCoGateway(
+      auxiliaryCoGateway.address,
+      this.auxiliary.txOptions,
+    );
+
+    logger.info('Deployment successful!!!');
+
+    return {
+      originOrganization,
+      auxiliaryOrganization,
+      originGateway,
+      auxiliaryCoGateway,
+      auxiliaryUtilityToken,
+    };
+  }
+
+  async deployTokenRules(auxiliaryEIP20Token, auxiliaryOrganization) {
+    logger.info('Deploying TokenRules');
+    const tokenRulesSetup = new OpenST.Setup.TokenRules(this.auxiliary.web3);
+    const response = await tokenRulesSetup.deploy(
+      auxiliaryOrganization,
+      auxiliaryEIP20Token,
+      this.auxiliary.txOptions,
+    );
+    return response.receipt.contractAddress;
   }
 
   _deployOrganization() {
@@ -52,35 +147,7 @@ class Deployer {
     );
   }
 
-  _deployAnchors(originOrganizationAddress, auxiliaryOrganizationAddress) {
-    return Setup.anchors(
-      this.origin.web3,
-      this.auxiliary.web3,
-      {
-        remoteChainId: this.auxiliary.chainId,
-        // Anchors use ring buffers to limit the number of state roots they store:
-        maxStateRoots: '10',
-        organization: originOrganizationAddress,
-        organizationOwner: this.origin.masterKey,
-        deployer: this.origin.deployer,
-      },
-      {
-        // The chain id of the chain that is tracked by this anchor:
-        remoteChainId: this.origin.chainId,
-        // Anchors use ring buffers to limit the number of state roots they store:
-        maxStateRoots: '10',
-        organization: auxiliaryOrganizationAddress,
-        organizationOwner: this.auxiliary.masterKey,
-        deployer: this.auxiliary.deployer,
-      },
-      this.origin.txOptions,
-      this.auxiliary.txOptions,
-    );
-  }
-
   async _deployGateways(
-    originAnchor,
-    auxiliaryAnchor,
     originOrganization,
     auxiliaryOrganization,
     auxiliaryUtilityToken,
@@ -91,7 +158,7 @@ class Deployer {
       {
         token: this.origin.token,
         baseToken: this.origin.baseToken,
-        stateRootProvider: originAnchor.address,
+        stateRootProvider: this.origin.anchor,
         bounty: '0',
         organization: originOrganization.address,
         burner: this.origin.burner,
@@ -100,7 +167,7 @@ class Deployer {
       },
       {
         utilityToken: auxiliaryUtilityToken.address,
-        stateRootProvider: auxiliaryAnchor.address,
+        stateRootProvider: this.auxiliary.anchor,
         bounty: '0',
         organization: auxiliaryOrganization.address,
         burner: this.auxiliary.burner,
@@ -122,62 +189,6 @@ class Deployer {
       auxiliaryOrganization.address,
       this.auxiliary.txOptions,
     );
-  }
-
-  async deployUtilityToken() {
-    logger.info('Deploying organization ');
-
-    const [originOrganization, auxiliaryOrganization] = await this._deployOrganization();
-
-    logger.info(`origin organization address: ${originOrganization.address}`);
-    logger.info(`auxiliary organization address:  ${auxiliaryOrganization.address}`);
-
-    logger.info('Deploying anchor');
-    const [originAnchor, auxiliaryAnchor] = await this._deployAnchors(
-      originOrganization.address,
-      auxiliaryOrganization.address,
-    );
-
-    logger.info(`origin anchor address ${originAnchor.address}`);
-    logger.info(`auxiliary anchor address${auxiliaryAnchor.address}`);
-
-    logger.info('Deploying utility token ');
-
-    const auxiliaryUtilityToken = await this._deployUtilityToken(auxiliaryOrganization);
-
-    logger.info(`auxiliary utilityToken address ${auxiliaryUtilityToken.address}`);
-
-    logger.info('Deploying gateways');
-
-    const [originGateway, auxiliaryCoGateway] = await this._deployGateways(
-      originAnchor,
-      auxiliaryAnchor,
-      originOrganization,
-      auxiliaryOrganization,
-      auxiliaryUtilityToken,
-    );
-
-    logger.info(`origin gateway address ${originGateway.address}`);
-    logger.info(`auxiliary coGateway address ${auxiliaryCoGateway.address}`);
-
-    logger.info('Setting cogateway in utility token');
-    // Fix me https://github.com/OpenSTFoundation/mosaic.js/issues/129
-    await auxiliaryUtilityToken.setCoGateway(
-      auxiliaryCoGateway.address,
-      this.auxiliary.txOptions,
-    );
-
-    logger.info('Deployment successful!!!');
-
-    return {
-      originOrganization,
-      auxiliaryOrganization,
-      originAnchor,
-      auxiliaryAnchor,
-      originGateway,
-      auxiliaryCoGateway,
-      auxiliaryUtilityToken,
-    };
   }
 }
 
