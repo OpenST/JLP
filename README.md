@@ -216,6 +216,8 @@ node src/bin/facilitator.js progressRedeem path_to_config.json messageHash
   * `messageHash` generated in redeem facilitator step.
   
 ## Setup OpenST
+
+Prerequisite: `organization` and `eip20Token` contracts should have been deployed.
     
 ```bash
 # Help:
@@ -225,7 +227,7 @@ node ./src/bin/openst.js --help
 node ./src/bin/openst.js config.json organization eip20Token
 ```
     
-It will write below contract address to your config file:
+It will write below contract addresses to your config file:
 * TokenHolder master copy address.
 * Gnosis master copy address.
 * Recovery master copy address.
