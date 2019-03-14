@@ -12,12 +12,12 @@ class ChainConfig {
     this.originChainId = process.env.ORIGIN_CHAIN_ID || 3;
     this.auxiliaryChainId = process.env.AUXILIARY_CHAIN_ID || 200;
     this.simpleTokenAddress = process.env.SIMPLE_TOKEN_ADDRESS || '0xca954C91BE676cBC4D5Ab5F624b37402E5f0d957';
-    this.originMasterKey = process.env.ORIGIN_MASTER_KEY || '0x6c92d481eb56badef931482ef6bf6c8fbf2606e3'; // '0x0efBe7A92D98DA8203cD3FBF4E72B8a1dc4577E7';
-    this.auxiliaryMasterKey = process.env.AUXILIARY_MASTER_KEY || '0x4cef550d4032be92fa8b1b6d945fe496a0484974';
+    this.originMasterKey = process.env.ORIGIN_MASTER_KEY || '0x6d4e5f5ca54b88fdb68a5d0e6ea5aa3869f88116';
+    this.auxiliaryMasterKey = process.env.AUXILIARY_MASTER_KEY || '0xe84e1244e8c74b5b2df317d3ecf2f8ffd1f134d8';
     this.originBurnerAddress = process.env.ORIGIN_BURNER_ADDRESS || '0x0000000000000000000000000000000000000000';
     this.auxiliaryBurnerAddress = process.env.AUXILIARY_BURNER_ADDRESS || '0x0000000000000000000000000000000000000000';
-    this.originDeployerAddress = process.env.ORIGIN_DEPLOYER_ADDRESS || '0x6c92d481eb56badef931482ef6bf6c8fbf2606e3';
-    this.auxiliaryDeployerAddress = process.env.AUXILIARY_DEPLOYER_ADDRESS || '0x4cef550d4032be92fa8b1b6d945fe496a0484974';
+    this.originDeployerAddress = process.env.ORIGIN_DEPLOYER_ADDRESS || '0x6d4e5f5ca54b88fdb68a5d0e6ea5aa3869f88116';
+    this.auxiliaryDeployerAddress = process.env.AUXILIARY_DEPLOYER_ADDRESS || '0xe84e1244e8c74b5b2df317d3ecf2f8ffd1f134d8';
     this.originGasPrice = process.env.ORIGIN_GAS_PRICE || '13000000000';
     this.auxiliaryGasPrice = process.env.AUXILIARY_GAS_PRICE || '1000000000';
     this.workerAddress = process.env.WORKER_ADDRESS || '0x7F6A99881cC1ebcBc7209a636B4692133F8f9F36';

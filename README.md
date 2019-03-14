@@ -230,6 +230,7 @@ node src/bin/bt.js acceptStake path_to_config.json stakeRequestHash
 
 * Replace `path_to_config.json` with a file location where config is stored.
 * Replace `stakeRequestHash` with the hash received from `requestStake` process.
+* Use `facilitator` agent to progress.
 
 ## Redeem Facilitator
 

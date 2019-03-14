@@ -1,6 +1,5 @@
 const { ContractInteract, Helpers } = require('@openstfoundation/brandedtoken.js');
 const { Utils, ContractInteract: MosaicContractInteract } = require('@openstfoundation/mosaic.js');
-const EthUtils = require('ethereumjs-util');
 const Account = require('eth-lib/lib/account');
 const logger = require('./logger');
 
@@ -66,7 +65,7 @@ class BTStakeMint {
       this.chainConfig.brandedToken.address,
       this.chainConfig.gatewayComposerAddress,
     );
-    console.log('calling request stake');
+
     // Fixme https://github.com/OpenSTFoundation/brandedtoken.js/issues/122
     await staker.requestStake(
       stakeVT,
@@ -83,7 +82,6 @@ class BTStakeMint {
       this.chainConfig.gatewayComposerAddress,
     ).call();
 
-    console.log('stakeRequestHash  ', stakeRequestHash);
     const { stakeRequests } = this.chainConfig;
 
     stakeRequest = {
@@ -160,11 +158,6 @@ class BTStakeMint {
       this.chainConfig.brandedToken.address,
     ).getEIP712SignHash();
 
-    let signature = EthUtils.ecsign(
-      EthUtils.toBuffer(requestHashToBeSigned),
-      EthUtils.toBuffer(this.chainConfig.workerPrivateKey),
-    );
-
     signature = signData(requestHashToBeSigned, this.chainConfig.workerPrivateKey);
 
     await facilitator.acceptStakeRequest(
@@ -185,7 +178,6 @@ class BTStakeMint {
       staker,
     ).call();
 
-    console.log('active process ', activeProcess);
     // FixMe https://github.com/OpenSTFoundation/mosaic.js/issues/136
     const nextNonce = await gatewayInstance.contract.methods.getNonce(
       staker,
