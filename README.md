@@ -260,9 +260,9 @@ node ./src/bin/create_user.js <config.json> <eip20Token> <owners> <threshold> <s
 * Replace `eip20Token` with the UBT address of the economy.
 * Replace `owners` with comma separated owner addresses.
 * Replace `threshold` with gnosis requirement. 
-* Replace `sessionKeys` comma separated ephemeral keys. 
-* Replace `sessionKeySpendingLimits` comma separated spending limits corresponding to ephemeral keys. 
-* Replace `sessionKeyExpirationHeights` comma separated expiration heights corresponding to ephemeral keys. 
+* Replace `sessionKeys` comma separated session keys. 
+* Replace `sessionKeySpendingLimits` comma separated spending limits corresponding to session keys. 
+* Replace `sessionKeyExpirationHeights` comma separated expiration heights corresponding to session keys. 
 
 ## Tests
 

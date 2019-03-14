@@ -24,6 +24,7 @@ class ChainConfig {
     this.stakes = {};
     this.redeems = {};
     this.utilityBrandedTokens = [];
+    this.users = [];
 
     // If a file path is given, config from the file will overwrite config from ENV or default.
     this.parseFile(filePath);

@@ -4,13 +4,11 @@
 
 const program = require('commander');
 const Web3 = require('web3');
-const OpenST = require('@openstfoundation/openst.js');
+const { GnosisSafe, Helpers } = require('@openstfoundation/openst.js');
 
 const connected = require('../connected');
 const logger = require('../logger');
 const { version } = require('../../package.json');
-
-const { GnosisSafe } = OpenST.ContractInteract;
 
 program
   .version(version)
@@ -35,7 +33,7 @@ program
             gasPrice: chainConfig.auxiliaryGasPrice,
           };
           const auxiliaryWeb3 = new Web3(connection.auxiliaryWeb3);
-          const userHelper = new OpenST.Helpers.User(
+          const userHelper = new Helpers.User(
             chainConfig.openst.tokenHolderMasterCopy,
             chainConfig.openst.gnosisSafeMasterCopy,
             chainConfig.openst.recoveryMasterCopy,
@@ -67,7 +65,15 @@ program
           logger.info('User created!');
           const gnosisSafe = new GnosisSafe(auxiliaryWeb3, gnosisSafeProxy);
           const modules = await gnosisSafe.getModules();
-          logger.info(`gnosisSafeProxy: ${gnosisSafeProxy}\n tokenHolderProxy: ${tokenHolderProxy}\n recoveryProxy: ${modules[0]}`);
+          const recoveryProxy = modules[0];
+          logger.info(`gnosisSafeProxy: ${gnosisSafeProxy}\n tokenHolderProxy: ${tokenHolderProxy}\n recoveryProxy: ${recoveryProxy}`);
+          const user = {
+            gnosisSafeProxy,
+            tokenHolderProxy,
+            recoveryProxy,
+          };
+          chainConfig.users.push(user);
+          chainConfig.write(config);
         },
       );
     },
@@ -81,8 +87,8 @@ program
       console.log('  eip20Token                   EIP20Token address of an economy.');
       console.log('  owners                       comma separated owners.');
       console.log('  threshold                    gnosis requirement.');
-      console.log('  sessionKeys                  comma separated ephemeral keys.');
-      console.log('  sessionKeySpendingLimits    comma separated session keys spending limits.');
+      console.log('  sessionKeys                  comma separated session keys.');
+      console.log('  sessionKeySpendingLimits     comma separated session keys spending limits.');
       console.log('  sessionKeyExpirationHeights  comma separated session keys expiration heights.');
       console.log('');
       console.log('Examples:');
