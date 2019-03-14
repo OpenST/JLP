@@ -1,4 +1,4 @@
-# Jean-Luc Picards Star Fleet training academy
+# 🚀 Jean-Luc Picards Star Fleet training academy
 
 ## getting started (on testnet)
 
@@ -232,6 +232,15 @@ It will write `tokenRulesAddress` to your config file.
 * Replace `config.json` with the path to the configuration file.
 * Replace `eip20Token` with eip20Token address.
 * Replace `organization` with an organization contract address. 
+
+## Tests
+
+To run the tests run `npm run test`.
+
+If you don't have a `./test/config_init.json` file, it will be copied with the default values.
+If you need a different config, you should update the file before running the tests again.
+
+For more details see [the test README](./test/README.md).
 
 ## Helpers
 
