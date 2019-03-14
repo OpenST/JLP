@@ -12,8 +12,9 @@ const { version } = require('../../package.json');
 program
   .version(version)
   .name('deploy')
-  .description('An executable to deploy a utility token.')
-  .arguments('<config>')
+  .description('An executable to deploy a utility token.');
+
+program.command('utilityToken <config>')
   .action(
     async (configPath) => {
       await connected.run(
@@ -38,13 +39,33 @@ program
         },
       );
     },
-  )
-  .on(
-    '--help',
-    () => {
-      console.log('');
-      console.log('Arguments:');
-      console.log('  config     path to a config file');
+  );
+
+program.command('anchors <config>')
+  .action(
+    async (configPath) => {
+      await connected.run(
+        configPath,
+        async (chainConfig, connection) => {
+          const deployer = new Deployer(chainConfig, connection);
+          const [originAnchor, auxiliaryAnchor] = await deployer.deployAnchors();
+
+          chainConfig.update({
+            originAnchorAddress: originAnchor.address,
+            auxiliaryAnchorAddress: auxiliaryAnchor.address,
+          });
+          chainConfig.write(configPath);
+        },
+      );
     },
-  )
+  );
+
+program.on(
+  '--help',
+  () => {
+    console.log('');
+    console.log('Arguments:');
+    console.log('  config  path to a config file');
+  },
+)
   .parse(process.argv);

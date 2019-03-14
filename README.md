@@ -1,4 +1,4 @@
-# Jean-Luc Picards Star Fleet training academy
+# 🚀 Jean-Luc Picards Star Fleet training academy
 
 ## getting started (on testnet)
 
@@ -35,13 +35,13 @@ Accounts are stored as encrypted Web3 key-vaults.
 
 ```bash
 # Help:
-./src/bin/accounts.js -h
+./src/bin/account.js -h
 
 # Create a new origin account
-./src/bin/accounts.js origin
+./src/bin/account.js origin
 
 # Create a new auxiliary account
-./src/bin/accounts.js auxiliary
+./src/bin/account.js auxiliary
 ```
 
 ## EIP20 Token
@@ -63,14 +63,18 @@ It will write `eip20TokenAddress` to your config file.
 
 Prerequisite: `eip20TokenAddress` in your config file.
 
-If you want to deploy gateways, use the `deploy` executable:
+If you want to deploy contracts to the chains, use the `deploy` executable:
 
 ```bash
 # Help:
 ./src/bin/deploy.js -h
 
-# Deployment:
-./src/bin/deploy.js config.json
+# Deployment of utility token with gateways (requires anchor addresses in your config):
+./src/bin/deploy.js utilityToken config.json
+
+# If you don't have anchor addresses, yet, you must deploy anchors first.
+# Deployment of anchors:
+./src/bin/deploy.js anchors config.json
 ```
 
 It will write contract addresses to your config file.
@@ -256,25 +260,83 @@ node src/bin/facilitator.js progressRedeem path_to_config.json messageHash
 
 ```
 
- * `messageHash` generated in redeem facilitator step.
+  * `messageHash` generated in redeem facilitator step.
+  
+ ## Deploy TokenRules
+ 
+ Prerequisite: `eip20Token` and `organization` in your config file.
+ These contracts  should be deployed on auxiliary chain.
+ 
+ ```bash
+ # Help:
+ node ./src/bin/tokenrules.js --help
+ 
+ # Deploy TokenRules token:
+ node ./src/bin/tokenrules.js config.json eip20Token organization
+ ```
+ 
+ It will write `tokenRulesAddress` to your config file.
+ 
+ * Replace `config.json` with the path to the configuration file.
+ * Replace `eip20Token` with eip20Token address.
+ * Replace `organization` with an organization contract address. 
+ 
+ ## Register Rule to TokenRules
+  
+  Prerequisite: `tokenRules` and `worker` in your config file.
+  
+  ```bash
+  # Help:
+  node ./src/bin/registerRule.js --help
+  
+  # Register rule to TokenRules:
+  node ./src/bin/registerRule.js config.json ruleName ruleAddress ruleAbi
+  ```
+  
+* Replace `config.json` with the path to the configuration file.
+* Replace `ruleName` with name of the rule.
+* Replace `ruleAddress` with address of the rule. 
+* Replace `ruleAbi` with abi of the rule. 
 
-## Deploy TokenRules
+## Create User
 
-Prerequisite: `eip20Token` and `organization` in your config file.
+Prerequisite: 
+* `tokenHolderMasterCopy` master copy in your config file.
+* `gnosisSafeMasterCopy` master copy in your config file.
+* `recoveryMasterCopy` master copy in your config file.
+* `ProxyFactory` contract address in your config file.
+* `userWalletFactory` contract address in your config file.
+* `proxyFactory` contract address in your config file.
+* `createAndAddModules` contract address in your config file.
+* `tokenRules` contract address in your config file.
+* `recoveryOwnerAddress` recoveryOwner address in your config file.
+* `recoveryControllerAddress` recoveryController address in your config file.
+* `recoveryBlockDelay` recovery block delay in your config file.
 
 ```bash
 # Help:
-node ./src/bin/tokenrules.js --help
-
-# Deploy TokenRules token:
-node ./src/bin/tokenrules.js config.json eip20Token organization
+node ./src/bin/create_user.js --help
+  
+# Create User:
+node ./src/bin/create_user.js <config.json> <eip20Token> <owners> <threshold> <sessionKeys> <sessionKeySpendingLimits> <sessionKeyExpirationHeights>
 ```
 
-It will write `tokenRulesAddress` to your config file.
-
 * Replace `config.json` with the path to the configuration file.
-* Replace `eip20Token` with eip20Token address.
-* Replace `organization` with an organization contract address. 
+* Replace `eip20Token` with the UBT address of the economy.
+* Replace `owners` with comma separated owner addresses.
+* Replace `threshold` with gnosis requirement. 
+* Replace `sessionKeys` comma separated session keys. 
+* Replace `sessionKeySpendingLimits` comma separated spending limits corresponding to session keys. 
+* Replace `sessionKeyExpirationHeights` comma separated expiration heights corresponding to session keys. 
+
+## Tests
+
+To run the tests run `npm run test`.
+
+If you don't have a `./test/config_init.json` file, it will be copied with the default values.
+If you need a different config, you should update the file before running the tests again.
+
+For more details see [the test README](./test/README.md).
 
 ## Helpers
 
@@ -286,7 +348,7 @@ Send base tokens from the local account to an address.
 # Help:
 node ./src/bin/send.js --help
 
-# Deploy TokenRules token:
+# Send funds:
 node ./src/bin/send.js config.json auxiliary 0xab3778bfa8edc02c290ccf192a5bbe3bba21e9a2 26346717769700000000
 ```
 
@@ -298,6 +360,7 @@ Get the base token balance of a local account.
 # Help:
 node ./src/bin/balance.js --help
 
-# Deploy TokenRules token:
+# Check balance:
 node ./src/bin/balance.js config.json auxiliary
 ```
+  

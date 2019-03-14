@@ -31,8 +31,8 @@ class BTDeployer {
     };
   }
 
-  async _deployOriginOrganization() {
-    const response = await Setup.organization(
+  _deployOriginOrganization() {
+    return Setup.organization(
       this.origin.web3,
       {
         deployer: this.origin.deployer,
@@ -46,7 +46,6 @@ class BTDeployer {
       },
       this.origin.txOptions,
     );
-    return response;
   }
 
   _deployBrandedToken(symbol, name, decimal, conversionRate, conversionRateDecimals, organization) {
@@ -117,7 +116,7 @@ class BTDeployer {
         this.origin.web3.utils.toChecksumAddress(this.chainConfig.workerAddress),
         this.origin.web3.utils.toChecksumAddress(this.auxiliary.masterKey),
       ],
-      workerExpirationHeight: '200000000',
+      workerExpirationHeight: '10000000000000',
     };
 
     const auxiliaryUBTConfig = {
@@ -203,7 +202,6 @@ class BTDeployer {
       originGatewayAddress: originGateway.address,
       auxiliaryCoGatewayAddress: auxiliaryCoGateway.address,
     });
-
 
     return {
       auxiliaryOrganization,
