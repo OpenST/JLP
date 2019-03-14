@@ -46,7 +46,7 @@ program.command('setupUtilityBrandedToken <config>')
             await btDeployer.deployUtilityBrandedToken();
             chainConfig.write(config);
           } catch (e) {
-            console.log('the exception is :- ', e);
+            console.log(e);
           }
         },
       );
@@ -85,7 +85,7 @@ program.command('requestStake <config> <originGatewayAddress> <stakeVT> <benefic
             );
             chainConfig.write(config);
           } catch (e) {
-            console.error('the exception is :- ', e);
+            console.error(e);
           }
         });
     },
