@@ -213,25 +213,43 @@ node src/bin/facilitator.js progressRedeem path_to_config.json messageHash
 
 ```
 
- * `messageHash` generated in redeem facilitator step.
-
-## Deploy TokenRules
-
-Prerequisite: `eip20Token` and `organization` in your config file.
-
-```bash
-# Help:
-node ./src/bin/tokenrules.js --help
-
-# Deploy TokenRules token:
-node ./src/bin/tokenrules.js config.json eip20Token organization
-```
-
-It will write `tokenRulesAddress` to your config file.
-
+  * `messageHash` generated in redeem facilitator step.
+  
+ ## Deploy TokenRules
+ 
+ Prerequisite: `eip20Token` and `organization` in your config file.
+ These contracts  should be deployed on auxiliary chain.
+ 
+ ```bash
+ # Help:
+ node ./src/bin/tokenrules.js --help
+ 
+ # Deploy TokenRules token:
+ node ./src/bin/tokenrules.js config.json eip20Token organization
+ ```
+ 
+ It will write `tokenRulesAddress` to your config file.
+ 
+ * Replace `config.json` with the path to the configuration file.
+ * Replace `eip20Token` with eip20Token address.
+ * Replace `organization` with an organization contract address. 
+ 
+ ## Register Rule to TokenRules
+  
+  Prerequisite: `tokenRules` and `worker` in your config file.
+  
+  ```bash
+  # Help:
+  node ./src/bin/registerRule.js --help
+  
+  # Register rule to TokenRules:
+  node ./src/bin/registerRule.js config.json ruleName ruleAddress ruleAbi
+  ```
+  
 * Replace `config.json` with the path to the configuration file.
-* Replace `eip20Token` with eip20Token address.
-* Replace `organization` with an organization contract address. 
+* Replace `ruleName` with name of the rule.
+* Replace `ruleAddress` with address of the rule. 
+* Replace `ruleAbi` with abi of the rule. 
 
 ## Tests
 
@@ -267,3 +285,4 @@ node ./src/bin/balance.js --help
 # Check balance:
 node ./src/bin/balance.js config.json auxiliary
 ```
+  
