@@ -251,6 +251,37 @@ node src/bin/facilitator.js progressRedeem path_to_config.json messageHash
 * Replace `ruleAddress` with address of the rule. 
 * Replace `ruleAbi` with abi of the rule. 
 
+## Create User
+
+Prerequisite: 
+* `tokenHolderMasterCopy` master copy in your config file.
+* `gnosisSafeMasterCopy` master copy in your config file.
+* `recoveryMasterCopy` master copy in your config file.
+* `ProxyFactory` contract address in your config file.
+* `userWalletFactory` contract address in your config file.
+* `proxyFactory` contract address in your config file.
+* `createAndAddModules` contract address in your config file.
+* `tokenRules` contract address in your config file.
+* `recoveryOwnerAddress` recoveryOwner address in your config file.
+* `recoveryControllerAddress` recoveryController address in your config file.
+* `recoveryBlockDelay` recovery block delay in your config file.
+
+```bash
+# Help:
+node ./src/bin/create_user.js --help
+  
+# Create User:
+node ./src/bin/create_user.js <config.json> <eip20Token> <owners> <threshold> <sessionKeys> <sessionKeySpendingLimits> <sessionKeyExpirationHeights>
+```
+
+* Replace `config.json` with the path to the configuration file.
+* Replace `eip20Token` with the UBT address of the economy.
+* Replace `owners` with comma separated owner addresses.
+* Replace `threshold` with gnosis requirement. 
+* Replace `sessionKeys` comma separated session keys. 
+* Replace `sessionKeySpendingLimits` comma separated spending limits corresponding to session keys. 
+* Replace `sessionKeyExpirationHeights` comma separated expiration heights corresponding to session keys. 
+
 ## Tests
 
 To run the tests run `npm run test`.
