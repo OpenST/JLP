@@ -7,10 +7,10 @@ class ChainConfig {
    * @param {string} [filePath] An optional config file to overwrite any defaults or env variables.
    */
   constructor(filePath) {
-    this.originWeb3Provider = process.env.ORIGIN_WEB3_PROVIDER || 'http://localhost:8545';
-    this.auxiliaryWeb3Provider = process.env.AUXILIARY_WEB3_PROVIDER || 'http://localhost:8547';
+    this.originWeb3Provider = process.env.ORIGIN_WEB3_PROVIDER || 'ws://localhost:8647';
+    this.auxiliaryWeb3Provider = process.env.AUXILIARY_WEB3_PROVIDER || 'ws://localhost:8646';
     this.originChainId = process.env.ORIGIN_CHAIN_ID || 3;
-    this.auxiliaryChainId = process.env.ORIGIN_CHAIN_ID || 200;
+    this.auxiliaryChainId = process.env.AUXILIARY_CHAIN_ID || 200;
     this.simpleTokenAddress = process.env.SIMPLE_TOKEN_ADDRESS || '0xca954C91BE676cBC4D5Ab5F624b37402E5f0d957';
     this.originMasterKey = process.env.ORIGIN_MASTER_KEY || '0x6d4e5f5ca54b88fdb68a5d0e6ea5aa3869f88116';
     this.auxiliaryMasterKey = process.env.AUXILIARY_MASTER_KEY || '0x490cc731b076e58509e1f7cee6c68b39cfe5ad62';
@@ -24,6 +24,7 @@ class ChainConfig {
     this.stakes = {};
     this.redeems = {};
     this.utilityBrandedTokens = [];
+    this.openst = {};
     this.users = [];
 
     // If a file path is given, config from the file will overwrite config from ENV or default.

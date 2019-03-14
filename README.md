@@ -215,36 +215,42 @@ node src/bin/facilitator.js progressRedeem path_to_config.json messageHash
 
   * `messageHash` generated in redeem facilitator step.
   
- ## Deploy TokenRules
+## Setup OpenST
+
+Prerequisite: `organization` and `eip20Token` contracts should have been deployed.
+    
+```bash
+# Help:
+node ./src/bin/openst.js --help
+    
+# Setup OpenST:
+node ./src/bin/openst.js config.json organization eip20Token
+```
+    
+It will write below contract addresses to your config file:
+* TokenHolder master copy address.
+* Gnosis master copy address.
+* Recovery master copy address.
+* UserWalletFactory contract address.
+* ProxyFactory contract address.
+* CreateAndAddModule helper contract address.
+* TokenRules contract address.
+
+* Replace `config.json` with the path to the configuration file.
+* Replace `organization` with an organization contract address. 
+* Replace `eip20Token` with eip20Token address.
  
- Prerequisite: `eip20Token` and `organization` in your config file.
- These contracts  should be deployed on auxiliary chain.
- 
- ```bash
- # Help:
- node ./src/bin/tokenrules.js --help
- 
- # Deploy TokenRules token:
- node ./src/bin/tokenrules.js config.json eip20Token organization
- ```
- 
- It will write `tokenRulesAddress` to your config file.
- 
- * Replace `config.json` with the path to the configuration file.
- * Replace `eip20Token` with eip20Token address.
- * Replace `organization` with an organization contract address. 
- 
- ## Register Rule to TokenRules
+## Register Rule to TokenRules
   
-  Prerequisite: `tokenRules` and `worker` in your config file.
-  
-  ```bash
-  # Help:
-  node ./src/bin/registerRule.js --help
-  
-  # Register rule to TokenRules:
-  node ./src/bin/registerRule.js config.json ruleName ruleAddress ruleAbi
-  ```
+Prerequisite: `tokenRules` and `worker` in your config file.
+
+```bash
+# Help:
+node ./src/bin/registerRule.js --help
+
+# Register rule to TokenRules:
+node ./src/bin/registerRule.js config.json ruleName ruleAddress ruleAbi
+```
   
 * Replace `config.json` with the path to the configuration file.
 * Replace `ruleName` with name of the rule.
@@ -266,6 +272,8 @@ Prerequisite:
 * `recoveryControllerAddress` recoveryController address in your config file.
 * `recoveryBlockDelay` recovery block delay in your config file.
 
+Don't forget to update config.openst with recoveryOwnerAddress, recoveryControllerAddress and recoveryBlockDelay.
+
 ```bash
 # Help:
 node ./src/bin/create_user.js --help
@@ -280,8 +288,8 @@ node ./src/bin/create_user.js <config.json> <eip20Token> <owners> <threshold> <s
 * Replace `threshold` with gnosis requirement. 
 * Replace `sessionKeys` comma separated session keys. 
 * Replace `sessionKeySpendingLimits` comma separated spending limits corresponding to session keys. 
-* Replace `sessionKeyExpirationHeights` comma separated expiration heights corresponding to session keys. 
-
+* Replace `sessionKeyExpirationHeights` comma separated expiration heights corresponding to session keys.  
+ 
 ## Tests
 
 To run the tests run `npm run test`.
@@ -290,7 +298,7 @@ If you don't have a `./test/config_init.json` file, it will be copied with the d
 If you need a different config, you should update the file before running the tests again.
 
 For more details see [the test README](./test/README.md).
-
+ 
 ## Helpers
 
 **Send**

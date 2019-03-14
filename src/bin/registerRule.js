@@ -25,16 +25,16 @@ program
             from: connection.auxiliaryAccount.address, // MasterKey is Worker address
             gasPrice: chainConfig.auxiliaryGasPrice,
           };
-          const auxiliaryWeb3 = new Web3(connection.auxiliaryWeb3);
+          const web3 = connection.auxiliaryWeb3;
           const tokenRules = new OpenST.ContractInteract.TokenRules(
-            auxiliaryWeb3,
+            web3,
             chainConfig.openst.tokenRules,
           );
           await tokenRules.registerRule(ruleName, ruleAddress, ruleAbi, registerRuleTxOptions);
           logger.info(`Rule ${ruleName} registered!`);
           logger.info('Validating registered rule...');
           const rule = await tokenRules.getRuleByName(ruleName);
-          if (!rule || (rule.ruleAddress !== auxiliaryWeb3.utils.toChecksumAddress(ruleAddress))) {
+          if (!rule || (rule.ruleAddress !== web3.utils.toChecksumAddress(ruleAddress))) {
             logger.info(`Failure in registration of rule: ${ruleName}.`);
             Promise.reject(new Error(`Failure in registration of rule: ${ruleName}.`));
           } else {
