@@ -2,6 +2,9 @@ const Package = require('@openstfoundation/openst.js');
 
 const logger = require('./logger');
 
+const { TokenRules, TokenHolder } = Package.ContractInteract;
+
+
 class OpenST {
   constructor(chainConfig, connection) {
     this.chainConfig = chainConfig;
@@ -17,7 +20,6 @@ class OpenST {
   }
 
   async deployTokenRules(auxiliaryOrganization, auxiliaryEIP20Token) {
-    const { TokenRules } = Package.ContractInteract;
     const tokenRulesTxOptions = this.auxiliary.txOptions;
     const tokenRules = await TokenRules.deploy(
       this.auxiliary.web3,
@@ -70,6 +72,38 @@ class OpenST {
     };
     Object.assign(this.chainConfig.openst, setupData);
     logger.info('Completed Setup of OpenST');
+  }
+
+  async directTransfer(sessionKey, sender, beneficiaryArray, amountArray) {
+    const tokenRules = new TokenRules(this.chainConfig.openst.tokenRules, this.auxiliary.web3);
+    const tokenHolder = new TokenHolder(sender, this.auxiliary.web3);
+    const directTransferExecutable = tokenRules.getDirectTransferExecutableData(
+      beneficiaryArray,
+      amountArray,
+    );
+    const sessionKeyData = await tokenHolder.getSessionKeyData(sessionKey);
+    const sessionKeyNonce = sessionKeyData.nonce;
+    const transaction = {
+      from: sender,
+      to: this.chainConfig.openst.tokenRules,
+      data: directTransferExecutable,
+      nonce: sessionKeyNonce,
+      callPrefix: await tokenHolder.getTokenHolderExecuteRuleCallPrefix(),
+      value: 0,
+      gasPrice: 0,
+      gas: 0,
+    };
+
+    const vrs = sessionKey.signEIP1077Transaction(transaction);
+    await sender.executeRule(
+      this.chainConfig.openst.tokenRules,
+      directTransferExecutable,
+      sessionKeyNonce,
+      vrs.r,
+      vrs.s,
+      vrs.v,
+      this.auxiliary.txOptions,
+    );
   }
 }
 

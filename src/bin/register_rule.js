@@ -3,7 +3,6 @@
 'use strict';
 
 const program = require('commander');
-const Web3 = require('web3');
 const OpenST = require('@openstfoundation/openst.js');
 
 const connected = require('../connected');

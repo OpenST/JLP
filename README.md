@@ -72,6 +72,8 @@ If you want to deploy contracts to the chains, use the `deploy` executable:
 # Deployment of utility token with gateways (requires anchor addresses in your config):
 ./src/bin/deploy.js utilityToken config.json
 
+node ./src/bin/deploy.js config.json
+
 # If you don't have anchor addresses, yet, you must deploy anchors first.
 # Deployment of anchors:
 ./src/bin/deploy.js anchors config.json
@@ -336,7 +338,24 @@ node ./src/bin/create_user.js <config.json> <eip20Token> <owners> <threshold> <s
 * Replace `threshold` with gnosis requirement. 
 * Replace `sessionKeys` comma separated session keys. 
 * Replace `sessionKeySpendingLimits` comma separated spending limits corresponding to session keys. 
-* Replace `sessionKeyExpirationHeights` comma separated expiration heights corresponding to session keys.  
+* Replace `sessionKeyExpirationHeights` comma separated expiration heights corresponding to session keys.
+
+## Direct Transfer from sender to beneficiaries
+
+```bash
+# Help:
+node ./src/bin/direct_transfer.js --help
+  
+# Create User:
+node ./src/bin/direct_transfer.js <config.json> <sessionKey> <sender> <beneficiaries> <amounts>
+```
+
+* Replace `config.json` with the path to the configuration file.
+* Replace `sessionKey` with the authorized session key.
+* Replace `sender` with TokenHolder address which act as sender.
+* Replace `threshold` with gnosis requirement. 
+* Replace `beneficiaries` comma separated beneficiaries. 
+* Replace `amounts` comma separated amounts respective to beneficiary. 
  
 ## Tests
 
