@@ -3,17 +3,15 @@
 'use strict';
 
 const program = require('commander');
-const Web3 = require('web3');
 const OpenST = require('@openstfoundation/openst.js');
 
 const connected = require('../connected');
-const logger = require('../logger');
 
 const { version } = require('../../package.json');
 
 program
   .version(version)
-  .name('RegisterRule')
+  .name('DirectTransfer')
   .arguments('<config> <sessionKey> <sender> <beneficiaries> <amounts>')
   .description('An executable to direct transfer from sender to beneficiaries.')
   .action(
