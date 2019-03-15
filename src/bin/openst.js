@@ -10,17 +10,55 @@ const { version } = require('../../package.json');
 
 program
   .version(version)
-  .name('bt')
-  .arguments('openst <config> <organization> <eip20Token>')
+  .name('openst')
+  .description('An executable to setup OpenST.');
+
+program.command('openst <config> <eip20Token> ')
   .description('An executable to setup OpenST.')
   .action(
-    async (config, organization, eip20Token) => {
+    async (config, eip20Token) => {
       await connected.run(
         config,
         async (chainConfig, connection) => {
-          const openst = new OpenST(chainConfig, connection);
-          await openst.setupOpenst(organization, eip20Token);
-          chainConfig.write(config);
+          try {
+            const openst = new OpenST(chainConfig, connection);
+            await openst.setupOpenst(eip20Token);
+            chainConfig.write(config);
+          } catch (e) {
+            console.error(e);
+          }
+        },
+      );
+    },
+  );
+
+program.command('pricerRule <config> <eip20Token> <baseCurrencyCode> <conversionRate> <conversionRateDecimals> <requiredPriceOracleDecimals>')
+  .description('An executable to deploy pricer rule.')
+  .action(
+    async (
+      config,
+      eip20Token,
+      baseCurrencyCode,
+      conversionRate,
+      conversionRateDecimals,
+      requiredPriceOracleDecimals,
+    ) => {
+      await connected.run(
+        config,
+        async (chainConfig, connection) => {
+          try {
+            const openst = new OpenST(chainConfig, connection);
+            await openst.deployPricerRule(
+              eip20Token,
+              baseCurrencyCode,
+              conversionRate,
+              conversionRateDecimals,
+              requiredPriceOracleDecimals,
+            );
+            chainConfig.write(config);
+          } catch (e) {
+            console.error(e);
+          }
         },
       );
     },
@@ -32,15 +70,18 @@ program.on(
     console.log('');
     console.log('openst Arguments:');
     console.log('  config        Path to a config file');
-    console.log('  organization  Organization contract address');
+    console.log('  eip20Token    EIP20Token contract address');
+    console.log('');
+    console.log('pricerRule Arguments:');
+    console.log('  config        Path to a config file');
     console.log('  eip20Token    EIP20Token contract address');
     console.log('');
     console.log('Examples:');
     console.log('  Deployment of openst contracts:');
-    console.log('  $ openst.js config.json organization eip20Token');
+    console.log('  $ openst.js config.json eip20Token');
     console.log('');
     console.log('  openst setup for JLP');
-    console.log('  $ openst.js openst config.json organization eip20Token');
+    console.log('  $ openst.js openst config.json eip20Token');
   },
 );
 

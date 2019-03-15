@@ -28,7 +28,9 @@ class OpenST {
     return tokenRules.address;
   }
 
-  async setupOpenst(auxiliaryOrganization, auxiliaryEIP20Token) {
+  async setupOpenst(auxiliaryEIP20Token) {
+    const ubtConfig = this.getUtilityBrandedTokenConfig(auxiliaryEIP20Token);
+
     logger.info('Starting Setup of OpenST');
     const tokenHolderTxOptions = this.auxiliary.txOptions;
     const gnosisTxOptions = this.auxiliary.txOptions;
@@ -55,8 +57,8 @@ class OpenST {
     );
 
     const tokenRulesAddress = await this.deployTokenRules(
-      auxiliaryOrganization,
-      auxiliaryEIP20Token,
+      ubtConfig.ubt.organizationAddress,
+      ubtConfig.ubt.address,
     );
 
     const setupData = {
@@ -68,8 +70,59 @@ class OpenST {
       createAndAddModules: createAndAddModules.address,
       tokenRules: tokenRulesAddress,
     };
+
     Object.assign(this.chainConfig.openst, setupData);
+
+    this.chainConfig.utilityBrandedTokens[ubtConfig.index].openst = setupData;
+
     logger.info('Completed Setup of OpenST');
+  }
+
+  getUtilityBrandedTokenConfig(auxiliaryEIP20Token) {
+    for (let i = 0; i < this.chainConfig.utilityBrandedTokens.length; i++) {
+      const ut = this.chainConfig.utilityBrandedTokens[i];
+      if (ut.address === auxiliaryEIP20Token) {
+        return { ubt: ut, index: i };
+      }
+    }
+    return 0;
+  }
+
+  async deployPricerRule(
+    auxiliaryEIP20Token,
+    baseCurrencyCode,
+    conversionRate,
+    conversionRateDecimals,
+    requiredPriceOracleDecimals,
+  ) {
+    logger.info('Deployment of PricerRule');
+    const ubtConfig = this.getUtilityBrandedTokenConfig(auxiliaryEIP20Token);
+
+    const { PricerRule } = Package.ContractInteract;
+
+    const PricerRuleTxOptions = this.auxiliary.txOptions;
+    const pricerRule = await PricerRule.deploy(
+      this.auxiliary.web3,
+      ubtConfig.ubt.organizationAddress,
+      ubtConfig.ubt.address,
+      ubtConfig.ubt.openst.tokenRules,
+      baseCurrencyCode,
+      conversionRate,
+      conversionRateDecimals,
+      requiredPriceOracleDecimals,
+      PricerRuleTxOptions,
+    );
+
+    const pricerOracleData = {
+      address: pricerRule.address,
+      baseCurrencyCode,
+      conversionRate,
+      conversionRateDecimals,
+      requiredPriceOracleDecimals,
+    };
+
+    this.chainConfig.utilityBrandedTokens[ubtConfig.index].openst.pricerOracle = pricerOracleData;
+    logger.info('PricerRule deployed');
   }
 }
 
