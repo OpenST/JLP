@@ -25,12 +25,13 @@
     "url": "https://github.com/benjaminbollen/JLP/issues"
   },
   "scripts": {
-    "test":"mocha --recursive --timeout 120000 test --exit"
+    "test": "node ./test/run.js"
   },
   "dependencies": {
+    "@openstfoundation/brandedtoken.js": "^0.10.0-alpha.2",
     "@openstfoundation/mosaic.js": "^0.10.0-beta.4",
-    "@openstfoundation/brandedtoken.js": "https://github.com/sarvesh-ost/brandedtoken.js.git#Branded_token_setup",
     "@openstfoundation/openst.js": "https://github.com/OpenST/openst.js.git#develop",
+    "axios": "^0.18.0",
     "bn.js": "4.11.8",
     "inquirer": "^6.2.2",
     "js-scrypt": "0.2.0",

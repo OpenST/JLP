@@ -53,6 +53,33 @@ class Connection {
     );
   }
 
+  static async openAndUnlockAccounts(
+    chainConfig,
+    originAccountConf,
+    auxiliaryAccountConf,
+    password,
+  ) {
+    const originWeb3 = new Web3();
+    const auxiliaryWeb3 = new Web3();
+    const originAccount = await Account.unlock(originAccountConf.name, originWeb3, password);
+    const auxiliaryAccount = await Account.unlock(
+      auxiliaryAccountConf.name,
+      auxiliaryWeb3,
+      password,
+    );
+    const originProvider = Provider.create('origin', originAccount, chainConfig);
+    const auxiliaryProvider = Provider.create('auxiliary', auxiliaryAccount, chainConfig);
+    originWeb3.setProvider(originProvider);
+    auxiliaryWeb3.setProvider(auxiliaryProvider);
+
+    return new Connection(
+      originWeb3,
+      auxiliaryWeb3,
+      originAccount,
+      auxiliaryAccount,
+    );
+  }
+
   /**
    * Closes an open connection.
    */
