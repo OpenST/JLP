@@ -295,7 +295,6 @@ Prerequisite: `eip20Token` contract should have been deployed.
 # Help:
 node ./src/bin/openst.js --help
     
-# Setup OpenST:
 node ./src/bin/openst.js pricerRule config eip20Token baseCurrencyCode conversionRate conversionRateDecimals requiredPriceOracleDecimals
 ```
 

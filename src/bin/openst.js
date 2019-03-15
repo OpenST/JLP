@@ -73,8 +73,12 @@ program.on(
     console.log('  eip20Token    EIP20Token contract address');
     console.log('');
     console.log('pricerRule Arguments:');
-    console.log('  config        Path to a config file');
-    console.log('  eip20Token    EIP20Token contract address');
+    console.log('  config                      Path to a config file');
+    console.log('  eip20Token                  EIP20Token contract address');
+    console.log('  baseCurrencyCode            Economy\'s base currency code');
+    console.log('  conversionRate              Conversion rate from the economy base currency to the token.');
+    console.log('  conversionRateDecimals      Conversion rate\'s decimals from the economy base currency to the token');
+    console.log('  requiredPriceOracleDecimals Required decimals for price oracles');
     console.log('');
     console.log('Examples:');
     console.log('  Deployment of openst contracts:');
@@ -82,6 +86,8 @@ program.on(
     console.log('');
     console.log('  openst setup for JLP');
     console.log('  $ openst.js openst config.json eip20Token');
+    console.log('  Deployment of PricerRule contract:');
+    console.log('  $ openst.js pricerRule config.json eip20Token USD 3 3 3');
   },
 );
 
