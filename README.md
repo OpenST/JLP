@@ -294,10 +294,10 @@ Prerequisite: `tokenRules` and `worker` in your config file.
 
 ```bash
 # Help:
-node ./src/bin/registerRule.js --help
+node ./src/bin/register_rule.js --help
 
 # Register rule to TokenRules:
-node ./src/bin/registerRule.js config.json ruleName ruleAddress ruleAbiFilePath
+node ./src/bin/register_rule.js config.json ruleName ruleAddress ruleAbiFilePath
 ```
   
 * Replace `config.json` with the path to the configuration file.
