@@ -56,7 +56,7 @@ program
       console.log('  config           path to a config file');
       console.log('  ruleName         rule name to be registered');
       console.log('  ruleAddress      rule address to be registered');
-      console.log('  ruleAbiFilePath  file path containing json abi of the rule');
+      console.log('  ruleAbiFilePath  file path containing abi of the rule');
       console.log('');
       console.log('Examples:');
       console.log('  Register rule in TokenRules:');

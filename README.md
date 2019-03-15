@@ -303,7 +303,7 @@ node ./src/bin/registerRule.js config.json ruleName ruleAddress ruleAbiFilePath
 * Replace `config.json` with the path to the configuration file.
 * Replace `ruleName` with name of the rule.
 * Replace `ruleAddress` with address of the rule. 
-* Replace `ruleAbiFilePath` with file path containing jsonabi of the rule. 
+* Replace `ruleAbiFilePath` with file path containing abi of the rule. 
 
 ## Create User
 
