@@ -85,7 +85,6 @@ program.on(
     console.log('  $ openst.js config.json eip20Token');
     console.log('');
     console.log('  openst setup for JLP');
-    console.log('  $ openst.js openst config.json eip20Token');
     console.log('  Deployment of PricerRule contract:');
     console.log('  $ openst.js pricerRule config.json eip20Token USD 3 3 3');
   },
