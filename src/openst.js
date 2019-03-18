@@ -21,8 +21,8 @@ class OpenST {
     const tokenRulesTxOptions = this.auxiliary.txOptions;
     const tokenRules = await TokenRules.deploy(
       this.auxiliary.web3,
-      auxiliaryOrganization,
-      auxiliaryEIP20Token,
+      auxiliaryOrganization.address,
+      auxiliaryEIP20Token.address,
       tokenRulesTxOptions,
     );
     return tokenRules.address;
