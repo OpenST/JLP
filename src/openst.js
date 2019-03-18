@@ -1,6 +1,7 @@
 const Package = require('@openstfoundation/openst.js');
-
 const logger = require('./logger');
+
+const { PricerRule, TokenRules } = Package.ContractInteract;
 
 class OpenST {
   constructor(chainConfig, connection) {
@@ -17,7 +18,6 @@ class OpenST {
   }
 
   async deployTokenRules(auxiliaryOrganization, auxiliaryEIP20Token) {
-    const { TokenRules } = Package.ContractInteract;
     const tokenRulesTxOptions = this.auxiliary.txOptions;
     const tokenRules = await TokenRules.deploy(
       this.auxiliary.web3,
@@ -98,10 +98,7 @@ class OpenST {
     logger.info('Deployment of PricerRule');
     const ubtConfig = this.getUtilityBrandedTokenConfig(auxiliaryEIP20Token);
 
-    const { PricerRule } = Package.ContractInteract;
-
-    const PricerRuleTxOptions = this.auxiliary.txOptions;
-    const pricerRule = await PricerRule.deploy(
+    const pricerRule = await PricerRule.deploytest(
       this.auxiliary.web3,
       ubtConfig.ubt.organizationAddress,
       ubtConfig.ubt.address,
@@ -110,18 +107,14 @@ class OpenST {
       conversionRate,
       conversionRateDecimals,
       requiredPriceOracleDecimals,
-      PricerRuleTxOptions,
+      this.auxiliary.txOptions,
     );
 
     const pricerOracleData = {
       address: pricerRule.address,
-      baseCurrencyCode,
-      conversionRate,
-      conversionRateDecimals,
-      requiredPriceOracleDecimals,
     };
 
-    this.chainConfig.utilityBrandedTokens[ubtConfig.index].openst.pricerOracle = pricerOracleData;
+    this.chainConfig.utilityBrandedTokens[ubtConfig.index].pricerOracle = pricerOracleData;
     logger.info('PricerRule deployed');
   }
 }
