@@ -17,4 +17,5 @@ module.exports = {
     origin: {},
     auxiliary: {},
   },
+  faucetReceipts: {},
 };

@@ -73,13 +73,41 @@ before(async () => {
       connection.auxiliaryWeb3,
     );
 
-    console.log('Keys funded with faucet  ', receipts.length);
+    shared.faucetTransactions = await funder.faucetTransactionDetails(
+      receipts.txHashes.originFaucetTXHashes,
+      receipts.txHashes.auxiliaryFaucetTXHashes,
+      receipts.txHashes.ropstenFaucetTXHashes,
+      connection.originWeb3,
+      connection.auxiliaryWeb3,
+    );
   } catch (error) {
     console.log(error);
     console.error(`Failed in before each hook ${error}`);
   }
 });
 
+after(async () => {
+  console.log('Refunding to faucet');
+  await funder.refundERC20TokenToFaucet(
+    shared.connection.originWeb3,
+    shared.accounts.origin.originDeployer.address,
+    shared.faucetTransactions.originTransactions,
+  );
+  await Promise.all(
+    [
+      funder.refundBaseTokenToFaucet(
+        shared.connection.originWeb3,
+        shared.accounts.origin.originDeployer.address,
+        shared.faucetTransactions.ropstenTransactions.faucetAddress,
+      ),
+      funder.refundBaseTokenToFaucet(
+        shared.connection.auxiliaryWeb3,
+        shared.accounts.auxiliary.auxiliaryDeployer.address,
+        shared.faucetTransactions.auxiliaryTransactions.faucetAddress,
+      ),
+    ],
+  );
+});
 /**
  * Writes the current chain config object to disk, overwriting the previous chain configuration
  * file.e
