@@ -72,8 +72,6 @@ If you want to deploy contracts to the chains, use the `deploy` executable:
 # Deployment of utility token with gateways (requires anchor addresses in your config):
 ./src/bin/deploy.js utilityToken config.json
 
-node ./src/bin/deploy.js config.json
-
 # If you don't have anchor addresses, yet, you must deploy anchors first.
 # Deployment of anchors:
 ./src/bin/deploy.js anchors config.json
