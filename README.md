@@ -294,16 +294,16 @@ Prerequisite: `tokenRules` and `worker` in your config file.
 
 ```bash
 # Help:
-node ./src/bin/registerRule.js --help
+node ./src/bin/register_rule.js --help
 
 # Register rule to TokenRules:
-node ./src/bin/registerRule.js config.json ruleName ruleAddress ruleAbi
+node ./src/bin/register_rule.js config.json ruleName ruleAddress ruleAbiFilePath
 ```
   
 * Replace `config.json` with the path to the configuration file.
 * Replace `ruleName` with name of the rule.
 * Replace `ruleAddress` with address of the rule. 
-* Replace `ruleAbi` with abi of the rule. 
+* Replace `ruleAbiFilePath` with file path containing abi of the rule. 
 
 ## Create User
 
