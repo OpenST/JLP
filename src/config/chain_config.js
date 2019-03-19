@@ -1,5 +1,5 @@
 const fs = require('fs');
-const Mosaic = require('@openstfoundation/mosaic.js');
+const Mosaic = require('@openst/mosaic.js');
 
 class ChainConfig {
   /**

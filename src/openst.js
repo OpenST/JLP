@@ -1,4 +1,4 @@
-const Package = require('@openstfoundation/openst.js');
+const Package = require('@openst/openst.js');
 
 const logger = require('./logger');
 

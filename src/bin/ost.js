@@ -4,7 +4,7 @@
 
 const program = require('commander');
 
-const { ContractInteract: { OSTPrime } } = require('@openstfoundation/mosaic.js');
+const { ContractInteract: { OSTPrime } } = require('@openst/mosaic.js');
 
 const connected = require('../connected');
 const logger = require('../logger');
