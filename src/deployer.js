@@ -1,5 +1,5 @@
-const { Setup, ContractInteract } = require('@openstfoundation/mosaic.js');
-const OpenST = require('@openstfoundation/openst.js');
+const { Setup, ContractInteract } = require('@openst/mosaic.js');
+const OpenST = require('@openst/openst.js');
 
 const logger = require('./logger');
 

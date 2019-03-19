@@ -1,5 +1,5 @@
-const { ContractInteract, Helpers } = require('@openstfoundation/brandedtoken.js');
-const { Utils, ContractInteract: MosaicContractInteract } = require('@openstfoundation/mosaic.js');
+const { ContractInteract, Helpers } = require('@openst/brandedtoken.js');
+const { Utils, ContractInteract: MosaicContractInteract } = require('@openst/mosaic.js');
 const Account = require('eth-lib/lib/account');
 const logger = require('./logger');
 

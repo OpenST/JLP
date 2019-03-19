@@ -1,4 +1,4 @@
-const { Facilitator: MosaicFacilitator, Utils, ContractInteract } = require('@openstfoundation/mosaic.js');
+const { Facilitator: MosaicFacilitator, Utils, ContractInteract } = require('@openst/mosaic.js');
 
 const logger = require('./logger');
 

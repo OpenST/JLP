@@ -1,4 +1,4 @@
-const { Setup, ContractInteract } = require('@openstfoundation/brandedtoken.js');
+const { Setup, ContractInteract } = require('@openst/brandedtoken.js');
 const logger = require('./logger');
 
 class BTDeployer {

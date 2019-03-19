@@ -3,7 +3,7 @@
 'use strict';
 
 const program = require('commander');
-const { ContractInteract, Helpers } = require('@openstfoundation/openst.js');
+const { ContractInteract, Helpers } = require('@openst/openst.js');
 
 const connected = require('../connected');
 const logger = require('../logger');
