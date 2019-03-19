@@ -1,6 +1,6 @@
 {
-  "originWeb3Provider": "http://localhost:8545",
-  "auxiliaryWeb3Provider": "http://localhost:8546",
+  "originWeb3Provider": "http://167.99.252.47:8545",
+  "auxiliaryWeb3Provider": "http://167.99.252.47:8546",
   "originChainId": 3,
   "auxiliaryChainId": 200,
   "simpleTokenAddress": "0xca954C91BE676cBC4D5Ab5F624b37402E5f0d957",
