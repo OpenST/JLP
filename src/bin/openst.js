@@ -7,6 +7,7 @@ const program = require('commander');
 const connected = require('../connected');
 const OpenST = require('../openst');
 const { version } = require('../../package.json');
+const logger = require('./../logger');
 
 program
   .version(version)
@@ -25,7 +26,7 @@ program.command('openst <config> <eip20Token> <organization> ')
             await openst.setupOpenst(eip20Token, organization);
             chainConfig.write(config);
           } catch (e) {
-            console.error(e);
+            logger.error(e.message);
           }
         },
       );
@@ -57,7 +58,7 @@ program.command('pricerRule <config> <eip20Token> <baseCurrencyCode> <conversion
             );
             chainConfig.write(config);
           } catch (e) {
-            console.error(e);
+            logger.error(e.message);
           }
         },
       );
