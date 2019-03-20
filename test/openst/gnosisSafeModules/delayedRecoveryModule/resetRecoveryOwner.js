@@ -2,7 +2,7 @@
 
 const assert = require('assert');
 
-const { ContractInteract, Helpers } = require('@openstfoundation/openst.js');
+const { ContractInteract, Helpers } = require('@openst/openst.js');
 const shared = require('../../../shared');
 const Deployer = require('../../../../src/deployer');
 const OpenST = require('../../../../src/openst');
