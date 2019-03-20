@@ -32,7 +32,11 @@ describe('DelayedRecoveryModule', async () => {
     // Setup OpenST
     //  deploys master contracts
     const openst = new OpenST(chainConfig, connection);
-    await openst.setupOpenst(auxiliaryOrganization, auxiliaryUtilityToken) // setupOpenst updates chainConfig
+    //  setupOpenst updates chainConfig
+    await openst.setupOpenst(
+      auxiliaryOrganization.address,
+      auxiliaryUtilityToken.address,
+    )
 
     const userWallet = {
       owners: ["0x0000000000000000000000000000000000000002"], // cannot be 0x1
