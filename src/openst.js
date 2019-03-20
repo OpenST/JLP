@@ -28,7 +28,7 @@ class OpenST {
     return tokenRules.address;
   }
 
-  async setupOpenst(auxiliaryEIP20Token) {
+  async setupOpenst(auxiliaryEIP20Token, organization) {
     const ubtConfig = this.getUtilityBrandedTokenConfig(auxiliaryEIP20Token);
 
     logger.info('Starting Setup of OpenST');
@@ -57,7 +57,7 @@ class OpenST {
     );
 
     const tokenRulesAddress = await this.deployTokenRules(
-      ubtConfig.ubt.organizationAddress,
+      organization,
       ubtConfig.ubt.address,
     );
 
@@ -85,7 +85,7 @@ class OpenST {
         return { ubt: ut, index: i };
       }
     }
-    return 0;
+    return { ubt: undefined, index: -1 };
   }
 
   async deployPricerRule(
@@ -116,6 +116,8 @@ class OpenST {
 
     this.chainConfig.utilityBrandedTokens[ubtConfig.index].pricerOracle = pricerOracleData;
     logger.info('PricerRule deployed');
+
+    return { pricerOracleData };
   }
 }
 

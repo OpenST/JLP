@@ -13,16 +13,16 @@ program
   .name('openst')
   .description('An executable to setup OpenST.');
 
-program.command('openst <config> <eip20Token> ')
+program.command('openst <config> <eip20Token> <organization> ')
   .description('An executable to setup OpenST.')
   .action(
-    async (config, eip20Token) => {
+    async (config, eip20Token, organization) => {
       await connected.run(
         config,
         async (chainConfig, connection) => {
           try {
             const openst = new OpenST(chainConfig, connection);
-            await openst.setupOpenst(eip20Token);
+            await openst.setupOpenst(eip20Token, organization);
             chainConfig.write(config);
           } catch (e) {
             console.error(e);
