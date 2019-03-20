@@ -2,9 +2,9 @@
 
 'use strict';
 
+const fs = require('fs');
 const program = require('commander');
-const Web3 = require('web3');
-const OpenST = require('@openstfoundation/openst.js');
+const OpenST = require('@openst/openst.js');
 
 const connected = require('../connected');
 const logger = require('../logger');
@@ -14,10 +14,10 @@ const { version } = require('../../package.json');
 program
   .version(version)
   .name('RegisterRule')
-  .arguments('<config> <ruleName> <ruleAddress> <ruleAbi>')
+  .arguments('<config> <ruleName> <ruleAddress> <ruleAbiFilePath>')
   .description('An executable to register rules in tokenrules.')
   .action(
-    async (config, ruleName, ruleAddress, ruleAbi) => {
+    async (config, ruleName, ruleAddress, ruleAbiFilePath) => {
       await connected.run(
         config,
         async (chainConfig, connection) => {
@@ -30,6 +30,10 @@ program
             web3,
             chainConfig.openst.tokenRules,
           );
+          let ruleAbi;
+          if (fs.existsSync(ruleAbiFilePath)) {
+            ruleAbi = fs.readFileSync(ruleAbiFilePath).toString();
+          }
           await tokenRules.registerRule(ruleName, ruleAddress, ruleAbi, registerRuleTxOptions);
           logger.info(`Rule ${ruleName} registered!`);
           logger.info('Validating registered rule...');
@@ -49,14 +53,14 @@ program
     () => {
       console.log('');
       console.log('Arguments:');
-      console.log('  config       path to a config file');
-      console.log('  ruleName     Rule name to be registered');
-      console.log('  ruleAddress  Rule address to be registered');
-      console.log('  ruleAbi      Abi of the rule');
+      console.log('  config           path to a config file');
+      console.log('  ruleName         rule name to be registered');
+      console.log('  ruleAddress      rule address to be registered');
+      console.log('  ruleAbiFilePath  file path containing abi of the rule');
       console.log('');
       console.log('Examples:');
       console.log('  Register rule in TokenRules:');
-      console.log('  $ registerRule.js config.json ruleName 0xa4aa50fbd4767085705db09e020a781e58e2fbf2 ruleAbi');
+      console.log('  $ register_rule.js config.json PricerRule 0xa4aa50fbd4767085705db09e020a781e58e2fbf2 path_to_rule.abi');
     },
   )
   .parse(process.argv);

@@ -1,5 +1,5 @@
-const { ContractInteract, Helpers } = require('@openstfoundation/brandedtoken.js');
-const { Utils, ContractInteract: MosaicContractInteract } = require('@openstfoundation/mosaic.js');
+const { ContractInteract, Helpers } = require('@openst/brandedtoken.js');
+const { Utils, ContractInteract: MosaicContractInteract } = require('@openst/mosaic.js');
 const Account = require('eth-lib/lib/account');
 const logger = require('./logger');
 
@@ -66,7 +66,7 @@ class BTStakeMint {
       this.chainConfig.gatewayComposerAddress,
     );
 
-    // Fixme https://github.com/OpenSTFoundation/brandedtoken.js/issues/122
+    // Fixme https://github.com/openst/brandedtoken.js/issues/122
     await staker.requestStake(
       stakeVT,
       mintBT,
@@ -178,13 +178,13 @@ class BTStakeMint {
       staker,
     ).call();
 
-    // FixMe https://github.com/OpenSTFoundation/mosaic.js/issues/136
+    // FixMe https://github.com/openst/mosaic.js/issues/136
     const nextNonce = await gatewayInstance.contract.methods.getNonce(
       staker,
     ).call();
     const currentNonce = parseInt(nextNonce, 10) - 1;
 
-    // FixMe In mosaic.js facilitator.stake should return messageHash. https://github.com/OpenSTFoundation/mosaic.js/issues/136
+    // FixMe In mosaic.js facilitator.stake should return messageHash. https://github.com/openst/mosaic.js/issues/136
     const messageHash = activeProcess.messageHash_;
 
     const gatewayStakeRequest = {

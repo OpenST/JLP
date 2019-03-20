@@ -1,5 +1,5 @@
-const { Setup, ContractInteract } = require('@openstfoundation/mosaic.js');
-const OpenST = require('@openstfoundation/openst.js');
+const { Setup, ContractInteract } = require('@openst/mosaic.js');
+const OpenST = require('@openst/openst.js');
 
 const logger = require('./logger');
 
@@ -96,7 +96,7 @@ class Deployer {
     logger.info(`auxiliary coGateway address ${auxiliaryCoGateway.address}`);
 
     logger.info('Setting cogateway in utility token');
-    // Fix me https://github.com/OpenSTFoundation/mosaic.js/issues/129
+    // Fix me https://github.com/openst/mosaic.js/issues/129
     await auxiliaryUtilityToken.setCoGateway(
       auxiliaryCoGateway.address,
       this.auxiliary.txOptions,
