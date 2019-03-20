@@ -1,4 +1,4 @@
-const { Facilitator: MosaicFacilitator, Utils, ContractInteract } = require('@openstfoundation/mosaic.js');
+const { Facilitator: MosaicFacilitator, Utils, ContractInteract } = require('@openst/mosaic.js');
 
 const logger = require('./logger');
 
@@ -57,11 +57,11 @@ class Facilitator {
       staker,
     ).call();
 
-    // FixMe https://github.com/OpenSTFoundation/mosaic.js/issues/136
+    // FixMe https://github.com/openst/mosaic.js/issues/136
     const nextNonce = await gatewayInstance.contract.methods.getNonce(staker).call();
     const currentNonce = parseInt(nextNonce, 10) - 1;
 
-    // FixMe In mosaic.js facilitator.stake should return messageHash. https://github.com/OpenSTFoundation/mosaic.js/issues/136
+    // FixMe In mosaic.js facilitator.stake should return messageHash. https://github.com/openst/mosaic.js/issues/136
     const messageHash = activeProcess.messageHash_;
     stakeRequest.messageHash = messageHash;
     stakeRequest.nonce = currentNonce.toString();
@@ -195,7 +195,7 @@ class Facilitator {
       redeemRequest.gasLimit,
       redeemRequest.hashLock,
       redeemRequest.unlockSecret,
-      txOptionAuxiliary, // FixMe https://github.com/OpenSTFoundation/mosaic.js/issues/141
+      txOptionAuxiliary, // FixMe https://github.com/openst/mosaic.js/issues/141
       txOptionOrigin,
     );
 

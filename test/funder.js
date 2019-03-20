@@ -66,7 +66,7 @@
 
 const axios = require('axios');
 const Web3 = require('web3');
-const Mosaic = require('@openstfoundation/mosaic.js');
+const Mosaic = require('@openst/mosaic.js');
 
 const Account = require('../src/account');
 const { MOSAIC_FAUCET_URL, ROPSTEN_FAUCET_URL, ROPSTEN_REFUND_ADDRESS } = require('./constants');
