@@ -70,6 +70,7 @@ class OpenST {
     };
     Object.assign(this.chainConfig.openst, setupData);
     logger.info('Completed Setup of OpenST');
+    return setupData;
   }
 }
 
