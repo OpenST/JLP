@@ -272,7 +272,7 @@ Prerequisite: `eip20Token` contract should have been deployed.
 node ./src/bin/openst.js --help
     
 # Setup OpenST:
-node ./src/bin/openst.js openst config.json eip20Token
+node ./src/bin/openst.js openst organization config.json eip20Token
 ```
     
 It will write below contract addresses to your config file:
@@ -286,6 +286,7 @@ It will write below contract addresses to your config file:
 
 * Replace `config.json` with the path to the configuration file.
 * Replace `eip20Token` with eip20Token address.
+* Replace `organization` with an organization contract address. 
 
 ## Deploy Pricer Rule
 
