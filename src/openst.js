@@ -111,10 +111,12 @@ class OpenST {
     );
 
     const pricerOracleData = {
-      address: pricerRule.address,
+      [baseCurrencyCode]: {
+        address: pricerRule.address,
+      },
     };
 
-    this.chainConfig.utilityBrandedTokens[ubtConfig.index].pricerOracle = pricerOracleData;
+    this.chainConfig.utilityBrandedTokens[ubtConfig.index].pricerOracles = pricerOracleData;
     logger.info('PricerRule deployed');
 
     return { pricerOracleData };
