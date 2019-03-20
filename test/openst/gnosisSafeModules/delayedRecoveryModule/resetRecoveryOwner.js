@@ -13,33 +13,25 @@ describe('DelayedRecoveryModule', async () => {
     const connection = shared.connection;
     const web3 = connection.auxiliaryWeb3;
 
-    // Set auxiliaryOrganization address
-    const auxiliaryOrganization = {
-      address: connection.auxiliaryAccount.address,
-    };
-
-    // Add eip20TokenAddress to config for utility token deployment
-    chainConfig.update({
-      eip20TokenAddress: "0x0000000000000000000000000000000000000001",
-    });
-
-    // Deploy utility token
-    const deployer = new Deployer(chainConfig, connection);
-    const txOptions = deployer.auxiliary.txOptions;
-    txOptions.from = connection.auxiliaryAccount.address;
-    const auxiliaryUtilityToken = await deployer._deployUtilityToken(auxiliaryOrganization);
+    // Required but not validated arguments
+    const mockAddresses = {
+      organization: "0x0000000000000000000000000000000000000001",
+      utilityToken: "0x0000000000000000000000000000000000000001",
+      owner: "0x0000000000000000000000000000000000000002",  // 0x1 reserved for sentinels by Gnosis Safe
+      newRecoveryOwner: "0x0000000000000000000000000000000000000001",
+    }
 
     // Setup OpenST
     //  deploys master contracts
     const openst = new OpenST(chainConfig, connection);
-    //  setupOpenst updates chainConfig
+    //  setupOpenst updates chainConfig with OpenST master copy and other addresses
     await openst.setupOpenst(
-      auxiliaryOrganization.address,
-      auxiliaryUtilityToken.address,
+      mockAddresses.organization,
+      mockAddresses.utilityToken,
     )
 
     const userWallet = {
-      owners: ["0x0000000000000000000000000000000000000002"], // cannot be 0x1
+      owners: [mockAddresses.owner],
       threshold: 1, // number of required confirmations
       recoveryOwner: connection.auxiliaryAccount, // account that signs resetRecoveryOwner request
       recoveryController: connection.auxiliaryAccount, // account that relays signed request
@@ -56,7 +48,7 @@ describe('DelayedRecoveryModule', async () => {
       chainConfig.openst.gnosisSafeMasterCopy,
       chainConfig.openst.recoveryMasterCopy,
       chainConfig.openst.createAndAddModules,
-      auxiliaryUtilityToken.address,
+      mockAddresses.utilityToken,
       chainConfig.openst.tokenRules,
       chainConfig.openst.userWalletFactory,
       chainConfig.openst.proxyFactory,
@@ -75,7 +67,7 @@ describe('DelayedRecoveryModule', async () => {
       userWallet.sessionKeys,
       userWallet.sessionKeySpendingLimits,
       userWallet.sessionKeyExpirationHeights,
-      txOptions,
+      openst.auxiliary.txOptions,
     );
 
     // Instantiate DelayedRecoveryModule
@@ -93,10 +85,9 @@ describe('DelayedRecoveryModule', async () => {
     )
 
     // Calculate recovery data
-    const newRecoveryOwner = "0x0000000000000000000000000000000000000003";
     const resetRecoveryOwnerData = delayedRecoveryModule.resetRecoveryOwnerData(
       userWallet.recoveryOwner.address,
-      newRecoveryOwner,
+      mockAddresses.newRecoveryOwner,
     );
 
     // Sign recovery data
@@ -107,16 +98,16 @@ describe('DelayedRecoveryModule', async () => {
 
     // Reset recoveryOwner
     await delayedRecoveryModule.resetRecoveryOwner(
-      newRecoveryOwner,
+      mockAddresses.newRecoveryOwner,
       signedRecoveryData.r,
       signedRecoveryData.s,
       signedRecoveryData.v,
-      txOptions,
+      openst.auxiliary.txOptions,
     );
 
     // Confirm recoveryOwner is newRecoveryOwner
     assert.strictEqual(
-      newRecoveryOwner,
+      mockAddresses.newRecoveryOwner,
       await delayedRecoveryModule.recoveryOwner(),
     )
   });
