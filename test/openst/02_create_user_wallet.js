@@ -10,9 +10,9 @@ describe('CreateUserWallet', async () => {
     const testAddresses = {
       organization: '0x0000000000000000000000000000000000000001',
       utilityToken: '0x0000000000000000000000000000000000000002',
-      owner: '0x0000000000000000000000000000000000000003',
-      sessionKeys: ['0x0000000000000000000000000000000000000004'],
     };
+    const owner = connection.auxiliaryAccount.address;
+    const sessionKeys = [connection.auxiliaryAccount.address];
     const openst = new OpenST(chainConfig, connection);
     //  setupOpenst updates chainConfig with OpenST master copies and factory contracts.
     await openst.setupOpenst(testAddresses.organization, testAddresses.utilityToken);
@@ -23,9 +23,9 @@ describe('CreateUserWallet', async () => {
       recoveryProxy,
     } = await openst.createUserWallet(
       testAddresses.utilityToken,
-      testAddresses.owner,
+      owner,
       1,
-      testAddresses.sessionKeys,
+      sessionKeys,
       [1000000000],
       [10000000000],
     );
