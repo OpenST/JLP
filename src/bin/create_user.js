@@ -7,7 +7,6 @@ const program = require('commander');
 const OpenST = require('../openst');
 
 const connected = require('../connected');
-const logger = require('../logger');
 const { version } = require('../../package.json');
 
 program
