@@ -97,12 +97,17 @@ describe('DelayedRecoveryModule', async () => {
       .signEIP712TypedData(resetRecoveryOwnerData);
 
     // Reset recoveryOwner
+    const resetRecoveryOwnerTxOptions = {
+      from: userWallet.recoveryController.address,
+      gasPrice: openst.auxiliary.txOptions.gasPrice,
+    }
+
     await delayedRecoveryModule.resetRecoveryOwner(
       mockAddresses.newRecoveryOwner,
       signedRecoveryData.r,
       signedRecoveryData.s,
       signedRecoveryData.v,
-      openst.auxiliary.txOptions,
+      resetRecoveryOwnerTxOptions,
     );
 
     // Confirm recoveryOwner is newRecoveryOwner
