@@ -25,16 +25,19 @@ describe('Direct Transfer', async () => {
       testAddresses.owner,
       1,
       [testAddresses.sessionKey],
-      [1000000000],
+      [10000000000],
       [10000000000],
     );
 
     // TODO Fund tokenHolderProxy
+
     await openst.directTransfer(
       testAddresses.sessionKey,
       tokenHolderProxy,
       [testAddresses.beneficiary],
       [1000],
     );
+
+    // Add Asserts
   });
 });
