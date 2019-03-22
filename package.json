@@ -28,9 +28,9 @@
     "test": "node ./test/run.js"
   },
   "dependencies": {
-    "@openstfoundation/brandedtoken.js": "^0.10.0-alpha.2",
-    "@openstfoundation/mosaic.js": "^0.10.0-beta.4",
-    "@openstfoundation/openst.js": "https://github.com/OpenST/openst.js.git#develop",
+    "@openst/brandedtoken.js": "^0.10.0-alpha.2",
+    "@openst/mosaic.js": "^0.10.0-beta.4",
+    "@openst/openst.js": "https://github.com/OpenST/openst.js.git#develop",
     "axios": "^0.18.0",
     "bn.js": "4.11.8",
     "inquirer": "^6.2.2",

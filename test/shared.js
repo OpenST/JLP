@@ -1,4 +1,4 @@
-'use strict';
+ 'use strict';
 
 /**
  * @file `shared` exists so that tests can share data across each other.

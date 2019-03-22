@@ -1,5 +1,5 @@
-const { Setup, ContractInteract } = require('@openstfoundation/mosaic.js');
-const OpenST = require('@openstfoundation/openst.js');
+const { Setup, ContractInteract } = require('@openst/mosaic.js');
+const OpenST = require('@openst/openst.js');
 
 const logger = require('./logger');
 
@@ -125,6 +125,10 @@ class Deployer {
   }
 
   _deployOrganization() {
+    console.log("this.origin.deployer :- ",this.origin.deployer);
+    console.log("this.origin.msaterkeydeployer :- ",this.origin.masterKey);
+    console.log("this.auxiliary.deployer:- ",this.auxiliary.deployer);
+    console.log("this.auxiliary.msaterkeydeployer :- ",this.auxiliary.masterKey);
     return Setup.organizations(
       this.origin.web3,
       this.auxiliary.web3,

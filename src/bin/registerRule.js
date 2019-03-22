@@ -4,7 +4,7 @@
 
 const program = require('commander');
 const Web3 = require('web3');
-const OpenST = require('@openstfoundation/openst.js');
+const OpenST = require('@openst/openst.js');
 
 const connected = require('../connected');
 const logger = require('../logger');
