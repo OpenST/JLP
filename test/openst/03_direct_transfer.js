@@ -1,6 +1,8 @@
 // 'use strict';
 
 const { assert } = require('chai');
+const BN = require('bn.js');
+const { ContractInteract } = require('@openst/mosaic.js');
 
 const { chainConfig, connection } = require('../shared');
 const OpenST = require('../../src/openst');
@@ -30,14 +32,22 @@ describe('Direct Transfer', async () => {
     );
 
     // TODO Fund tokenHolderProxy
-
+    const eip20Instance = new ContractInteract.EIP20Token(
+      connection.auxiliaryWeb3,
+      testAddresses.utilityToken,
+    );
+    const beneficiaryBalanceBefore = await eip20Instance.balanceOf(testAddresses.beneficiary);
+    const transferAmount = new BN('1000');
     await openst.directTransfer(
       testAddresses.sessionKey,
       tokenHolderProxy,
       [testAddresses.beneficiary],
-      [1000],
+      [transferAmount],
     );
-
-    // Add Asserts
+    const beneficiaryBalanceAfter = await eip20Instance.balanceOf(testAddresses.beneficiary);
+    assert.strictEqual(
+      beneficiaryBalanceBefore.add(transferAmount),
+      beneficiaryBalanceAfter,
+    );
   });
 });
