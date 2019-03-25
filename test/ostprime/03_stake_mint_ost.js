@@ -1,21 +1,13 @@
-// 1. stake
-// 2. anchor
-// 3. progressStake
-
 const mosaic = require('@openst/mosaic.js');
 
 const { EIP20Token } = mosaic.ContractInteract;
-const Facilitator = require('./../src/facilitator');
-const EIP20 = require('./../src/eip20');
-const shared = require('./shared');
-const Deployer = require('./../src/deployer');
-const StateRootAnchorService = require('./../src/state_root_anchor_service');
+const Facilitator = require('../../src/facilitator');
+const EIP20 = require('../../src/eip20');
+const shared = require('../shared');
+const Deployer = require('../../src/deployer');
+const StateRootAnchorService = require('../../src/state_root_anchor_service');
 
 describe('stake and mint', () => {
-  before(() => {
-
-  });
-
   it('should stake and mint', async () => {
     const symbol = 'OST';
     const name = 'OST';
@@ -30,6 +22,7 @@ describe('stake and mint', () => {
 
     const contractInstances = await deployer.deployUtilityToken();
     const { originWeb3, auxiliaryWeb3 } = shared.connection;
+    const utilityBrandedTokenAddress = contractInstances.auxiliaryUtilityToken.address;
     chainConfig.update({
       originOrganizationAddress: contractInstances.originOrganization.address,
       auxiliaryOrganizationAddress: contractInstances.auxiliaryOrganization.address,
@@ -37,7 +30,7 @@ describe('stake and mint', () => {
       // auxiliaryAnchorAddress: contractInstances.auxiliaryAnchor.address,
       originGatewayAddress: contractInstances.originGateway.address,
       auxiliaryCoGatewayAddress: contractInstances.auxiliaryCoGateway.address,
-      auxiliaryUtilityTokenAddress: contractInstances.auxiliaryUtilityToken.address,
+      auxiliaryUtilityTokenAddress: utilityBrandedTokenAddress,
     });
     chainConfig.write();
 
@@ -46,7 +39,7 @@ describe('stake and mint', () => {
       shared.connection,
       chainConfig.toMosaic(shared.connection),
     );
-    const amount = 10000;
+    const stakedAmount = 10000;
 
     const eip20Token = new EIP20Token(originWeb3, eip20TokenAddress);
     const staker = shared.accounts.origin.originDeployer.address;
@@ -55,14 +48,14 @@ describe('stake and mint', () => {
     const beneficiary = shared.accounts.auxiliary.auxiliaryMasterKey.address;
     const { messageHash } = await facilitator.stake(
       staker,
-      amount,
+      stakedAmount,
       beneficiary,
     );
 
     const stakerBalanceAfterStake = await eip20Token.balanceOf(staker);
 
     assert.strictEqual(
-      initialStakerBalance - amount,
+      initialStakerBalance - stakedAmount,
       stakerBalanceAfterStake,
       'Incorrect staker balance',
     );
@@ -84,19 +77,14 @@ describe('stake and mint', () => {
       timeout,
     );
 
-    await stateRootAnchorService.start();
+    const anchorInfo = await stateRootAnchorService.getSourceInfo('latest');
+    await stateRootAnchorService.anchor(anchorInfo, targetTxOptions);
 
     await facilitator.progressStake(messageHash);
 
-    // verifying the beneficiary balance
-    // const auxEIP20Token = new EIP20Token(
-    //   auxiliaryWeb3,
-    //   contractInstances.auxiliaryUtilityToken.address,
-    // );
-    //
-    // const gasUsed = new BN(tx.receipt.gasUsed);
-    // const maxReward = gasUsed.mul(unstakeMessage.gasPrice);
-    //
-    // const beneficiaryBalance = await auxEIP20Token.balanceOf(staker);
+    const ubtTokenInstance = new EIP20Token(originWeb3, utilityBrandedTokenAddress);
+    const beneficiaryBalance = await ubtTokenInstance.balanceOf(beneficiary);
+    const mintedToken = initialStakerBalance - stakedAmount;
+    assert.strictEqual(beneficiaryBalance, mintedToken, 'Minted tokens are not as per expected number');
   });
 });
