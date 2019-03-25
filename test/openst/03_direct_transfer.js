@@ -10,52 +10,51 @@ const OpenST = require('../../src/openst');
 
 describe('Direct Transfer', async () => {
   it('Transfers tokens from sender to receiver', async () => {
-    const testAddresses = {
-      organization: '0x0000000000000000000000000000000000000001',
-      utilityToken: '0x0000000000000000000000000000000000000002',
-      beneficiary: '0x0000000000000000000000000000000000000005',
-    };
-    const sessionKey = connection.auxiliaryAccount.address;
-    const openst = new OpenST(chainConfig, connection);
-    //  setupOpenst updates chainConfig with OpenST master copies and factory contracts.
-    await openst.setupOpenst(testAddresses.organization, testAddresses.utilityToken);
+    const auxiliaryUtilityToken = chainConfig.utilitybrandedtokens[0].address;
 
+    const openst = new OpenST(chainConfig, connection);
     const {
-      tokenHolderProxy,
+      beneficiary,
     } = await openst.createUserWallet(
-      testAddresses.utilityToken,
+      auxiliaryUtilityToken,
       connection.auxiliaryAccount.address,
-      1, // gnosis multisig requirement
-      [sessionKey],
-      [10000000000],
-      [10000000000],
+      1,
+      connection.auxiliaryAccount.address, // Comma separated session keys.
+      '100000000000',
+      '100000000000',
     );
 
+    // Register beneficiary as internal actor
     const utilityBrandedToken = BrandedToken.ContractInteract.UtilityBrandedToken(
       connection.auxiliaryWeb3,
-      testAddresses.utilityToken,
+      auxiliaryUtilityToken,
     );
     const txOptions = {
       gasPrice: chainConfig.auxiliaryGasPrice,
       from: connection.auxiliaryAccount.address,
     };
     await utilityBrandedToken.registerInternalActors(
-      [tokenHolderProxy, testAddresses.beneficiary],
+      [beneficiary],
       txOptions,
     );
+
     const eip20Instance = new ContractInteract.EIP20Token(
       connection.auxiliaryWeb3,
-      testAddresses.utilityToken,
+      auxiliaryUtilityToken,
     );
-    const beneficiaryBalanceBefore = await eip20Instance.balanceOf(testAddresses.beneficiary);
+    const beneficiaryBalanceBefore = await eip20Instance.balanceOf(beneficiary);
+
+    // Performs Direct Transfer.
+    const sessionKey = connection.auxiliaryAccount.address;
     const transferAmount = new BN('1000');
+    const sender = chainConfig.openst.users[0].tokenHolderProxy;
     await openst.directTransfer(
       sessionKey,
-      tokenHolderProxy,
-      [testAddresses.beneficiary],
+      sender,
+      [beneficiary],
       [transferAmount],
     );
-    const beneficiaryBalanceAfter = await eip20Instance.balanceOf(testAddresses.beneficiary);
+    const beneficiaryBalanceAfter = await eip20Instance.balanceOf(beneficiary);
     assert.strictEqual(
       beneficiaryBalanceBefore.add(transferAmount),
       beneficiaryBalanceAfter,
