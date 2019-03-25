@@ -91,6 +91,7 @@ class BTStakeMint {
     stakeRequests[stakeRequestHash] = stakeRequest;
 
     logger.info(`requestStake completed, your request hash is: ${stakeRequestHash}`);
+    return stakeRequestHash;
   }
 
   async acceptStake(stakeRequestHash) {
@@ -158,7 +159,7 @@ class BTStakeMint {
       this.chainConfig.brandedToken.address,
     ).getEIP712SignHash();
 
-    signature = signData(requestHashToBeSigned, this.chainConfig.workerPrivateKey);
+    const signature = signData(requestHashToBeSigned, this.chainConfig.workerPrivateKey);
 
     await facilitator.acceptStakeRequest(
       stakeRequest.stakeRequestHash,
@@ -211,6 +212,7 @@ class BTStakeMint {
 
     logger.info('Stake successful');
     logger.info(`Please use faciliator agent to progressStake and use this message hash : ${messageHash}`);
+    return messageHash;
   }
 
   getUtilityBrandedTokenConfig(originGateway) {
