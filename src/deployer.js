@@ -96,7 +96,7 @@ class Deployer {
     logger.info(`auxiliary coGateway address ${auxiliaryCoGateway.address}`);
 
     logger.info('Setting cogateway in utility token');
-    // Fix me https://github.com/OpenSTFoundation/mosaic.js/issues/129
+    // Fix me https://github.com/openst/mosaic.js/issues/129
     await auxiliaryUtilityToken.setCoGateway(
       auxiliaryCoGateway.address,
       this.auxiliary.txOptions,

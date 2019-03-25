@@ -1,12 +1,12 @@
 {
-  "name": "@benjaminbollen/JLP.js",
+  "name": "@openst/JLP",
   "version": "0.1.0-alpha.0",
   "description": "Build a Star Fleet base in the universe.",
   "main": "lib/mosaic.node.js",
   "browser": "lib/mosaic.web.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/benjaminbollen/JLP.git"
+    "url": "git+https://github.com/openst/JLP.git"
   },
   "keywords": [
     "OpenST",
@@ -18,20 +18,19 @@
     "Ethereum",
     "EIP20"
   ],
-  "homepage": "https://github.com/benjaminbollen/JLP",
+  "homepage": "https://github.com/openst/JLP",
   "author": "OpenST Ltd.",
-  "license": "LGPL-3.0-only",
+  "license": "MIT",
   "bugs": {
-    "url": "https://github.com/benjaminbollen/JLP/issues"
+    "url": "https://github.com/openst/JLP/issues"
   },
   "scripts": {
-    "test": "node ./test/run.js"
+    "test":"mocha --recursive --timeout 120000 test --exit"
   },
   "dependencies": {
-    "@openst/brandedtoken.js": "^0.10.0-alpha.2",
-    "@openst/mosaic.js": "^0.10.0-beta.4",
-    "@openst/openst.js": "https://github.com/OpenST/openst.js.git#develop",
-    "axios": "^0.18.0",
+    "@openst/mosaic.js": "^0.10.0-beta.5",
+    "@openst/brandedtoken.js": "^0.10.0-beta.1",
+    "@openst/openst.js": "^0.10.0-beta.1",
     "bn.js": "4.11.8",
     "inquirer": "^6.2.2",
     "js-scrypt": "0.2.0",
