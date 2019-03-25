@@ -17,7 +17,9 @@ describe('stake and mint', () => {
     const { chainConfig } = shared;
     const eip20 = new EIP20(chainConfig, symbol, name, totalSupply, decimals);
     const eip20TokenAddress = await eip20.deployEIP20(shared.connection);
-
+    chainConfig.update({
+      eip20TokenAddress,
+    });
     const deployer = new Deployer(chainConfig, shared.connection);
 
     const contractInstances = await deployer.deployUtilityToken();
@@ -26,8 +28,6 @@ describe('stake and mint', () => {
     chainConfig.update({
       originOrganizationAddress: contractInstances.originOrganization.address,
       auxiliaryOrganizationAddress: contractInstances.auxiliaryOrganization.address,
-      // originAnchorAddress: contractInstances.originAnchor.address,
-      // auxiliaryAnchorAddress: contractInstances.auxiliaryAnchor.address,
       originGatewayAddress: contractInstances.originGateway.address,
       auxiliaryCoGatewayAddress: contractInstances.auxiliaryCoGateway.address,
       auxiliaryUtilityTokenAddress: utilityBrandedTokenAddress,
