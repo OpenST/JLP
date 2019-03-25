@@ -7,27 +7,32 @@ const OpenST = require('../../src/openst');
 
 describe('CreateUserWallet', async () => {
   it('Creates user wallet', async () => {
-    const testAddresses = {
-      organization: '0x0000000000000000000000000000000000000001',
-      utilityToken: '0x0000000000000000000000000000000000000002',
-    };
+    const auxiliaryOrganization = chainConfig.utilitybrandedtokens[0].organizationAddress;
+    const auxiliaryUtilityToken = chainConfig.utilitybrandedtokens[0].address;
+
     const owner = connection.auxiliaryAccount.address;
-    const sessionKeys = [connection.auxiliaryAccount.address];
     const openst = new OpenST(chainConfig, connection);
     //  setupOpenst updates chainConfig with OpenST master copies and factory contracts.
-    await openst.setupOpenst(testAddresses.organization, testAddresses.utilityToken);
+    await openst.setupOpenst(auxiliaryOrganization, auxiliaryUtilityToken);
 
+    // For createUserWallet config should have recoveryOwnerAddress, recoveryControllerAddress
+    // and recoveryBlockDelay
+    chainConfig.openst.update({
+      recoveryOwnerAddress: connection.auxiliaryAccount.address,
+      recoveryControllerAddress: connection.auxiliaryAccount.address,
+      recoveryBlockDelay: '100000000000',
+    });
     const {
       tokenHolderProxy,
       gnosisSafeProxy,
       recoveryProxy,
     } = await openst.createUserWallet(
-      testAddresses.utilityToken,
+      auxiliaryUtilityToken,
       owner,
       1,
-      sessionKeys,
-      [1000000000],
-      [10000000000],
+      connection.auxiliaryAccount.address, // Comma separated session keys.
+      '100000000000',
+      '100000000000',
     );
 
     assert.isNotNull(tokenHolderProxy, 'TokenHolder proxy address should not be null.');
