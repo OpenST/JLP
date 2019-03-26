@@ -45,7 +45,7 @@
 
 /**
  * @typedef {Object} BaseCoinRefundTransaction
- * @property {string}  type Type of fund.
+ * @property {string}  type Type of fund, either ERC20 or base coin.
  * @property {string} faucetAddress Address of faucet.
  */
 
