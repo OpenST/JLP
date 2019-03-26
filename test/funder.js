@@ -29,7 +29,6 @@
  *                                                 from ropsten faucet
  */
 
-
 /**
  * @typedef {Object} FundingDetails
  *
@@ -112,26 +111,24 @@ const addAuxiliaryAccount = async (name, web3) => {
  * @param {string} chainId Chain Id of chain where beneficiary will get fund.
  * @return {Promise<string>} Transaction hash returned by faucet.
  */
-const fundAccountFromMosaicFaucet = (address, chainId) => new Promise(
-  (resolve, reject) => axios.post(MOSAIC_FAUCET_URL, {
+const fundAccountFromMosaicFaucet = async (address, chainId) => {
+  const response = await axios.post(MOSAIC_FAUCET_URL, {
     beneficiary: `${address}@${chainId}`,
-  })
-    .then(response => resolve(response.data))
-    .catch(error => reject(error)),
-);
+  });
+  return response.data.txHash;
+};
 
 /**
  * This funds an account from ropsten faucet.
  * @param {string} address Beneficiary address where funds will be added;
  * @return {Promise<string>} Transaction hash returned by faucet.
  */
-const fundAccountFromRopstenFaucet = address => new Promise(
-  (resolve, reject) => axios.post(ROPSTEN_FAUCET_URL, {
+const fundAccountFromRopstenFaucet = async (address) => {
+  const response = await axios.post(ROPSTEN_FAUCET_URL, {
     toWhom: address,
-  })
-    .then(response => resolve(response.data))
-    .catch(error => reject(error)),
-);
+  });
+  return response.data.txHash;
+};
 
 /**
  * This methods takes various faucet fund request as a promise and waits
@@ -154,9 +151,9 @@ const waitForFunding = (
   auxiliaryMosaicFaucetFundRequests,
   ropstenFaucetFundRequest,
 ]).then((faucetResponse) => {
-  const originTransactionHashes = faucetResponse[0].map(response => response.txHash);
-  const auxiliaryTransactionHashes = faucetResponse[1].map(response => response.txHash);
-  const ropstenTransactionHashes = faucetResponse[2].map(response => response.txHash);
+  const originTransactionHashes = faucetResponse[0];
+  const auxiliaryTransactionHashes = faucetResponse[1];
+  const ropstenTransactionHashes = faucetResponse[2];
 
   return Promise.all([
     originWeb3.eth.getTransactionReceiptMined(originTransactionHashes),
@@ -265,8 +262,8 @@ const faucetTransactionDetails = async (
 };
 
 /**
- * This method returns all the base token balance to faucet address from the
- * `from` address.
+ * This method returns all the base token balance to faucet address from a
+ * given address.
  * @param {Web3} web3 Instance of web3.
  * @param {string} from Address from which fund will be transferred.
  * @param {string} faucetAddress Address of the faucet.
@@ -283,7 +280,7 @@ const refundBaseTokenToFaucet = async (web3, from, faucetAddress) => {
         from,
         value: refundAmount,
         gas: 21000,
-
+        gasPrice,
       },
     );
   }
