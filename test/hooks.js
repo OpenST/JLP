@@ -35,10 +35,11 @@ before(async () => {
     await funder.addAuxiliaryAccount('auxiliaryMasterKey', web3);
     await funder.addAuxiliaryAccount('auxiliaryWorker', web3);
 
-    const connection = await Connection.openAndUnlockAccounts(
+    const connection = await Connection.open(
       chainConfig,
-      shared.accounts.origin.originDeployer,
-      shared.accounts.auxiliary.auxiliaryDeployer,
+      shared.accounts.origin.originDeployer.name,
+      shared.accounts.auxiliary.auxiliaryDeployer.name,
+      funder.DEFAULT_PASSWORD,
       funder.DEFAULT_PASSWORD,
     );
     shared.connection = connection;

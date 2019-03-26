@@ -4,6 +4,7 @@
 
 const program = require('commander');
 const Web3 = require('web3');
+const inquirer = require('inquirer');
 
 const Account = require('../account');
 const logger = require('../logger');
@@ -21,7 +22,27 @@ program
         process.exit(1);
       }
 
-      await Account.create(chain, new Web3());
+      const { password } = await inquirer.prompt({
+        type: 'password',
+        name: 'password',
+        message: 'Select a password to encrypt the account:',
+      });
+      await inquirer.prompt({
+        type: 'password',
+        name: 'password',
+        message: 'Repeat the password:',
+        validate: input => new Promise(
+          (resolve, reject) => {
+            if (input === password) {
+              resolve(true);
+            } else {
+              reject(new Error('Passwords don\'t match, please try again. (^C to abort)'));
+            }
+          },
+        ),
+      });
+
+      await Account.create(chain, new Web3(), password);
     },
   )
   .on(

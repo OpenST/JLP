@@ -1,6 +1,7 @@
 'use strict';
 
 const Web3 = require('web3');
+const inquirer = require('inquirer');
 
 const Account = require('../account');
 const Provider = require('./provider');
@@ -32,41 +33,46 @@ class Connection {
 
   /**
    * Opens a new connection with new Web3 instances.
-   *
    * @param {ChainConfig} chainConfig JLP chain configuration.
+   * @param {string} [originAccountName=origin] Origin chain account identifier.
+   * @param {string} [auxiliaryAccountName=auxiliary] Auxiliary chain account
+   *                                                   identifier.
+   * @param {string} [originPassword] Password to unlock origin account.
+   * @param {string} [auxiliaryPassword] Password to unlock auxiliary account.
+   * @return {Promise<Connection>} Promise that resolve to instance of
+   *                               Connection.
    */
-  static async open(chainConfig) {
-    const originWeb3 = new Web3();
-    const auxiliaryWeb3 = new Web3();
-    const originAccount = await Account.unlock('origin', originWeb3);
-    const auxiliaryAccount = await Account.unlock('auxiliary', auxiliaryWeb3);
-    const originProvider = Provider.create('origin', originAccount, chainConfig);
-    const auxiliaryProvider = Provider.create('auxiliary', auxiliaryAccount, chainConfig);
-    originWeb3.setProvider(originProvider);
-    auxiliaryWeb3.setProvider(auxiliaryProvider);
-
-    return new Connection(
-      originWeb3,
-      auxiliaryWeb3,
-      originAccount,
-      auxiliaryAccount,
-    );
-  }
-
-  static async openAndUnlockAccounts(
+  static async open(
     chainConfig,
-    originAccountConf,
-    auxiliaryAccountConf,
-    password,
+    originAccountName = 'origin',
+    auxiliaryAccountName = 'auxiliary',
+    originPassword,
+    auxiliaryPassword,
   ) {
     const originWeb3 = new Web3();
     const auxiliaryWeb3 = new Web3();
-    const originAccount = await Account.unlock(originAccountConf.name, originWeb3, password);
-    const auxiliaryAccount = await Account.unlock(
-      auxiliaryAccountConf.name,
-      auxiliaryWeb3,
-      password,
-    );
+
+    let name = originAccountName;
+    if (!originPassword) {
+      const { password } = await inquirer.prompt({
+        type: 'password',
+        name: 'password',
+        message: `Input your account password to unlock ${name}:`,
+      });
+      originPassword = password;
+    }
+    const originAccount = await Account.unlock(name, originWeb3, originPassword);
+
+    name = auxiliaryAccountName;
+    if (!auxiliaryPassword) {
+      const { password } = await inquirer.prompt({
+        type: 'password',
+        name: 'password',
+        message: `Input your account password to unlock ${name}:`,
+      });
+      auxiliaryPassword = password;
+    }
+    const auxiliaryAccount = await Account.unlock(name, auxiliaryWeb3, auxiliaryPassword);
     const originProvider = Provider.create('origin', originAccount, chainConfig);
     const auxiliaryProvider = Provider.create('auxiliary', auxiliaryAccount, chainConfig);
     originWeb3.setProvider(originProvider);

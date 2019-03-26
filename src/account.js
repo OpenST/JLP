@@ -1,7 +1,6 @@
 'use strict';
 
 const fs = require('fs');
-const inquirer = require('inquirer');
 const path = require('path');
 
 const logger = require('./logger');
@@ -22,14 +21,12 @@ class Account {
    *
    * @param {string} chain Chain identifier to read and write the accounts file.
    * @param {Web3} web3 Web3 instance to create an account.
-   * @param {string} [password] Password to encrypt the account.
+   * @param {string} password Password to encrypt the account.
    */
   static async create(chain, web3, password) {
     const accounts = Account._readAccountsFromDisk();
     const account = Account._newWeb3Account(web3);
-    const encryptedAccount = await Account._encrypt(account, web3, password);
-
-    accounts[chain] = encryptedAccount;
+    accounts[chain] = await Account._encrypt(account, web3, password);
 
     Account._writeAccountsToDisk(accounts);
     logger.info(`Created account ${account.address}`);
@@ -40,6 +37,8 @@ class Account {
    * Returns an unlocked account object. May ask the user for a password on CLI.
    *
    * @param {string} chain 'origin' or 'auxiliary'.
+   * @param {Web3} web3 Web3 instance to create an account.
+   * @param {string} password Password to unlock the account.
    */
   static async unlock(chain, web3, password) {
     if (unlockedAccounts[chain]) {
@@ -54,7 +53,7 @@ class Account {
       return {};
     }
 
-    const decrypted = await Account._decrypt(account, chain, web3, password);
+    const decrypted = await Account._decrypt(account, web3, password);
     logger.info(`Decrypted account ${decrypted.address}`);
 
     unlockedAccounts[chain] = decrypted;
@@ -110,56 +109,29 @@ class Account {
   }
 
   /**
-   * Encrypts the given account with a password inquired from the command line.
+   * Encrypts the given account with a password.
    * @private
    * @param {Object} account A Web3 account object.
-   * @param {string} [givenPassword] Password to encrypt the account.
    * @param {Web3} web3 Web3 instance to create an account.
+   * @param {string} givenPassword Password to encrypt the account.
    * @returns {Object} A Web3 keyStore object.
    */
   static async _encrypt(account, web3, givenPassword) {
-    let accountPassword = givenPassword;
-    if (!givenPassword) {
-      const { password } = await inquirer.prompt({
-        type: 'password',
-        name: 'password',
-        message: 'Select a password to encrypt the account:',
-      });
-      await inquirer.prompt({
-        type: 'password',
-        name: 'password',
-        message: 'Repeat the password:',
-        validate: input => new Promise(
-          (resolve, reject) => {
-            if (input === password) {
-              resolve(true);
-            } else {
-              reject(new Error('Passwords don\'t match, please try again. (^C to abort)'));
-            }
-          },
-        ),
-      });
-      accountPassword = password;
-    }
-
-    const encrypted = web3.eth.accounts.encrypt(account.privateKey, accountPassword);
+    const encrypted = web3.eth.accounts.encrypt(account.privateKey, givenPassword);
 
     return encrypted;
   }
 
-  static async _decrypt(account, name, web3, givenPassword) {
-    let accountPassword = givenPassword;
-
-    if (!givenPassword) {
-      const { password } = await inquirer.prompt({
-        type: 'password',
-        name: 'password',
-        message: `Input your account password to unlock ${name}:`,
-      });
-      accountPassword = password;
-    }
-
-    const decrypted = web3.eth.accounts.decrypt(account, accountPassword);
+  /**
+   * Decrypts the given account with a password.
+   * @private
+   * @param {Object} account A Web3 account object.
+   * @param {Web3} web3 Web3 instance to create an account.
+   * @param {string} givenPassword Password to encrypt the account.
+   * @returns {Object} Decrypted account object.
+   */
+  static async _decrypt(account, web3, givenPassword) {
+    const decrypted = web3.eth.accounts.decrypt(account, givenPassword);
 
     return decrypted;
   }

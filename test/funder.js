@@ -39,13 +39,13 @@
 
 /**
  * @typedef {Object} ERC20RefundTransaction
- * @property {string}  type Type of fund.
+ * @property {string}  type Type of fund, either ERC20 or base coin.
  * @property {string} faucetAddress Address of faucet.
  * @property {string} tokenAddress Address of ERC20 contract.
  */
 
 /**
- * @typedef {Object} BaseTokenRefundTransaction
+ * @typedef {Object} BaseCoinRefundTransaction
  * @property {string}  type Type of fund.
  * @property {string} faucetAddress Address of faucet.
  */
@@ -56,10 +56,10 @@
  * @property {ERC20RefundTransaction} originTransactions Return to faucet
  *                                                        transaction detail for
  *                                                        origin chain.
- * @property {BaseTokenRefundTransaction} auxiliaryTransactions Return to faucet
+ * @property {BaseCoinRefundTransaction} auxiliaryTransactions Return to faucet
  *                                                        transaction detail for
  *                                                        auxiliary chain.
- * @property {BaseTokenRefundTransaction} ropstenTransactions Return to faucet
+ * @property {BaseCoinRefundTransaction} ropstenTransactions Return to faucet
  *                                                        transaction detail for
  *                                                        the ropsten.
  */
@@ -135,7 +135,7 @@ const fundAccountFromRopstenFaucet = address => new Promise(
 
 /**
  * This methods takes various faucet fund request as a promise and waits
- * till all the promises are not resolved.
+ * until all the promises are not resolved.
  * @param {Array<Promise>} originMosaicFaucetFundRequests
  * @param {Array<Promise>} auxiliaryMosaicFaucetFundRequests
  * @param {Array<Promise>} ropstenFaucetFundRequest
@@ -143,7 +143,7 @@ const fundAccountFromRopstenFaucet = address => new Promise(
  * @param {Web3} auxiliaryWeb3
  * @return {Promise<FundingDetails>}
  */
-const waitForFunding = async (
+const waitForFunding = (
   originMosaicFaucetFundRequests,
   auxiliaryMosaicFaucetFundRequests,
   ropstenFaucetFundRequest,
