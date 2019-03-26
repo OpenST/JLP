@@ -68,6 +68,7 @@ const Web3 = require('web3');
 const Mosaic = require('@openst/mosaic.js');
 
 const Account = require('../src/account');
+const logger = require('../src/logger');
 const { MOSAIC_FAUCET_URL, ROPSTEN_FAUCET_URL, ROPSTEN_REFUND_ADDRESS } = require('./constants');
 const shared = require('./shared');
 
@@ -115,6 +116,7 @@ const fundAccountFromMosaicFaucet = async (address, chainId) => {
   const response = await axios.post(MOSAIC_FAUCET_URL, {
     beneficiary: `${address}@${chainId}`,
   });
+  logger.info(`Transaction hash for chain ${chainId} faucet: ${response.data.txHash}`);
   return response.data.txHash;
 };
 
@@ -127,6 +129,7 @@ const fundAccountFromRopstenFaucet = async (address) => {
   const response = await axios.post(ROPSTEN_FAUCET_URL, {
     toWhom: address,
   });
+  logger.info(`Transaction hash for ropsten faucet: ${response.data.txHash}`);
   return response.data.txHash;
 };
 
@@ -151,6 +154,7 @@ const waitForFunding = (
   auxiliaryMosaicFaucetFundRequests,
   originBaseCoinFundRequests,
 ]).then((faucetResponse) => {
+  logger.info('Received funding transaction hashed, waiting for the receipts');
   const originERC20TransactionHashes = faucetResponse[0];
   const auxiliaryTransactionHashes = faucetResponse[1];
   const originBaseCoinTransactionHashes = faucetResponse[2];
@@ -180,10 +184,11 @@ const waitForFunding = (
  * @param {Number=} interval Polling interval in milli second.
  */
 function getTransactionReceiptMined(txHash, interval) {
-  console.log(txHash);
+  logger.info(`Waiting for the receipt for txhash ${txHash}`);
   const self = this;
   const transactionReceiptAsync = (resolve, reject) => {
     self.getTransactionReceipt(txHash, (error, receipt) => {
+      logger.info(`Waiting for the receipt for txhash ${txHash}`);
       if (error) {
         reject(error);
       } else if (receipt == null) {
@@ -192,6 +197,7 @@ function getTransactionReceiptMined(txHash, interval) {
           interval || 500,
         );
       } else {
+        logger.info(`Received receipt for txHash ${txHash}`);
         resolve(receipt);
       }
     });
@@ -270,10 +276,12 @@ const faucetTransactionDetails = async (
  * @param {string} faucetAddress Address of the faucet.
  */
 const refundBaseCoinToFaucet = async (web3, from, faucetAddress) => {
+  logger.info('Refunding base coin to faucet');
   const balance = new BN(await web3.eth.getBalance(from));
   const gasPrice = new BN(await web3.eth.getGasPrice());
   const transactionFee = gasPrice.muln(21000);
   const refundAmount = balance.sub(transactionFee);
+  logger.info(`Refund amount is ${refundAmount}`);
   if (refundAmount.gt(0)) {
     await web3.eth.sendTransaction(
       {
@@ -285,6 +293,7 @@ const refundBaseCoinToFaucet = async (web3, from, faucetAddress) => {
       },
     );
   }
+  logger.info('Refund of base coin is done');
 };
 
 /**
@@ -296,6 +305,7 @@ const refundBaseCoinToFaucet = async (web3, from, faucetAddress) => {
  * details for ERC20.
  */
 const refundERC20TokenToFaucet = async (web3, from, faucetTransaction) => {
+  logger.info('Refunding ERC20 fund to faucet');
   const gasPrice = new BN(await web3.eth.getGasPrice());
   const token = new Mosaic.ContractInteract.EIP20Token(
     web3, faucetTransaction.tokenAddress,
@@ -310,6 +320,7 @@ const refundERC20TokenToFaucet = async (web3, from, faucetTransaction) => {
     gasPrice,
     gas: '100000',
   });
+  logger.info('Refund of ERC20 fund is done');
 };
 
 module.exports = {
