@@ -24,7 +24,7 @@ before_install:
   - sudo apt-get install software-properties-common
   - sudo add-apt-repository -y ppa:ethereum/ethereum
 install:
-  - npm ci --quiet
+  - npm install --quiet
   - export PATH=./node_modules/.bin/:${PATH}
 before_script:
   - docker pull augurproject/dev-node-geth:v1.8.18
