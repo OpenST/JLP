@@ -1,21 +1,21 @@
 /**
  * @typedef {Object} FundingReceipts
  *
- * @property {Array<Object>} originFaucetReceipts Array of receipts for
+ * @property {Array<Object>} originERC20FaucetReceipts Array of receipts for
  *                                                origin chain addresses funded
  *                                                from mosaic faucet.
  * @property {Array<Object>} auxiliaryFaucetReceipts Array of receipts for
  *                                                   auxiliary chain addresses
  *                                                   funded from mosaic faucet.
- * @property {Array<Object>} ropstenFaucetReceipts Array of receipts for
+ * @property {Array<Object>} originBaseCoinFaucetReceipts Array of receipts for
  *                                                 origin chain addresses funded
- *                                                 from ropsten faucet
+ *                                                 from origin faucet
  */
 
 /**
  * @typedef {Object} FundingTransactionHashes
  *
- * @property {Array<string>} originFaucetTXHashes Array of transaction
+ * @property {Array<string>} originERC20FaucetTXHashes Array of transaction
  *                                                hashes for origin chain
  *                                                addresses funded from
  *                                                mosaic faucet.
@@ -23,10 +23,10 @@
  *                                                   hashes for auxiliary
  *                                                   chain addresses funded
  *                                                   from mosaic faucet.
- * @property {Array<string>} ropstenFaucetTXHashes Array of transaction hashes
+ * @property {Array<string>} originBaseCoinFaucetTXHashes Array of transaction hashes
  *                                                 for auxiliary for origin
  *                                                 chain addresses funded
- *                                                 from ropsten faucet
+ *                                                 from origin faucet
  */
 
 /**
@@ -52,15 +52,15 @@
 /**
  *
  * @typedef {Object} RefundTransactionDetails
- * @property {ERC20RefundTransaction} originTransactions Return to faucet
+ * @property {ERC20RefundTransaction} originERC20Transactions Return to faucet
  *                                                        transaction detail for
  *                                                        origin chain.
  * @property {BaseCoinRefundTransaction} auxiliaryTransactions Return to faucet
  *                                                        transaction detail for
  *                                                        auxiliary chain.
- * @property {BaseCoinRefundTransaction} ropstenTransactions Return to faucet
+ * @property {BaseCoinRefundTransaction} originBaseCoinTransactions Return to faucet
  *                                                        transaction detail for
- *                                                        the ropsten.
+ *                                                        the origin.
  */
 
 const axios = require('axios');
@@ -133,42 +133,42 @@ const fundAccountFromRopstenFaucet = async (address) => {
 /**
  * This methods takes various faucet fund request as a promise and waits
  * until all the promises are not resolved.
- * @param {Array<Promise>} originMosaicFaucetFundRequests
- * @param {Array<Promise>} auxiliaryMosaicFaucetFundRequests
- * @param {Array<Promise>} ropstenFaucetFundRequest
+ * @param {Promise} originERC20FundRequests
+ * @param {Promise} auxiliaryMosaicFaucetFundRequests
+ * @param {Promise} originBaseCoinFundRequests
  * @param {Web3} originWeb3
  * @param {Web3} auxiliaryWeb3
  * @return {Promise<FundingDetails>}
  */
 const waitForFunding = (
-  originMosaicFaucetFundRequests,
+  originERC20FundRequests,
   auxiliaryMosaicFaucetFundRequests,
-  ropstenFaucetFundRequest,
+  originBaseCoinFundRequests,
   originWeb3,
   auxiliaryWeb3,
 ) => Promise.all([
-  originMosaicFaucetFundRequests,
+  originERC20FundRequests,
   auxiliaryMosaicFaucetFundRequests,
-  ropstenFaucetFundRequest,
+  originBaseCoinFundRequests,
 ]).then((faucetResponse) => {
-  const originTransactionHashes = faucetResponse[0];
+  const originERC20TransactionHashes = faucetResponse[0];
   const auxiliaryTransactionHashes = faucetResponse[1];
-  const ropstenTransactionHashes = faucetResponse[2];
+  const originBaseCoinTransactionHashes = faucetResponse[2];
 
   return Promise.all([
-    originWeb3.eth.getTransactionReceiptMined(originTransactionHashes),
+    originWeb3.eth.getTransactionReceiptMined(originERC20TransactionHashes),
     auxiliaryWeb3.eth.getTransactionReceiptMined(auxiliaryTransactionHashes),
-    originWeb3.eth.getTransactionReceiptMined(ropstenTransactionHashes),
+    originWeb3.eth.getTransactionReceiptMined(originBaseCoinTransactionHashes),
   ]).then(receipts => ({
     receipts: {
-      originFaucetReceipts: receipts[0],
+      originERC20FaucetReceipts: receipts[0],
       auxiliaryFaucetReceipts: receipts[1],
-      ropstenFaucetReceipts: receipts[2],
+      originBaseCoinFaucetReceipts: receipts[2],
     },
     txHashes: {
-      originFaucetTXHashes: originTransactionHashes,
+      originERC20FaucetTXHashes: originERC20TransactionHashes,
       auxiliaryFaucetTXHashes: auxiliaryTransactionHashes,
-      ropstenFaucetTXHashes: ropstenTransactionHashes,
+      originBaseCoinFaucetTXHashes: originBaseCoinTransactionHashes,
     },
   }));
 });
@@ -180,6 +180,7 @@ const waitForFunding = (
  * @param {Number=} interval Polling interval in milli second.
  */
 function getTransactionReceiptMined(txHash, interval) {
+  console.log(txHash);
   const self = this;
   const transactionReceiptAsync = (resolve, reject) => {
     self.getTransactionReceipt(txHash, (error, receipt) => {
@@ -211,51 +212,51 @@ function getTransactionReceiptMined(txHash, interval) {
  * This method captures detail about funding transaction from fauce like faucet
  * address, eip20 token address etc. which is used to return remaining fund
  * to faucet.
- * @param {Array<string>} originFaucetTXHashes Transaction hashes of funding
+ * @param {Array<string>} originERC20FaucetTXHashes Transaction hashes of funding
  *                                             transaction by mosaic faucet
  *                                             on the origin chain.
  * @param {Array<string>} auxiliaryFaucetTXHashes Transaction hashes of funding
  *                                                transaction by mosaic faucet
  *                                                on the auxiliary chain.
- * @param {Array<string>} ropstenFaucetTXHashes Transaction hashes of funding
- *                                              transaction by ropsten faucet
+ * @param {Array<string>} originBaseCoinFaucetTXHashes Transaction hashes of funding
+ *                                              transaction by base coin faucet
  *                                              on the origin chain.
  * @param {Web3} originWeb3 Web3 instance pointing to the origin chain.
  * @param auxiliaryWeb3 Web3 instance pointing to the auxiliary chain.
  * @return {Promise<RefundTransactionDetails>} Details of refund transaction
- *                                            to mosaic and ropsten faucet.
+ *                                            to mosaic and base coin faucet.
  */
 const faucetTransactionDetails = async (
-  originFaucetTXHashes,
+  originERC20FaucetTXHashes,
   auxiliaryFaucetTXHashes,
-  ropstenFaucetTXHashes,
+  originBaseCoinFaucetTXHashes,
   originWeb3,
   auxiliaryWeb3,
 ) => {
   // Get faucet address from one transaction.
-  const originTransaction = originWeb3.eth.getTransaction(originFaucetTXHashes[0]);
+  const originERC20Transaction = originWeb3.eth.getTransaction(originERC20FaucetTXHashes[0]);
   const auxiliaryTransaction = auxiliaryWeb3.eth.getTransaction(auxiliaryFaucetTXHashes[0]);
-  const ropstenTransaction = originWeb3.eth.getTransaction(ropstenFaucetTXHashes[0]);
+  const originBaseCoinTransaction = originWeb3.eth.getTransaction(originBaseCoinFaucetTXHashes[0]);
 
   return Promise.all(
     [
-      originTransaction,
+      originERC20Transaction,
       auxiliaryTransaction,
-      ropstenTransaction,
+      originBaseCoinTransaction,
     ],
   ).then(transactions => ({
-    originTransactions: {
+    originERC20Transactions: {
       type: 'ERC20',
       faucetAddress: transactions[0].from,
       tokenAddress: transactions[0].to,
 
     },
     auxiliaryTransactions: {
-      type: 'BaseToken',
+      type: 'BaseCoin',
       faucetAddress: transactions[1].from,
     },
-    ropstenTransactions: {
-      type: 'BaseToken',
+    originBaseCoinTransactions: {
+      type: 'BaseCoin',
       faucetAddress: ROPSTEN_REFUND_ADDRESS,
     },
   }));
@@ -268,7 +269,7 @@ const faucetTransactionDetails = async (
  * @param {string} from Address from which fund will be transferred.
  * @param {string} faucetAddress Address of the faucet.
  */
-const refundBaseTokenToFaucet = async (web3, from, faucetAddress) => {
+const refundBaseCoinToFaucet = async (web3, from, faucetAddress) => {
   const balance = new BN(await web3.eth.getBalance(from));
   const gasPrice = new BN(await web3.eth.getGasPrice());
   const transactionFee = gasPrice.muln(21000);
@@ -288,7 +289,7 @@ const refundBaseTokenToFaucet = async (web3, from, faucetAddress) => {
 
 /**
  * This method returns all the ERC20 token balance to faucet address from
- * the `from` address;
+ * a given address;
  * @param {Web3} web3 Instance of web3.
  * @param {string} from Address from which fund will be transferred.
  * @param {ERC20RefundTransaction} faucetTransaction Return transaction
@@ -319,7 +320,7 @@ module.exports = {
   addAuxiliaryAccount,
   addOriginAccount,
   faucetTransactionDetails,
-  refundBaseTokenToFaucet,
+  refundBaseCoinToFaucet,
   refundERC20TokenToFaucet,
   DEFAULT_PASSWORD,
 };

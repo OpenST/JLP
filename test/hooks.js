@@ -47,7 +47,7 @@ before(async () => {
     connection.originWeb3.eth.getTransactionReceiptMined = funder.getTransactionReceiptMined;
     connection.auxiliaryWeb3.eth.getTransactionReceiptMined = funder.getTransactionReceiptMined;
 
-    const originFundRequests = Promise.all([
+    const originERC20FundRequests = Promise.all([
       funder.fundAccountFromMosaicFaucet(
         shared.accounts.origin.originDeployer.address,
         shared.accounts.origin.originDeployer.chainId,
@@ -61,23 +61,23 @@ before(async () => {
       ),
     ]);
 
-    const ropstenFaucetFundRequest = Promise.all([
+    const originBaseCoinFundRequest = Promise.all([
       funder.fundAccountFromRopstenFaucet(
         shared.accounts.origin.originDeployer.address,
       ),
     ]);
     const receipts = await funder.waitForFunding(
-      originFundRequests,
+      originERC20FundRequests,
       auxiliaryFundRequests,
-      ropstenFaucetFundRequest,
+      originBaseCoinFundRequest,
       connection.originWeb3,
       connection.auxiliaryWeb3,
     );
 
     shared.faucetTransactions = await funder.faucetTransactionDetails(
-      receipts.txHashes.originFaucetTXHashes,
+      receipts.txHashes.originERC20FaucetTXHashes,
       receipts.txHashes.auxiliaryFaucetTXHashes,
-      receipts.txHashes.ropstenFaucetTXHashes,
+      receipts.txHashes.originBaseCoinFaucetTXHashes,
       connection.originWeb3,
       connection.auxiliaryWeb3,
     );
@@ -92,16 +92,16 @@ after(async () => {
   await funder.refundERC20TokenToFaucet(
     shared.connection.originWeb3,
     shared.accounts.origin.originDeployer.address,
-    shared.faucetTransactions.originTransactions,
+    shared.faucetTransactions.originERC20Transactions,
   );
   await Promise.all(
     [
-      funder.refundBaseTokenToFaucet(
+      funder.refundBaseCoinToFaucet(
         shared.connection.originWeb3,
         shared.accounts.origin.originDeployer.address,
-        shared.faucetTransactions.ropstenTransactions.faucetAddress,
+        shared.faucetTransactions.originBaseCoinTransactions.faucetAddress,
       ),
-      funder.refundBaseTokenToFaucet(
+      funder.refundBaseCoinToFaucet(
         shared.connection.auxiliaryWeb3,
         shared.accounts.auxiliary.auxiliaryDeployer.address,
         shared.faucetTransactions.auxiliaryTransactions.faucetAddress,
