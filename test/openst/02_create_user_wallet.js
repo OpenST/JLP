@@ -8,11 +8,14 @@ const OpenST = require('../../src/openst');
 
 describe('CreateUserWallet', async () => {
   it('Creates user wallet', async () => {
-    // const auxiliaryUtilityToken = chainConfig.utilitybrandedtokens[0].address;
-    const auxiliaryUtilityToken = '0x0000000000000000000000000000000000000001';
 
-    const owner = connection.auxiliaryAccount.address;
     const openst = new OpenST(chainConfig, connection);
+    const owner = connection.auxiliaryAccount.address;
+
+    // const auxiliaryUtilityToken = chainConfig.utilitybrandedtokens[0].address;
+
+    // TODO Enable above line once BT Stake and Mint PR is merged
+    const auxiliaryUtilityToken = '0x0000000000000000000000000000000000000001';
 
     // Openst Setup has already been done in openst setup smoke test.
     // Master copies will be read from chainConfig.
