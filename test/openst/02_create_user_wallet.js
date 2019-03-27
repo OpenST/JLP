@@ -8,7 +8,8 @@ const OpenST = require('../../src/openst');
 
 describe('CreateUserWallet', async () => {
   it('Creates user wallet', async () => {
-    const auxiliaryUtilityToken = chainConfig.utilitybrandedtokens[0].address;
+    // const auxiliaryUtilityToken = chainConfig.utilitybrandedtokens[0].address;
+    const auxiliaryUtilityToken = '0x0000000000000000000000000000000000000001';
 
     const owner = connection.auxiliaryAccount.address;
     const openst = new OpenST(chainConfig, connection);
