@@ -33,7 +33,7 @@ describe('DelayedRecoveryModule', async () => {
     const userWallet = {
       owners: [mockAddresses.owner],
       threshold: 1, // number of required confirmations
-      recoveryOwner: connection.auxiliaryAccount, // account that signs resetRecoveryOwner request
+      recoveryOwner: await web3.eth.accounts.create(), // account that signs resetRecoveryOwner request
       recoveryController: connection.auxiliaryAccount, // account that relays signed request
       recoveryBlockDelay: 1, // not relevant to this test, must be greater than 0
       sessionKeys: [], // not required
