@@ -1,6 +1,7 @@
 // 'use strict';
 
 const Web3 = require('web3');
+const { assert } = require('chai');
 const { ContractInteract } = require('@openst/mosaic.js');
 const shared = require('../shared');
 const BTDeployer = require('../../src/bt_deployer.js');
@@ -14,12 +15,13 @@ describe('Stake and mint', async () => {
   let stakeRequestHash;
   let messageHash;
   let utilityBrandedTokenConfig;
-  const { chainConfig, connection } = shared;
+
   const stakeVT = new BN(100);
   let tokenBalanceBeforeStake;
   let valueToken;
 
   it('Deploy Gateway Composer', async () => {
+    const { chainConfig, connection } = shared;
     const btDeployer = new BTDeployer(chainConfig, connection);
     // This will throw if anything fails, which will result in test failure.
     // Hence no need of explicit assertion.
@@ -27,27 +29,29 @@ describe('Stake and mint', async () => {
   });
 
   it('request Stake', async () => {
+    const { chainConfig, connection } = shared;
     valueToken = new ContractInteract.EIP20Token(
       connection.originWeb3,
       chainConfig.eip20TokenAddress,
     );
 
-    tokenBalanceBeforeStake = await valueToken.balanceOf(
+    tokenBalanceBeforeStake = new BN(await valueToken.balanceOf(
       connection.originAccount.address,
-    );
+    ));
 
     btStakeAndMint = new BTStakeMint(chainConfig, connection);
     utilityBrandedTokenConfig = chainConfig.utilityBrandedTokens[0];
     const { originGatewayAddress } = utilityBrandedTokenConfig;
-    const beneficiary = connection.auxiliaryAccount;
-    const gasPrice = 20;
-    const gasLimit = 20;
+
+    const beneficiary = connection.auxiliaryAccount.address;
+    const gasPrice = '0';
+    const gasLimit = '0';
 
     // This will throw if anything fails, which will result in test failure.
     // Hence no need of explicit assertion.
     stakeRequestHash = await btStakeAndMint.requestStake(
       originGatewayAddress,
-      stakeVT,
+      stakeVT.toString(10),
       beneficiary,
       gasPrice,
       gasLimit,
@@ -61,6 +65,7 @@ describe('Stake and mint', async () => {
   });
 
   it('anchor stateRoot', async () => {
+    const { chainConfig, connection } = shared;
     const {
       originWeb3,
       auxiliaryWeb3,
@@ -90,28 +95,30 @@ describe('Stake and mint', async () => {
   });
 
   it('progress stake', async () => {
-    const tokenBalanceAfterStake = await valueToken.balanceOf(
+    const { chainConfig, connection } = shared;
+    const tokenBalanceAfterStake = new BN(await valueToken.balanceOf(
       connection.originAccount.address,
-    );
+    ));
 
     const utilityBrandedToken = new ContractInteract.UtilityToken(
       connection.auxiliaryWeb3,
       utilityBrandedTokenConfig.address,
     );
-    const initialMintedBalance = await utilityBrandedToken.balanceOf(
+    const initialMintedBalance = new BN(await utilityBrandedToken.balanceOf(
       connection.auxiliaryAccount.address,
-    );
+    ));
 
     const mosaic = chainConfig.toMosaicFromMessageHash(connection, messageHash);
     const facilitator = new Facilitator(chainConfig, connection, mosaic);
     await facilitator.progressStake(messageHash);
 
 
-    const finalMintedBalance = await utilityBrandedToken.balanceOf(
+    const finalMintedBalance = new BN(await utilityBrandedToken.balanceOf(
       connection.auxiliaryAccount.address,
-    );
+    ));
 
     const totalMintedBalance = finalMintedBalance.sub(initialMintedBalance);
+
     // Conversion rate is setup such that 1 OST = 2 BT
     assert.strictEqual(
       totalMintedBalance.eq(stakeVT.muln(2)),

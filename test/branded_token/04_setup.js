@@ -2,13 +2,27 @@
 
 const shared = require('../shared');
 const BTDeployer = require('../../src/bt_deployer.js');
+const EIP20 = require('../../src/eip20.js');
 
 describe('Setup Branded token', async () => {
   let btDeployer;
 
-  it('set branded token', async () => {
+  // fixMe remove deployment of eip20token after ostprime stake and mint
+  // tests are merged.
+  it('deploy eip20 token', async () => {
+    const { chainConfig } = shared;
+    const symbol = 'JLP';
+    const name = 'JLP';
+    const decimal = 18;
+    const totalSupply = '10000000000000000000000000000000000000';
+    const eip20 = new EIP20(chainConfig, symbol, name, totalSupply, decimal);
+    const eip20TokenAddress = await eip20.deployEIP20(shared.connection);
+    chainConfig.update({
+      eip20TokenAddress,
+    });
+  });
+  it('setup branded token', async () => {
     const { chainConfig, connection } = shared;
-
     btDeployer = new BTDeployer(chainConfig, connection);
 
     const symbol = 'JLP';
@@ -18,7 +32,7 @@ describe('Setup Branded token', async () => {
     const conversionRate = 200000;
     const conversionDecimal = 5;
 
-    const { originOrganization, brandedToken } = btDeployer.deployBrandedToken(
+    const { originOrganization, brandedToken } = await btDeployer.deployBrandedToken(
       symbol,
       name,
       decimal,
@@ -35,7 +49,7 @@ describe('Setup Branded token', async () => {
       conversionRate,
       conversionDecimal,
       originOrganization: originOrganization.address,
-      valueToken: this.origin.token,
+      valueToken: chainConfig.eip20TokenAddress,
     };
   });
 

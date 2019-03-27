@@ -1,4 +1,6 @@
-const { ContractInteract, Helpers } = require('@openst/brandedtoken.js');
+const {
+  ContractInteract, Helpers, Staker, Facilitator,
+} = require('@openst/brandedtoken.js');
 const { Utils, ContractInteract: MosaicContractInteract } = require('@openst/mosaic.js');
 const Account = require('eth-lib/lib/account');
 const logger = require('./logger');
@@ -59,7 +61,7 @@ class BTStakeMint {
       gasLimit,
     };
 
-    const staker = new Helpers.Staker(
+    const staker = new Staker(
       this.origin.web3,
       this.origin.token,
       this.chainConfig.brandedToken.address,
@@ -120,13 +122,12 @@ class BTStakeMint {
     if (isAlreadyRegistered) {
       logger.info(`Beneficiary address ${stakeRequest.beneficiary} already registered as Internal actor`);
     } else {
-      await ubtContractInstance.registerInternalActor(
+      await ubtContractInstance.registerInternalActors(
         [stakeRequest.beneficiary],
         registerInternalActorTxOptions,
       );
       logger.info(`${stakeRequest.beneficiary} address registered as Internal actor`);
     }
-
 
     const staker = this.chainConfig.gatewayComposerAddress;
 
@@ -137,7 +138,7 @@ class BTStakeMint {
 
     logger.info('acceptStake started');
 
-    const facilitator = new Helpers.Facilitator(
+    const facilitator = new Facilitator(
       this.origin.web3,
       this.origin.token,
       this.chainConfig.brandedToken.address,
