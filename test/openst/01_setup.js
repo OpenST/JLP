@@ -9,8 +9,11 @@ describe('openst setup', async () => {
   it('Successfully performs setup of master copies and factory contracts', async () => {
     const { chainConfig, connection } = shared;
 
-    const auxiliaryOrganizationAddress = chainConfig.utilitybrandedtokens[0].organizationAddress;
-    const auxiliaryUtilityToken = chainConfig.utilitybrandedtokens[0].address;
+    // const auxiliaryOrganizationAddress = chainConfig.utilitybrandedtokens[0].organizationAddress;
+    // const auxiliaryUtilityToken = chainConfig.utilitybrandedtokens[0].address;
+    // Enable above lines once BT Stake and Mint PR is merged
+    const auxiliaryOrganizationAddress = '0x0000000000000000000000000000000000000001';
+    const auxiliaryUtilityToken = '0x0000000000000000000000000000000000000002';
 
     // Setup OpenST
     const openst = new OpenST(chainConfig, connection);
