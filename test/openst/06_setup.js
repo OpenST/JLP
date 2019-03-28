@@ -6,14 +6,10 @@ const shared = require('../shared');
 const OpenST = require('./../../src/openst');
 
 describe('openst setup', async () => {
-  it('Successfully performs setup of master copies and factory contracts', async () => {
+  it('Setup of master copies and factory contracts', async () => {
     const { chainConfig, connection } = shared;
-
-    // const auxiliaryOrganizationAddress = chainConfig.utilitybrandedtokens[0].organizationAddress;
-    // const auxiliaryUtilityToken = chainConfig.utilitybrandedtokens[0].address;
-    // Enable above lines once BT Stake and Mint PR is merged
-    const auxiliaryOrganizationAddress = '0x0000000000000000000000000000000000000001';
-    const auxiliaryUtilityToken = '0x0000000000000000000000000000000000000002';
+    const auxiliaryOrganizationAddress = chainConfig.utilityBrandedTokens[0].organizationAddress;
+    const auxiliaryUtilityToken = chainConfig.utilityBrandedTokens[0].address;
 
     // Setup OpenST
     const openst = new OpenST(chainConfig, connection);
