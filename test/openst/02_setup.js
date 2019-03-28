@@ -2,27 +2,26 @@
 
 const { assert } = require('chai');
 
-const { chainConfig, connection } = require('../shared');
+const shared = require('../shared');
 const OpenST = require('./../../src/openst');
 
 describe('openst setup', async () => {
   it('Successfully performs setup of master copies and factory contracts', async () => {
     // const auxiliaryOrganizationAddress = chainConfig.utilitybrandedtokens[0].organizationAddress;
     // const auxiliaryUtilityToken = chainConfig.utilitybrandedtokens[0].address;
-
     // TODO Enable above lines once BT Stake and Mint PR is merged
     const auxiliaryOrganizationAddress = '0x0000000000000000000000000000000000000001';
     const auxiliaryUtilityToken = '0x0000000000000000000000000000000000000002';
 
     // Setup OpenST
-    const openst = new OpenST(chainConfig, connection);
+    const openst = new OpenST(shared.chainConfig, shared.connection);
     await openst.setupOpenst(auxiliaryOrganizationAddress, auxiliaryUtilityToken);
-    assert.isNotNull(chainConfig.openst.tokenHolderMasterCopy, 'TokenHolder contract address should not be null.');
-    assert.isNotNull(chainConfig.openst.gnosisSafeMasterCopy, 'GnosisSafe contract address should not be null.');
-    assert.isNotNull(chainConfig.openst.recoveryMasterCopy, 'Recovery contract address should not be null.');
-    assert.isNotNull(chainConfig.openst.userWalletFactory, 'UserWalletFactory contract address should not be null.');
-    assert.isNotNull(chainConfig.openst.proxyFactory, 'ProxyFactory contract address should not be null.');
-    assert.isNotNull(chainConfig.openst.createAndAddModules, 'CreateAndAddModules contract address should not be null.');
-    assert.isNotNull(chainConfig.openst.tokenRules, 'TokenRules contract address should not be null.');
+    assert.isNotNull(shared.chainConfig.openst.tokenHolderMasterCopy, 'TokenHolder contract address should not be null.');
+    assert.isNotNull(shared.chainConfig.openst.gnosisSafeMasterCopy, 'GnosisSafe contract address should not be null.');
+    assert.isNotNull(shared.chainConfig.openst.recoveryMasterCopy, 'Recovery contract address should not be null.');
+    assert.isNotNull(shared.chainConfig.openst.userWalletFactory, 'UserWalletFactory contract address should not be null.');
+    assert.isNotNull(shared.chainConfig.openst.proxyFactory, 'ProxyFactory contract address should not be null.');
+    assert.isNotNull(shared.chainConfig.openst.createAndAddModules, 'CreateAndAddModules contract address should not be null.');
+    assert.isNotNull(shared.chainConfig.openst.tokenRules, 'TokenRules contract address should not be null.');
   });
 });
