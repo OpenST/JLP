@@ -32,7 +32,6 @@
     "@openst/brandedtoken.js": "^0.10.0-beta.1",
     "@openst/mosaic.js": "^0.10.0-beta.5",
     "@openst/openst.js": "^0.10.0-beta.1",
-    "axios": "^0.18.0",
     "bn.js": "4.11.8",
     "inquirer": "^6.2.2",
     "js-scrypt": "0.2.0",

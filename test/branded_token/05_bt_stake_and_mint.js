@@ -44,8 +44,8 @@ describe('Stake and mint', async () => {
     const { originGatewayAddress } = utilityBrandedTokenConfig;
 
     const beneficiary = connection.auxiliaryAccount.address;
-    const gasPrice = '0';
-    const gasLimit = '0';
+    const gasPrice = '2';
+    const gasLimit = '2';
 
     // This will throw if anything fails, which will result in test failure.
     // Hence no need of explicit assertion.

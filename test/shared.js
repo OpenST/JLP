@@ -13,9 +13,4 @@
 module.exports = {
   chainConfig: undefined,
   connection: undefined,
-  accounts: {
-    origin: {},
-    auxiliary: {},
-  },
-  faucetReceipts: {},
 };
