@@ -1,10 +1,14 @@
 dist: trusty
 language: node_js
 sudo: required
+services:
+  - docker
 branches:
   only:
-  - master
-  - develop
+    - master
+    - develop
+    - /^feature\/.*/
+    - /^release-.*/
 notifications:
   email:
     recipients:
@@ -12,8 +16,17 @@ notifications:
     on_success: always
     on_failure: always
 node_js:
-  - "9"
+  - "8"
+before_install:
+  - sudo apt-get update
+  - sudo apt-get install nodejs
+  - sudo apt-get install npm
+  - sudo apt-get install software-properties-common
+  - sudo add-apt-repository -y ppa:ethereum/ethereum
 install:
-  - npm install
+  - npm install --quiet
+  - export PATH=./node_modules/.bin/:${PATH}
+before_script:
+  - docker pull augurproject/dev-node-geth:v1.8.18
 script:
-  - npm run test
+  - npm run test:devenv
