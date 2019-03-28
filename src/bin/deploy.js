@@ -26,8 +26,6 @@ program.command('utilityToken <config>')
             chainConfig.update({
               originOrganizationAddress: contractInstances.originOrganization.address,
               auxiliaryOrganizationAddress: contractInstances.auxiliaryOrganization.address,
-              originAnchorAddress: contractInstances.originAnchor.address,
-              auxiliaryAnchorAddress: contractInstances.auxiliaryAnchor.address,
               originGatewayAddress: contractInstances.originGateway.address,
               auxiliaryCoGatewayAddress: contractInstances.auxiliaryCoGateway.address,
               auxiliaryUtilityTokenAddress: contractInstances.auxiliaryUtilityToken.address,
