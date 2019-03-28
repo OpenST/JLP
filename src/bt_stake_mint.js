@@ -1,4 +1,6 @@
-const { ContractInteract, Helpers } = require('@openst/brandedtoken.js');
+const {
+  ContractInteract, Helpers, Staker, Facilitator,
+} = require('@openst/brandedtoken.js');
 const { Utils, ContractInteract: MosaicContractInteract } = require('@openst/mosaic.js');
 const Account = require('eth-lib/lib/account');
 const logger = require('./logger');
@@ -59,7 +61,7 @@ class BTStakeMint {
       gasLimit,
     };
 
-    const staker = new Helpers.Staker(
+    const staker = new Staker(
       this.origin.web3,
       this.origin.token,
       this.chainConfig.brandedToken.address,
@@ -91,6 +93,7 @@ class BTStakeMint {
     stakeRequests[stakeRequestHash] = stakeRequest;
 
     logger.info(`requestStake completed, your request hash is: ${stakeRequestHash}`);
+    return stakeRequestHash;
   }
 
   async acceptStake(stakeRequestHash) {
@@ -119,13 +122,12 @@ class BTStakeMint {
     if (isAlreadyRegistered) {
       logger.info(`Beneficiary address ${stakeRequest.beneficiary} already registered as Internal actor`);
     } else {
-      await ubtContractInstance.registerInternalActor(
+      await ubtContractInstance.registerInternalActors(
         [stakeRequest.beneficiary],
         registerInternalActorTxOptions,
       );
       logger.info(`${stakeRequest.beneficiary} address registered as Internal actor`);
     }
-
 
     const staker = this.chainConfig.gatewayComposerAddress;
 
@@ -136,7 +138,7 @@ class BTStakeMint {
 
     logger.info('acceptStake started');
 
-    const facilitator = new Helpers.Facilitator(
+    const facilitator = new Facilitator(
       this.origin.web3,
       this.origin.token,
       this.chainConfig.brandedToken.address,
@@ -158,7 +160,7 @@ class BTStakeMint {
       this.chainConfig.brandedToken.address,
     ).getEIP712SignHash();
 
-    signature = signData(requestHashToBeSigned, this.chainConfig.workerPrivateKey);
+    const signature = signData(requestHashToBeSigned, this.chainConfig.workerPrivateKey);
 
     await facilitator.acceptStakeRequest(
       stakeRequest.stakeRequestHash,
@@ -211,6 +213,7 @@ class BTStakeMint {
 
     logger.info('Stake successful');
     logger.info(`Please use faciliator agent to progressStake and use this message hash : ${messageHash}`);
+    return messageHash;
   }
 
   getUtilityBrandedTokenConfig(originGateway) {
