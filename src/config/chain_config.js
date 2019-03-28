@@ -29,6 +29,7 @@ class ChainConfig {
     this.utilityBrandedTokens = [];
     this.openst = {};
     this.users = [];
+    this.fileName = filePath;
 
     // If a file path is given, config from the file will overwrite config from ENV or default.
     this.parseFile(filePath);
@@ -46,7 +47,8 @@ class ChainConfig {
   }
 
   write(filePath) {
-    fs.writeFileSync(filePath, JSON.stringify(this, null, '  '));
+    const fileName = filePath || this.fileName;
+    fs.writeFileSync(fileName, JSON.stringify(this, null, '  '));
   }
 
   toMosaic(connection) {

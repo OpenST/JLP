@@ -13,7 +13,7 @@ class Deployer {
         gasPrice: chainConfig.originGasPrice,
       },
       token: chainConfig.eip20TokenAddress,
-      baseToken: chainConfig.simpleTokenAddress,
+      baseToken: chainConfig.eip20TokenAddress,
       anchor: chainConfig.originAnchorAddress,
       burner: chainConfig.originBurnerAddress,
       masterKey: connection.originAccount.address,
@@ -125,10 +125,6 @@ class Deployer {
   }
 
   _deployOrganization() {
-    console.log("this.origin.deployer :- ",this.origin.deployer);
-    console.log("this.origin.msaterkeydeployer :- ",this.origin.masterKey);
-    console.log("this.auxiliary.deployer:- ",this.auxiliary.deployer);
-    console.log("this.auxiliary.msaterkeydeployer :- ",this.auxiliary.masterKey);
     return Setup.organizations(
       this.origin.web3,
       this.auxiliary.web3,
