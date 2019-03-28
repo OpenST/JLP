@@ -1,4 +1,4 @@
-'use strict';
+ 'use strict';
 
 /**
  * @file `shared` exists so that tests can share data across each other.
@@ -13,4 +13,8 @@
 module.exports = {
   chainConfig: undefined,
   connection: undefined,
+  accounts: {
+    origin: {},
+    auxiliary: {},
+  },
 };
