@@ -8,12 +8,13 @@ const OpenST = require('../../src/openst');
 describe('openst setup', async () => {
   it('Setup of master copies and factory contracts', async () => {
     const { chainConfig, connection } = shared;
-    const auxiliaryOrganizationAddress = chainConfig.utilityBrandedTokens[0].organizationAddress;
-    const auxiliaryUtilityToken = chainConfig.utilityBrandedTokens[0].address;
+    const utilityBrandedTokenConfigs = chainConfig.utilityBrandedTokens;
+    const utilityBrandedTokenConfig = utilityBrandedTokenConfigs[utilityBrandedTokenConfigs.length - 1];
+    const { organizationAddress, address } = utilityBrandedTokenConfig;
 
     // Setup OpenST
     const openst = new OpenST(chainConfig, connection);
-    await openst.setupOpenst(auxiliaryOrganizationAddress, auxiliaryUtilityToken);
+    await openst.setupOpenst(organizationAddress, address);
     assert.isNotNull(chainConfig.openst.tokenHolderMasterCopy, 'TokenHolder contract address should not be null.');
     assert.isNotNull(chainConfig.openst.gnosisSafeMasterCopy, 'GnosisSafe contract address should not be null.');
     assert.isNotNull(chainConfig.openst.recoveryMasterCopy, 'Recovery contract address should not be null.');
