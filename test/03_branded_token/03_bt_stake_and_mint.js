@@ -38,7 +38,7 @@ describe('BT stake and mint', async () => {
 
     const utilityBrandedTokenConfigs = chainConfig.utilityBrandedTokens;
     // Take the latest deployed UBT config
-    const utilityBrandedTokenConfig = utilityBrandedTokenConfigs[utilityBrandedTokenConfigs.length - 1];
+    utilityBrandedTokenConfig = utilityBrandedTokenConfigs[utilityBrandedTokenConfigs.length - 1];
 
     // Openst Setup has already been done in openst setup smoke test.
     // Master copies will be read from chainConfig.
