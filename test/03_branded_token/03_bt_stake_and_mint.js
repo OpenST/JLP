@@ -66,11 +66,10 @@ describe('BT stake and mint', async () => {
       '100000000000',
     );
 
+    beneficiary = connection.auxiliaryAccount.address;
     assert.isNotNull(tokenHolderProxy, 'TokenHolder proxy address should not be null.');
     assert.isNotNull(gnosisSafeProxy, 'Gnosis proxy address should not be null.');
     assert.isNotNull(recoveryProxy, 'Recovery proxy address should not be null.');
-    beneficiary = tokenHolderProxy;
-    // beneficiary = connection.auxiliaryAccount.address;
   });
 
   it('Request Stake', async () => {
