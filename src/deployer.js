@@ -13,7 +13,7 @@ class Deployer {
         gasPrice: chainConfig.originGasPrice,
       },
       token: chainConfig.eip20TokenAddress,
-      baseToken: chainConfig.simpleTokenAddress,
+      baseToken: chainConfig.eip20TokenAddress,
       anchor: chainConfig.originAnchorAddress,
       burner: chainConfig.originBurnerAddress,
       masterKey: connection.originAccount.address,
