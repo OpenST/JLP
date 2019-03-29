@@ -5,7 +5,6 @@
 const program = require('commander');
 
 const connected = require('../connected');
-const EIP20Token = require('../../contracts/EIP20Token');
 const logger = require('../logger');
 const EIP20 = require('./../eip20');
 

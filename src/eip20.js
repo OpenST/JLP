@@ -27,10 +27,9 @@ class EIP20 {
       gasPrice: this.chainConfig.originGasPrice,
       from: originAccount.address,
     };
-
     const contract = new originWeb3.eth.Contract(EIP20Token.abi, undefined, txOptions);
     let eip20TokenAddress;
-    const tx = await contract
+    const tx = contract
       .deploy(
         {
           data: EIP20Token.bin,
@@ -43,9 +42,9 @@ class EIP20 {
         },
         txOptions,
       );
-
     txOptions.gas = await tx.estimateGas(txOptions);
-    await tx.send(txOptions)
+    await tx
+      .send(txOptions)
       .on('receipt', (receipt) => {
         logger.info(`Deployed EIP20 token "${this.symbol}" to ${receipt.contractAddress}`);
         eip20TokenAddress = receipt.contractAddress;

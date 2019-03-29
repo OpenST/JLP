@@ -21,19 +21,16 @@ class Account {
    * Backs up any existing accounts.json file.
    *
    * @param {string} chain Chain identifier to read and write the accounts file.
-   * @param {Web3} web3 Web3 instance to create an account.
-   * @param {string} [password] Password to encrypt the account.
    */
-  static async create(chain, web3, password) {
+  static async create(chain, web3) {
     const accounts = Account._readAccountsFromDisk();
     const account = Account._newWeb3Account(web3);
-    const encryptedAccount = await Account._encrypt(account, web3, password);
+    const encryptedAccount = await Account._encrypt(account, web3);
 
     accounts[chain] = encryptedAccount;
 
     Account._writeAccountsToDisk(accounts);
     logger.info(`Created account ${account.address}`);
-    return account.address;
   }
 
   /**
@@ -41,7 +38,7 @@ class Account {
    *
    * @param {string} chain 'origin' or 'auxiliary'.
    */
-  static async unlock(chain, web3, password) {
+  static async unlock(chain, web3) {
     if (unlockedAccounts[chain]) {
       return unlockedAccounts[chain];
     }
@@ -54,7 +51,7 @@ class Account {
       return {};
     }
 
-    const decrypted = await Account._decrypt(account, chain, web3, password);
+    const decrypted = await Account._decrypt(account, chain, web3);
     logger.info(`Decrypted account ${decrypted.address}`);
 
     unlockedAccounts[chain] = decrypted;
@@ -113,53 +110,43 @@ class Account {
    * Encrypts the given account with a password inquired from the command line.
    * @private
    * @param {Object} account A Web3 account object.
-   * @param {string} [givenPassword] Password to encrypt the account.
-   * @param {Web3} web3 Web3 instance to create an account.
+   *
    * @returns {Object} A Web3 keyStore object.
    */
-  static async _encrypt(account, web3, givenPassword) {
-    let accountPassword = givenPassword;
-    if (!givenPassword) {
-      const { password } = await inquirer.prompt({
-        type: 'password',
-        name: 'password',
-        message: 'Select a password to encrypt the account:',
-      });
-      await inquirer.prompt({
-        type: 'password',
-        name: 'password',
-        message: 'Repeat the password:',
-        validate: input => new Promise(
-          (resolve, reject) => {
-            if (input === password) {
-              resolve(true);
-            } else {
-              reject(new Error('Passwords don\'t match, please try again. (^C to abort)'));
-            }
-          },
-        ),
-      });
-      accountPassword = password;
-    }
+  static async _encrypt(account, web3) {
+    const { password } = await inquirer.prompt({
+      type: 'password',
+      name: 'password',
+      message: 'Select a password to encrypt the account:',
+    });
+    await inquirer.prompt({
+      type: 'password',
+      name: 'password',
+      message: 'Repeat the password:',
+      validate: input => new Promise(
+        (resolve, reject) => {
+          if (input === password) {
+            resolve(true);
+          } else {
+            reject(new Error('Passwords don\'t match, please try again. (^C to abort)'));
+          }
+        },
+      ),
+    });
 
-    const encrypted = web3.eth.accounts.encrypt(account.privateKey, accountPassword);
+    const encrypted = web3.eth.accounts.encrypt(account.privateKey, password);
 
     return encrypted;
   }
 
-  static async _decrypt(account, name, web3, givenPassword) {
-    let accountPassword = givenPassword;
+  static async _decrypt(account, name, web3) {
+    const { password } = await inquirer.prompt({
+      type: 'password',
+      name: 'password',
+      message: `Input your account password to unlock ${name}:`,
+    });
 
-    if (!givenPassword) {
-      const { password } = await inquirer.prompt({
-        type: 'password',
-        name: 'password',
-        message: `Input your account password to unlock ${name}:`,
-      });
-      accountPassword = password;
-    }
-
-    const decrypted = web3.eth.accounts.decrypt(account, accountPassword);
+    const decrypted = web3.eth.accounts.decrypt(account, password);
 
     return decrypted;
   }

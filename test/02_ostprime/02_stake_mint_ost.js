@@ -8,7 +8,7 @@ const shared = require('../shared');
 
 const StateRootAnchorService = require('../../src/state_root_anchor_service');
 
-describe('stake and mint', () => {
+describe('OST prime stake and mint', () => {
   let messageHash;
   let facilitator;
   let beneficiary;
