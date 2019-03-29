@@ -1,6 +1,7 @@
 // 'use strict';
 
 const assert = require('assert');
+const BN = require('bn.js');
 
 const { ContractInteract } = require('@openst/openst.js');
 const shared = require('../shared');
@@ -11,20 +12,13 @@ describe('PricerRule', async () => {
     const { chainConfig } = shared;
     const { connection } = shared;
 
-    // Add utilityBrandedTokens to config.
-    chainConfig.update({
-      utilityBrandedTokens: [{
-        address: '0x0000000000000000000000000000000000000001',
-      }],
-    });
-
-    const auxiliaryEIP20Token = '0x0000000000000000000000000000000000000001';
+    const auxiliaryEIP20Token = chainConfig.utilityBrandedTokens[chainConfig.utilityBrandedTokens.length - 1].address;
     const baseCurrencyCode = 'USD';
     const conversionRate = 3;
     const conversionRateDecimals = 3;
     const requiredPriceOracleDecimals = 3;
     const openST = new OpenST(chainConfig, shared.connection);
-    const pricerRuleAddress = await openST.deployPricerRule(
+    const { pricerOracleData } = await openST.deployPricerRule(
       auxiliaryEIP20Token,
       baseCurrencyCode,
       conversionRate,
@@ -32,22 +26,33 @@ describe('PricerRule', async () => {
       requiredPriceOracleDecimals,
     );
 
-    const pricerRule = new ContractInteract.PricerRule(connection.auxiliaryWeb3, pricerRuleAddress);
+    const { auxiliaryWeb3 } = connection;
+    const pricerRule = await new ContractInteract.PricerRule(
+      auxiliaryWeb3,
+      pricerOracleData[baseCurrencyCode].address,
+    );
 
-    const contractConversionRate = await pricerRule.conversionRateFromBaseCurrencyToToken().call();
+    const contractConversionRate = new BN(
+      await pricerRule.contract.methods.conversionRateFromBaseCurrencyToToken().call(),
+    );
+    assert.strictEqual(contractConversionRate.eq(new BN(conversionRate)), true);
 
-    assert.strictEqual(contractConversionRate.eq(conversionRate), true);
+    const contractConversionRateDecimals = new BN(
+      await pricerRule.contract.methods.conversionRateDecimalsFromBaseCurrencyToToken().call(),
+    );
+    assert.strictEqual(contractConversionRateDecimals.eq(new BN(conversionRateDecimals)), true);
 
-    const contractConversionRateDecimals = await pricerRule.conversionRateDecimalsFromBaseCurrencyToToken().call();
+    const contractRequiredPriceOracleDecimals = new BN(
+      await pricerRule.contract.methods.requiredPriceOracleDecimals().call(),
+    );
+    assert.strictEqual(
+      contractRequiredPriceOracleDecimals.eq(
+        new BN(requiredPriceOracleDecimals),
+      ),
+      true,
+    );
 
-    assert.strictEqual(contractConversionRateDecimals.eq(conversionRateDecimals), true);
-
-    const contractRequiredPriceOracleDecimals = await pricerRule.requiredPriceOracleDecimals().call();
-
-    assert.strictEqual(contractRequiredPriceOracleDecimals.eq(requiredPriceOracleDecimals), true);
-
-    const contractBaseCurrencyCode = await pricerRule.baseCurrencyCode().call();
-
-    assert.strictEqual(contractBaseCurrencyCode.eq(baseCurrencyCode), true);
+    const contractBaseCurrencyCode = await pricerRule.contract.methods.baseCurrencyCode().call();
+    assert.strictEqual(contractBaseCurrencyCode, auxiliaryWeb3.utils.toHex(baseCurrencyCode));
   });
 });

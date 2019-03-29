@@ -28,7 +28,7 @@ class OpenST {
     return tokenRules.address;
   }
 
-  async setupOpenst(auxiliaryEIP20Token, organization) {
+  async setupOpenst(auxiliaryOrganization, auxiliaryEIP20Token) {
     const ubtConfig = this.getUtilityBrandedTokenConfig(auxiliaryEIP20Token);
 
     logger.info('Starting Setup of OpenST');
@@ -57,7 +57,7 @@ class OpenST {
     );
 
     const tokenRulesAddress = await this.deployTokenRules(
-      organization,
+      auxiliaryOrganization,
       ubtConfig.ubt.address,
     );
 
@@ -79,7 +79,7 @@ class OpenST {
   }
 
   getUtilityBrandedTokenConfig(auxiliaryEIP20Token) {
-    for (let i = 0; i < this.chainConfig.utilityBrandedTokens.length; i++) {
+    for (let i = 0; i < this.chainConfig.utilityBrandedTokens.length; i += 1) {
       const ut = this.chainConfig.utilityBrandedTokens[i];
       if (ut.address === auxiliaryEIP20Token) {
         return { ubt: ut, index: i };
@@ -98,7 +98,7 @@ class OpenST {
     logger.info('Deployment of PricerRule');
     const ubtConfig = this.getUtilityBrandedTokenConfig(auxiliaryEIP20Token);
 
-    const pricerRule = await PricerRule.deploytest(
+    const pricerRule = await PricerRule.deploy(
       this.auxiliary.web3,
       ubtConfig.ubt.organizationAddress,
       ubtConfig.ubt.address,
