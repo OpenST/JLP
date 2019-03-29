@@ -10,7 +10,7 @@ const StateRootAnchorService = require('../../src/state_root_anchor_service');
 const Facilitator = require('../../src/facilitator');
 
 const { BN } = Web3.utils;
-describe('Stake and mint', async () => {
+describe('BT stake and mint', async () => {
   let btStakeAndMint;
   let stakeRequestHash;
   let messageHash;
@@ -28,7 +28,7 @@ describe('Stake and mint', async () => {
     await btDeployer.deployGatewayComposer();
   });
 
-  it('request Stake', async () => {
+  it('Request Stake', async () => {
     const { chainConfig, connection } = shared;
     valueToken = new ContractInteract.EIP20Token(
       connection.originWeb3,
@@ -40,7 +40,9 @@ describe('Stake and mint', async () => {
     ));
 
     btStakeAndMint = new BTStakeMint(chainConfig, connection);
-    utilityBrandedTokenConfig = chainConfig.utilityBrandedTokens[0];
+    // Take the latest deployed UBT config
+    const utilityBrandedTokenConfigs = chainConfig.utilityBrandedTokens;
+    utilityBrandedTokenConfig = utilityBrandedTokenConfigs[utilityBrandedTokenConfigs.length - 1];
     const { originGatewayAddress } = utilityBrandedTokenConfig;
 
     const beneficiary = connection.auxiliaryAccount.address;
@@ -58,13 +60,13 @@ describe('Stake and mint', async () => {
     );
   });
 
-  it('accept stake request', async () => {
+  it('Accept Stake Request', async () => {
     // This will throw if anything fails, which will result in test failure.
     // Hence no need of explicit assertion.
     messageHash = await btStakeAndMint.acceptStake(stakeRequestHash);
   });
 
-  it('anchor stateRoot', async () => {
+  it('Anchor StateRoot', async () => {
     const { chainConfig, connection } = shared;
     const {
       originWeb3,
@@ -94,7 +96,7 @@ describe('Stake and mint', async () => {
     await stateRootAnchorService.anchor(anchorInfo, targetTxOptions);
   });
 
-  it('progress stake', async () => {
+  it('Progress Stake', async () => {
     const { chainConfig, connection } = shared;
     const tokenBalanceAfterStake = new BN(await valueToken.balanceOf(
       connection.originAccount.address,
