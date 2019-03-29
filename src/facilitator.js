@@ -95,7 +95,6 @@ class Facilitator {
       from: this.connection.originAccount.address,
       gas: '5000000',
     };
-    console.log('stakeRequest.beneficiary:', stakeRequest.beneficiary);
     await this.mosaicFacilitator.progressStake(
       stakeRequest.staker,
       stakeRequest.amount,
