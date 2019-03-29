@@ -29,7 +29,7 @@ class OpenST {
   }
 
   async setupOpenst(auxiliaryOrganization, auxiliaryEIP20Token) {
-    const ubtConfig = this.getUtilityBrandedTokenConfig(auxiliaryEIP20Token);
+    const { ubt, index } = this.getUtilityBrandedTokenConfig(auxiliaryEIP20Token);
 
     logger.info('Starting Setup of OpenST');
     const tokenHolderTxOptions = this.auxiliary.txOptions;
@@ -58,7 +58,7 @@ class OpenST {
 
     const tokenRulesAddress = await this.deployTokenRules(
       auxiliaryOrganization,
-      ubtConfig.ubt.address,
+      ubt.address,
     );
 
     const setupData = {
@@ -73,7 +73,7 @@ class OpenST {
 
     Object.assign(this.chainConfig.openst, setupData);
 
-    this.chainConfig.utilityBrandedTokens[ubtConfig.index].openst = setupData;
+    this.chainConfig.utilityBrandedTokens[index].openst = setupData;
 
     logger.info('Completed Setup of OpenST');
   }
