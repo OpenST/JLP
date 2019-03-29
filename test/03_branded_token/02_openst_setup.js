@@ -5,7 +5,7 @@ const { assert } = require('chai');
 const shared = require('../shared');
 const OpenST = require('../../src/openst');
 
-describe('openst setup', async () => {
+describe('Openst Setup', async () => {
   it('Setup of master copies and factory contracts', async () => {
     const { chainConfig, connection } = shared;
     const utilityBrandedTokenConfigs = chainConfig.utilityBrandedTokens;
