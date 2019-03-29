@@ -3,7 +3,9 @@
 const Web3 = require('web3');
 const { assert } = require('chai');
 const { ContractInteract } = require('@openst/mosaic.js');
+
 const shared = require('../shared');
+const OpenST = require('../../src/openst');
 const BTDeployer = require('../../src/bt_deployer.js');
 const BTStakeMint = require('../../src/bt_stake_mint.js');
 const StateRootAnchorService = require('../../src/state_root_anchor_service');
@@ -15,6 +17,7 @@ describe('BT stake and mint', async () => {
   let stakeRequestHash;
   let messageHash;
   let utilityBrandedTokenConfig;
+  let beneficiary;
 
   const stakeVT = new BN(100);
   let tokenBalanceBeforeStake;
@@ -26,6 +29,50 @@ describe('BT stake and mint', async () => {
     // This will throw if anything fails, which will result in test failure.
     // Hence no need of explicit assertion.
     await btDeployer.deployGatewayComposer();
+  });
+
+  it('Creates user wallet', async () => {
+    const { chainConfig, connection } = shared;
+    const openst = new OpenST(chainConfig, connection);
+    const owner = connection.auxiliaryAccount.address;
+
+    const utilityBrandedTokenConfigs = chainConfig.utilityBrandedTokens;
+    // Take the latest deployed UBT config
+    const utilityBrandedTokenConfig = utilityBrandedTokenConfigs[utilityBrandedTokenConfigs.length - 1];
+
+    // Openst Setup has already been done in openst setup smoke test.
+    // Master copies will be read from chainConfig.
+    // For createUserWallet config should have recoveryOwnerAddress, recoveryControllerAddress
+    // and recoveryBlockDelay
+    await chainConfig.update({
+      openst: {
+        ...chainConfig.openst,
+        recoveryOwnerAddress: connection.auxiliaryAccount.address,
+        recoveryControllerAddress: connection.auxiliaryAccount.address,
+        recoveryBlockDelay: '100000000000',
+      },
+    });
+
+    const {
+      tokenHolderProxy,
+      gnosisSafeProxy,
+      recoveryProxy,
+    } = await openst.createUserWallet(
+      utilityBrandedTokenConfig.address,
+      owner,
+      1,
+      connection.auxiliaryAccount.address, // Comma separated session keys.
+      '100000000000',
+      '100000000000',
+    );
+
+
+    assert.isNotNull(tokenHolderProxy, 'TokenHolder proxy address should not be null.');
+    assert.isNotNull(gnosisSafeProxy, 'Gnosis proxy address should not be null.');
+    assert.isNotNull(recoveryProxy, 'Recovery proxy address should not be null.');
+    // beneficiary = connection.auxiliaryWeb3.utils.toChecksumAddress(tokenHolderProxy);
+    beneficiary = tokenHolderProxy;
+    console.log(`beneficiary:${beneficiary}, connection.auxiliaryAccount.address: ${connection.auxiliaryAccount.address}`);
   });
 
   it('Request Stake', async () => {
@@ -41,11 +88,8 @@ describe('BT stake and mint', async () => {
 
     btStakeAndMint = new BTStakeMint(chainConfig, connection);
     // Take the latest deployed UBT config
-    const utilityBrandedTokenConfigs = chainConfig.utilityBrandedTokens;
-    utilityBrandedTokenConfig = utilityBrandedTokenConfigs[utilityBrandedTokenConfigs.length - 1];
     const { originGatewayAddress } = utilityBrandedTokenConfig;
 
-    const beneficiary = connection.auxiliaryAccount.address;
     const gasPrice = '2';
     const gasLimit = '2';
 

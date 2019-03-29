@@ -87,12 +87,15 @@ class Facilitator {
     const txOptionAuxiliary = {
       gasPrice: this.chainConfig.auxiliaryGasPrice,
       from: this.connection.auxiliaryAccount.address,
+      gas: '5000000',
     };
 
     const txOptionOrigin = {
       gasPrice: this.chainConfig.originGasPrice,
       from: this.connection.originAccount.address,
+      gas: '5000000',
     };
+    console.log('stakeRequest.beneficiary:', stakeRequest.beneficiary);
     await this.mosaicFacilitator.progressStake(
       stakeRequest.staker,
       stakeRequest.amount,
