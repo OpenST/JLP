@@ -130,7 +130,7 @@ class BTDeployer {
 
     const originGatewayConfig = {
       token: this.chainConfig.brandedToken.address,
-      baseToken: this.origin.baseToken,
+      baseToken: this.origin.token,
       stateRootProvider: this.chainConfig.originAnchorAddress,
       bounty: '0',
       organization: this.chainConfig.originOrganizationAddress,
