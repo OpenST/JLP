@@ -3,6 +3,7 @@
 const Web3 = require('web3');
 const { assert } = require('chai');
 const { ContractInteract } = require('@openst/mosaic.js');
+const { ContractInteract: BTContractInteract } = require('@openst/brandedtoken.js');
 
 const shared = require('../shared');
 const OpenST = require('../../src/openst');
@@ -10,6 +11,7 @@ const BTDeployer = require('../../src/bt_deployer.js');
 const BTStakeMint = require('../../src/bt_stake_mint.js');
 const StateRootAnchorService = require('../../src/state_root_anchor_service');
 const Facilitator = require('../../src/facilitator');
+const logger = require('./../../src/logger');
 
 const { BN } = Web3.utils;
 describe('BT stake and mint', async () => {
@@ -22,6 +24,9 @@ describe('BT stake and mint', async () => {
   const stakeVT = new BN(100);
   let tokenBalanceBeforeStake;
   let valueToken;
+
+  const gasPrice = '2';
+  const gasLimit = '2';
 
   it('Deploy Gateway Composer', async () => {
     const { chainConfig, connection } = shared;
@@ -66,7 +71,7 @@ describe('BT stake and mint', async () => {
       '100000000000',
     );
 
-    beneficiary = connection.auxiliaryAccount.address;
+    beneficiary = tokenHolderProxy;
     assert.isNotNull(tokenHolderProxy, 'TokenHolder proxy address should not be null.');
     assert.isNotNull(gnosisSafeProxy, 'Gnosis proxy address should not be null.');
     assert.isNotNull(recoveryProxy, 'Recovery proxy address should not be null.');
@@ -86,9 +91,6 @@ describe('BT stake and mint', async () => {
     btStakeAndMint = new BTStakeMint(chainConfig, connection);
     // Take the latest deployed UBT config
     const { originGatewayAddress } = utilityBrandedTokenConfig;
-
-    const gasPrice = '2';
-    const gasLimit = '2';
 
     // This will throw if anything fails, which will result in test failure.
     // Hence no need of explicit assertion.
@@ -143,28 +145,52 @@ describe('BT stake and mint', async () => {
       connection.originAccount.address,
     ));
 
+    const ubtContractInstance = new BTContractInteract.UtilityBrandedToken(
+      connection.auxiliaryWeb3,
+      utilityBrandedTokenConfig.address,
+    );
+    const facilitator = connection.auxiliaryAccount.address;
+    const registerInternalActorTxOptions = {
+      gasPrice: chainConfig.auxiliaryGasPrice,
+      from: facilitator,
+    };
+
+    const isAlreadyRegistered = await ubtContractInstance.contract.methods.isInternalActor(
+      facilitator,
+    ).call();
+
+    if (isAlreadyRegistered) {
+      logger.info(`Faciliator ${facilitator} is already registered as Internal actor`);
+    } else {
+      await ubtContractInstance.registerInternalActors(
+        [facilitator],
+        registerInternalActorTxOptions,
+      );
+      logger.info(`Facilitator ${facilitator} address registered as Internal actor`);
+    }
+
     const utilityBrandedToken = new ContractInteract.UtilityToken(
       connection.auxiliaryWeb3,
       utilityBrandedTokenConfig.address,
     );
     const initialMintedBalance = new BN(await utilityBrandedToken.balanceOf(
-      connection.auxiliaryAccount.address,
+      beneficiary,
     ));
 
     const mosaic = chainConfig.toMosaicFromMessageHash(connection, messageHash);
-    const facilitator = new Facilitator(chainConfig, connection, mosaic);
-    await facilitator.progressStake(messageHash);
-
+    const facilitatorInstance = new Facilitator(chainConfig, connection, mosaic);
+    await facilitatorInstance.progressStake(messageHash);
 
     const finalMintedBalance = new BN(await utilityBrandedToken.balanceOf(
-      connection.auxiliaryAccount.address,
+      beneficiary,
     ));
 
+    const reward = (new BN(gasPrice)).mul(new BN(gasLimit));
     const totalMintedBalance = finalMintedBalance.sub(initialMintedBalance);
-
     // Conversion rate is setup such that 1 OST = 2 BT
+    const expectedMintBalance = stakeVT.muln(2).sub(reward);
     assert.strictEqual(
-      totalMintedBalance.eq(stakeVT.muln(2)),
+      totalMintedBalance.eq(expectedMintBalance),
       true,
       `Total minted amount ${totalMintedBalance} should be double of stake amount ${stakeVT}`,
     );
