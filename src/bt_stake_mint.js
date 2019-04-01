@@ -128,9 +128,7 @@ class BTStakeMint {
       );
       logger.info(`${stakeRequest.beneficiary} address registered as Internal actor`);
     }
-
     const staker = this.chainConfig.gatewayComposerAddress;
-
     const brandedToken = new ContractInteract.BrandedToken(
       this.origin.web3,
       this.chainConfig.brandedToken.address,
