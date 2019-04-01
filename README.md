@@ -173,7 +173,7 @@ node src/bin/bt.js setupBrandedToken <config.json> <symbol> <name> <decimal> <co
 
 ## Setup Utility Branded Token
 
-Prerequisite: Branded token config in config file.
+Prerequisite: Branded token config, `originAnchorAddress`, and `auxiliaryAnchorAddress` in config file.
 
 ```bash
 # Help: 
