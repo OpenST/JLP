@@ -26,7 +26,6 @@
   },
   "scripts": {
     "test:devenv": "cd test && ./run_tests_devenv.sh",
-    "test": "node ./test/run.js"
   },
   "dependencies": {
     "@openst/brandedtoken.js": "^0.10.0-beta.1",
