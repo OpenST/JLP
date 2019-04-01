@@ -23,8 +23,8 @@ describe('BT stake and mint', async () => {
   it('Deploy Gateway Composer', async () => {
     const { chainConfig, connection } = shared;
     const btDeployer = new BTDeployer(chainConfig, connection);
-    // This will throw if anything fails, which will result in test failure.
-    // Hence no need of explicit assertion.
+    // Below line will throw an exception if anything fails, which will
+    // result in test failure. Hence no need of explicit assertion.
     await btDeployer.deployGatewayComposer();
   });
 
@@ -49,8 +49,10 @@ describe('BT stake and mint', async () => {
     const gasPrice = '2';
     const gasLimit = '2';
 
-    // This will throw if anything fails, which will result in test failure.
-    // Hence no need of explicit assertion.
+    // Below line will throw an exception if anything fails, which will
+    // result in test failure. Hence no need of explicit assertion.
+    // Also request stake performs two transactions, approval of stake
+    // amount and request stake on gateway composer.
     stakeRequestHash = await btStakeAndMint.requestStake(
       originGatewayAddress,
       stakeVT.toString(10),
@@ -61,8 +63,8 @@ describe('BT stake and mint', async () => {
   });
 
   it('Accept Stake Request', async () => {
-    // This will throw if anything fails, which will result in test failure.
-    // Hence no need of explicit assertion.
+    // Below line will throw an exception if anything fails, which will
+    // result in test failure. Hence no need of explicit assertion.
     messageHash = await btStakeAndMint.acceptStake(stakeRequestHash);
   });
 
@@ -91,8 +93,8 @@ describe('BT stake and mint', async () => {
     );
 
     const anchorInfo = await stateRootAnchorService.getSourceInfo('latest');
-    // This will throw if anything fails, which will result in test failure.
-    // Hence no need of explicit assertion.
+    // Below line will throw an exception if anything fails, which will
+    // result in test failure. Hence no need of explicit assertion.
     await stateRootAnchorService.anchor(anchorInfo, targetTxOptions);
   });
 
@@ -112,6 +114,9 @@ describe('BT stake and mint', async () => {
 
     const mosaic = chainConfig.toMosaicFromMessageHash(connection, messageHash);
     const facilitator = new Facilitator(chainConfig, connection, mosaic);
+
+    // Below line will throw an exception if anything fails, which will
+    // result in test failure. Hence no need of explicit assertion.
     await facilitator.progressStake(messageHash);
 
 
@@ -121,7 +126,7 @@ describe('BT stake and mint', async () => {
 
     const totalMintedBalance = finalMintedBalance.sub(initialMintedBalance);
 
-    // Conversion rate is setup such that 1 OST = 2 BT
+    // Conversion rate is setup such that 1 OST = 2 BT.
     assert.strictEqual(
       totalMintedBalance.eq(stakeVT.muln(2)),
       true,
