@@ -39,8 +39,8 @@ describe('Setup Branded token', async () => {
   });
 
   it('deploy utility branded token', async () => {
-    // This will throw if anything fails, which will result in test failure.
-    // Hence no need of explicit assertion.
+    // Below line will throw an exception if anything fails, which will
+    // result in test failure. Hence no need of explicit assertion.
     await btDeployer.deployUtilityBrandedToken();
   });
 });

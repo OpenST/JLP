@@ -2,7 +2,6 @@ const {
   ContractInteract, Helpers, Staker, Facilitator,
 } = require('@openst/brandedtoken.js');
 const { Utils, ContractInteract: MosaicContractInteract } = require('@openst/mosaic.js');
-const Account = require('eth-lib/lib/account');
 const logger = require('./logger');
 
 class BTStakeMint {
@@ -151,15 +150,17 @@ class BTStakeMint {
 
     const btNonce = await brandedToken.contract.methods.nonce().call();
 
-    const requestHashToBeSigned = new Helpers.StakeHelper().getStakeRequestTypedData(
+    const stakeRequestTypedData = new Helpers.StakeHelper().getStakeRequestTypedData(
       stakeRequest.stakeVT,
       parseInt((btNonce) - 1, 10),
       staker,
       this.chainConfig.brandedToken.address,
-    ).getEIP712SignHash();
+    );
+    const workerAccountInstance = this.origin.web3.eth.accounts.privateKeyToAccount(
+      this.chainConfig.workerPrivateKey,
+    );
 
-    const signature = signData(requestHashToBeSigned, this.chainConfig.workerPrivateKey);
-
+    const signature = workerAccountInstance.signEIP712TypedData(stakeRequestTypedData);
     await facilitator.acceptStakeRequest(
       stakeRequest.stakeRequestHash,
       signature,
@@ -219,18 +220,6 @@ class BTStakeMint {
       ut => ut.originGatewayAddress === originGateway,
     );
   }
-}
-
-function signData(hash, privateKey) {
-  const signature = Account.sign(hash, privateKey);
-  const vrs = Account.decodeSignature(signature);
-  return {
-    messageHash: hash,
-    r: vrs[1],
-    s: vrs[2],
-    v: vrs[0],
-    signature,
-  };
 }
 
 module.exports = BTStakeMint;
