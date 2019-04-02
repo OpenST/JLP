@@ -76,7 +76,7 @@ program.command('requestStake <config> <originGatewayAddress> <stakeVT> <benefic
         async (chainConfig, connection) => {
           try {
             const btStakeMint = new BTStakeMint(chainConfig, connection);
-            await btStakeMint.requestStake(
+            await btStakeMint.requestStakeWithGatewayComposer(
               originGatewayAddress,
               stakeVT,
               beneficiary,
@@ -98,7 +98,7 @@ program.command('acceptStake <config> <stakeRequestHash> ')
         async (chainConfig, connection) => {
           try {
             const btStakeMint = new BTStakeMint(chainConfig, connection);
-            await btStakeMint.acceptStake(stakeRequestHash);
+            await btStakeMint.acceptStakeWithGatewayComposer(stakeRequestHash);
             chainConfig.write(config);
           } catch (e) {
             console.error(e);

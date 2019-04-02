@@ -34,7 +34,13 @@ class BTStakeMint {
     };
   }
 
-  async requestStake(originGatewayAddress, stakeVT, beneficiary, gasPrice, gasLimit) {
+  async requestStakeWithGatewayComposer(
+    originGatewayAddress,
+    stakeVT,
+    beneficiary,
+    gasPrice,
+    gasLimit,
+  ) {
     logger.info('Started requestStake');
     const { txOptions } = this.origin;
 
@@ -95,7 +101,7 @@ class BTStakeMint {
     return stakeRequestHash;
   }
 
-  async acceptStake(stakeRequestHash) {
+  async acceptStakeWithGatewayComposer(stakeRequestHash) {
     let stakeRequest = this.chainConfig.stakeRequests[stakeRequestHash];
 
     const { originGateway } = stakeRequest;
