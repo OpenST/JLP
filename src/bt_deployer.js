@@ -31,7 +31,7 @@ class BTDeployer {
     };
   }
 
-  _deployOriginOrganization() {
+  async _deployOriginOrganization() {
     return Setup.organization(
       this.origin.web3,
       {
@@ -178,7 +178,6 @@ class BTDeployer {
     logger.info(`utilityBrandedToken address ${utilityBrandedToken.address}`);
     logger.info(`originGateway address ${originGateway.address}`);
     logger.info(`auxiliaryCoGateway address ${auxiliaryCoGateway.address}`);
-
 
     const brandedToken = new ContractInteract.BrandedToken(
       this.origin.web3,
