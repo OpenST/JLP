@@ -156,8 +156,10 @@ class BTStakeMint {
       staker,
       this.chainConfig.brandedToken.address,
     );
-    const wallets = this.origin.web3.eth.accounts.wallet;
-    const workerAccountInstance = wallets[wallets.length - 1];
+    const workerAccountInstance = this.origin.web3.eth.accounts.privateKeyToAccount(
+      this.chainConfig.workerPrivateKey,
+    );
+
     const signature = workerAccountInstance.signEIP712TypedData(stakeRequestTypedData);
     await facilitator.acceptStakeRequest(
       stakeRequest.stakeRequestHash,

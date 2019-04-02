@@ -32,11 +32,6 @@ class BTDeployer {
   }
 
   async _deployOriginOrganization() {
-    await this.origin.web3.eth.accounts.wallet.create(1);
-    const accounts = this.origin.web3.eth.accounts.wallet;
-    const worker = accounts[accounts.length - 1].address;
-
-    this.chainConfig.originWorkerAddress = worker;
     return Setup.organization(
       this.origin.web3,
       {
@@ -44,7 +39,7 @@ class BTDeployer {
         owner: this.origin.masterKey,
         admin: this.origin.masterKey,
         workers: [
-          this.origin.web3.utils.toChecksumAddress(worker),
+          this.origin.web3.utils.toChecksumAddress(this.chainConfig.workerAddress),
           this.origin.web3.utils.toChecksumAddress(this.origin.masterKey),
         ],
         workerExpirationHeight: '20000000',
@@ -113,17 +108,12 @@ class BTDeployer {
   async deployUtilityBrandedToken() {
     logger.info('Deploying utility branded token');
 
-    await this.auxiliary.web3.eth.accounts.wallet.create(1);
-    const accounts = this.auxiliary.web3.eth.accounts.wallet;
-    const worker = accounts[accounts.length - 1].address;
-    this.chainConfig.auxiliaryWorkerAddress = worker;
-
     const auxiliaryOrganizationConfig = {
       deployer: this.auxiliary.deployer,
       owner: this.auxiliary.masterKey,
       admin: this.auxiliary.masterKey,
       workers: [
-        this.origin.web3.utils.toChecksumAddress(worker),
+        this.origin.web3.utils.toChecksumAddress(this.chainConfig.workerAddress),
         this.origin.web3.utils.toChecksumAddress(this.auxiliary.masterKey),
       ],
       workerExpirationHeight: '10000000000000',
