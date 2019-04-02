@@ -146,7 +146,8 @@ class OpenST {
       gasPrice: 0,
       gas: 0,
     };
-    // Reuse of worker as session key
+    // Reuse of worker as session key as private key is logged to
+    // config.json on Organiation deployment.
     const sessionKeyAccountInstance = this.auxiliary.web3.eth.accounts.privateKeyToAccount(
       this.chainConfig.workerPrivateKey,
     );
