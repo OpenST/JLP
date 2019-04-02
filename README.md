@@ -334,9 +334,9 @@ node ./src/bin/create_user.js <config.json> <eip20Token> <owners> <threshold> <s
 * Replace `eip20Token` with the UBT address of the economy.
 * Replace `owners` with comma separated owner addresses.
 * Replace `threshold` with gnosis requirement. 
-* Replace `sessionKeys` comma separated session keys. 
-* Replace `sessionKeySpendingLimits` comma separated spending limits corresponding to session keys. 
-* Replace `sessionKeyExpirationHeights` comma separated expiration heights corresponding to session keys.
+* Replace `sessionKeys` with comma separated session keys. 
+* Replace `sessionKeySpendingLimits` with comma separated spending limits corresponding to session keys. 
+* Replace `sessionKeyExpirationHeights` with comma separated expiration heights corresponding to session keys.
 
 ## Direct Transfer from sender to beneficiaries
 
@@ -352,8 +352,8 @@ node ./src/bin/direct_transfer.js <config.json> <sessionKey> <sender> <beneficia
 * Replace `sessionKey` with the authorized session key.
 * Replace `sender` with TokenHolder address which act as sender.
 * Replace `threshold` with gnosis requirement. 
-* Replace `beneficiaries` comma separated beneficiaries. 
-* Replace `amounts` comma separated amounts respective to beneficiary. 
+* Replace `beneficiaries` with comma separated beneficiaries. 
+* Replace `amounts` with comma separated amounts respective to beneficiary. 
  
 ## Tests
 
