@@ -3,10 +3,10 @@
 'use strict';
 
 const program = require('commander');
-const { ContractInteract, Helpers } = require('@openst/openst.js');
+
+const OpenST = require('../openst');
 
 const connected = require('../connected');
-const logger = require('../logger');
 const { version } = require('../../package.json');
 
 program
@@ -27,45 +27,19 @@ program
       await connected.run(
         config,
         async (chainConfig, connection) => {
-          const createUserTxOptions = {
-            from: connection.auxiliaryAccount.address,
-            gasPrice: chainConfig.auxiliaryGasPrice,
-          };
-          const web3 = connection.auxiliaryWeb3;
-          const userHelper = new Helpers.User(
-            chainConfig.openst.tokenHolderMasterCopy,
-            chainConfig.openst.gnosisSafeMasterCopy,
-            chainConfig.openst.recoveryMasterCopy,
-            chainConfig.openst.createAndAddModules,
+          const openst = new OpenST(chainConfig, connection);
+          const {
+            tokenHolderProxy,
+            gnosisSafeProxy,
+            recoveryProxy,
+          } = await openst.createUserWallet(
             eip20Token,
-            chainConfig.openst.tokenRules,
-            chainConfig.openst.userWalletFactory,
-            chainConfig.openst.proxyFactory,
-            web3,
-          );
-          const ownersArray = owners.split(',').map(item => item.trim());
-          const sessionKeysArray = sessionKeys.split(',').map(item => item.trim());
-          const sessionKeySpendingLimitsArray = sessionKeySpendingLimits.split(',').map(item => item.trim());
-          const sessionKeyExpirationHeightsArray = sessionKeyExpirationHeights.split(',').map(item => item.trim());
-          const response = await userHelper.createUserWallet(
-            ownersArray,
+            owners,
             threshold,
-            chainConfig.openst.recoveryOwnerAddress,
-            chainConfig.openst.recoveryControllerAddress,
-            chainConfig.openst.recoveryBlockDelay,
-            sessionKeysArray,
-            sessionKeySpendingLimitsArray,
-            sessionKeyExpirationHeightsArray,
-            createUserTxOptions,
+            sessionKeys,
+            sessionKeySpendingLimits,
+            sessionKeyExpirationHeights,
           );
-          const { returnValues } = response.events.UserWalletCreated;
-          const gnosisSafeProxy = returnValues._gnosisSafeProxy;
-          const tokenHolderProxy = returnValues._tokenHolderProxy;
-          logger.info('User created!');
-          const gnosisSafe = new ContractInteract.GnosisSafe(web3, gnosisSafeProxy);
-          const modules = await gnosisSafe.getModules();
-          const recoveryProxy = modules[0];
-          logger.info(`gnosisSafeProxy: ${gnosisSafeProxy}\n tokenHolderProxy: ${tokenHolderProxy}\n recoveryProxy: ${recoveryProxy}`);
           const user = {
             gnosisSafeProxy,
             tokenHolderProxy,

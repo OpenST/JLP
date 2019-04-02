@@ -71,6 +71,53 @@ class OpenST {
     Object.assign(this.chainConfig.openst, setupData);
     logger.info('Completed Setup of OpenST');
   }
+
+  async createUserWallet(
+    eip20Token,
+    owners,
+    threshold,
+    sessionKeys,
+    sessionKeySpendingLimits,
+    sessionKeyExpirationHeights,
+  ) {
+    const { Helpers, ContractInteract } = Package;
+
+    const userHelper = new Helpers.User(
+      this.chainConfig.openst.tokenHolderMasterCopy,
+      this.chainConfig.openst.gnosisSafeMasterCopy,
+      this.chainConfig.openst.recoveryMasterCopy,
+      this.chainConfig.openst.createAndAddModules,
+      eip20Token,
+      this.chainConfig.openst.tokenRules,
+      this.chainConfig.openst.userWalletFactory,
+      this.chainConfig.openst.proxyFactory,
+      this.auxiliary.web3,
+    );
+    const ownersArray = owners.split(',').map(item => item.trim());
+    const sessionKeysArray = sessionKeys.split(',').map(item => item.trim());
+    const sessionKeySpendingLimitsArray = sessionKeySpendingLimits.split(',').map(item => item.trim());
+    const sessionKeyExpirationHeightsArray = sessionKeyExpirationHeights.split(',').map(item => item.trim());
+    const response = await userHelper.createUserWallet(
+      ownersArray,
+      threshold,
+      this.chainConfig.openst.recoveryOwnerAddress,
+      this.chainConfig.openst.recoveryControllerAddress,
+      this.chainConfig.openst.recoveryBlockDelay,
+      sessionKeysArray,
+      sessionKeySpendingLimitsArray,
+      sessionKeyExpirationHeightsArray,
+      this.auxiliary.txOptions,
+    );
+    const { returnValues } = response.events.UserWalletCreated;
+    const gnosisSafeProxy = returnValues._gnosisSafeProxy;
+    const tokenHolderProxy = returnValues._tokenHolderProxy;
+    logger.info('User created!');
+    const gnosisSafe = new ContractInteract.GnosisSafe(this.auxiliary.web3, gnosisSafeProxy);
+    const modules = await gnosisSafe.getModules();
+    const recoveryProxy = modules[0];
+    logger.info(`gnosisSafeProxy: ${gnosisSafeProxy}\n tokenHolderProxy: ${tokenHolderProxy}\n recoveryProxy: ${recoveryProxy}`);
+    return { tokenHolderProxy, gnosisSafeProxy, recoveryProxy };
+  }
 }
 
 module.exports = OpenST;
