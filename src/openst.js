@@ -118,12 +118,18 @@ class OpenST {
     const modules = await gnosisSafe.getModules();
     const recoveryProxy = modules[0];
     logger.info(`gnosisSafeProxy: ${gnosisSafeProxy}\n tokenHolderProxy: ${tokenHolderProxy}\n recoveryProxy: ${recoveryProxy}`);
+    const user = {
+      gnosisSafeProxy,
+      tokenHolderProxy,
+      recoveryProxy,
+    };
+    this.chainConfig.users.push(user);
     return { tokenHolderProxy, gnosisSafeProxy, recoveryProxy };
   }
 
   async directTransfer(sessionKey, sender, beneficiaryArray, amountArray) {
-    const tokenRules = new TokenRules(this.chainConfig.openst.tokenRules, this.auxiliary.web3);
-    const tokenHolder = new TokenHolder(sender, this.auxiliary.web3);
+    const tokenRules = new TokenRules(this.auxiliary.web3, this.chainConfig.openst.tokenRules);
+    const tokenHolder = new TokenHolder(this.auxiliary.web3, sender);
     const directTransferExecutable = tokenRules.getDirectTransferExecutableData(
       beneficiaryArray,
       amountArray,
@@ -140,9 +146,12 @@ class OpenST {
       gasPrice: 0,
       gas: 0,
     };
-
-    const vrs = sessionKey.signEIP1077Transaction(transaction);
-    await sender.executeRule(
+    // Reuse of worker as session key
+    const sessionKeyAccountInstance = this.auxiliary.web3.eth.accounts.privateKeyToAccount(
+      this.chainConfig.workerPrivateKey,
+    );
+    const vrs = sessionKeyAccountInstance.signEIP1077Transaction(transaction);
+    await tokenHolder.executeRule(
       this.chainConfig.openst.tokenRules,
       directTransferExecutable,
       sessionKeyNonce,

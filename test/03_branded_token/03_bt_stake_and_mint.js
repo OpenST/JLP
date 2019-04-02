@@ -58,6 +58,9 @@ describe('BT stake and mint', async () => {
       },
     });
 
+    // Using worker as the session key for reusability. Worker account is created
+    // and private key is logged to config.json. We will need private key during EIP712 signing.
+    const sessionKey = chainConfig.workerAddress;
     const {
       tokenHolderProxy,
       gnosisSafeProxy,
@@ -66,7 +69,7 @@ describe('BT stake and mint', async () => {
       utilityBrandedTokenConfig.address,
       owner,
       1,
-      connection.auxiliaryAccount.address, // Comma separated session keys.
+      sessionKey, // Comma separated session keys.
       '100000000000',
       '100000000000',
     );

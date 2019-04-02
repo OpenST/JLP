@@ -28,11 +28,7 @@ program
         config,
         async (chainConfig, connection) => {
           const openst = new OpenST(chainConfig, connection);
-          const {
-            tokenHolderProxy,
-            gnosisSafeProxy,
-            recoveryProxy,
-          } = await openst.createUserWallet(
+          await openst.createUserWallet(
             eip20Token,
             owners,
             threshold,
@@ -40,12 +36,6 @@ program
             sessionKeySpendingLimits,
             sessionKeyExpirationHeights,
           );
-          const user = {
-            gnosisSafeProxy,
-            tokenHolderProxy,
-            recoveryProxy,
-          };
-          chainConfig.users.push(user);
           chainConfig.write(config);
         },
       );
