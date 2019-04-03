@@ -221,6 +221,142 @@ class BTStakeMint {
     return messageHash;
   }
 
+  async requestStake(
+    originGatewayAddress,
+    stakeAmount,
+    staker,
+    beneficiary,
+    gasPrice,
+    gasLimit,
+  ) {
+    logger.info('Started requestStake');
+
+    const brandedToken = new ContractInteract.BrandedToken(
+      this.origin.web3,
+      this.chainConfig.brandedToken.address,
+    );
+    const mintBT = await brandedToken.convertToBrandedTokens(stakeAmount);
+    console.log('mintBT: ', mintBT);
+
+    const stakerNonce = await new MosaicContractInteract.EIP20Gateway(
+      this.origin.web3,
+      originGatewayAddress,
+    ).getNonce(staker);
+
+    console.log('stakerNonce: ', stakerNonce);
+
+    let stakeRequest = {
+      staker,
+      originGateway: originGatewayAddress,
+      beneficiary,
+      stakeVT: stakeAmount,
+      mintBT,
+      stakerNonce,
+      gasPrice,
+      gasLimit,
+    };
+
+    await brandedToken.requestStake(stakeAmount, { from: staker });
+
+    const stakeRequestHash = await brandedToken.contract.methods.stakeRequestHashes(
+      staker,
+    ).call();
+
+    console.log('stakeRequestHash: ', stakeRequestHash);
+    const { stakeRequests } = this.chainConfig;
+
+    stakeRequest = {
+      stakeRequestHash,
+      ...stakeRequest,
+    };
+    stakeRequests[stakeRequestHash] = stakeRequest;
+
+    logger.info(`requestStake completed, your request hash is: ${stakeRequestHash}`);
+    return stakeRequestHash;
+  }
+
+  async acceptStake(stakeRequestHash) {
+    const stakeRequest = this.chainConfig.stakeRequests[stakeRequestHash];
+
+    const { originGateway } = stakeRequest;
+
+    const utilityBrandedTokenConfig = this.getUtilityBrandedTokenConfig(originGateway);
+
+    const ubtContractInstance = new ContractInteract.UtilityBrandedToken(
+      this.auxiliary.web3,
+      utilityBrandedTokenConfig.address,
+    );
+
+    const registerInternalActorTxOptions = {
+      from: this.auxiliary.masterKey,
+      gasPrice: this.auxiliary.txOptions.gasPrice,
+    };
+
+    const isAlreadyRegistered = await ubtContractInstance.contract.methods.isInternalActor(
+      stakeRequest.beneficiary,
+    ).call();
+
+    if (isAlreadyRegistered) {
+      logger.info(`Beneficiary address ${stakeRequest.beneficiary} already registered as Internal actor`);
+    } else {
+      await ubtContractInstance.registerInternalActors(
+        [stakeRequest.beneficiary],
+        registerInternalActorTxOptions,
+      );
+      logger.info(`${stakeRequest.beneficiary} address registered as Internal actor`);
+    }
+    const { staker } = stakeRequest;
+    const brandedToken = new ContractInteract.BrandedToken(
+      this.origin.web3,
+      this.chainConfig.brandedToken.address,
+    );
+
+    logger.info('acceptStake started');
+
+    const btNonce = await brandedToken.contract.methods.nonce().call();
+
+    const stakeRequestTypedData = new Helpers.StakeHelper().getStakeRequestTypedData(
+      stakeRequest.stakeVT,
+      parseInt((btNonce) - 1, 10),
+      staker,
+      this.chainConfig.brandedToken.address,
+    );
+    const workerAccountInstance = this.origin.web3.eth.accounts.privateKeyToAccount(
+      this.chainConfig.workerPrivateKey,
+    );
+
+    const signature = workerAccountInstance.signEIP712TypedData(stakeRequestTypedData);
+
+    await brandedToken.acceptStakeRequest(
+      stakeRequest.stakeRequestHash,
+      signature.r,
+      signature.s,
+      signature.v,
+      this.origin.txOptions,
+    );
+
+    const { stakeRequests } = this.chainConfig;
+
+    delete stakeRequests[stakeRequestHash];
+
+    const stakeInfo = {
+      staker,
+      beneficiary: stakeRequest.beneficiary,
+      amount: stakeRequest.mintBT,
+      gasPrice: stakeRequest.gasPrice,
+      gasLimit: stakeRequest.gasLimit,
+      auxiliaryUtilityTokenAddress: utilityBrandedTokenConfig.address,
+      auxiliaryOrganizationAddress: utilityBrandedTokenConfig.organizationAddress,
+      originGatewayAddress: utilityBrandedTokenConfig.originGatewayAddress,
+      auxiliaryCoGatewayAddress: utilityBrandedTokenConfig.auxiliaryCoGatewayAddress,
+      originBrandedTokenAddress: this.chainConfig.brandedToken.address,
+      originOrganizationAddress: this.chainConfig.brandedToken.originOrganization,
+    };
+
+    logger.info('acceptStake completed.');
+    return stakeInfo;
+  }
+
   getUtilityBrandedTokenConfig(originGateway) {
     return this.chainConfig.utilityBrandedTokens.find(
       ut => ut.originGatewayAddress === originGateway,
