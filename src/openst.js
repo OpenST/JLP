@@ -2,6 +2,9 @@ const Package = require('@openst/openst.js');
 
 const logger = require('./logger');
 
+const { TokenRules, TokenHolder } = Package.ContractInteract;
+
+
 class OpenST {
   constructor(chainConfig, connection) {
     this.chainConfig = chainConfig;
@@ -17,7 +20,6 @@ class OpenST {
   }
 
   async deployTokenRules(auxiliaryOrganization, auxiliaryEIP20Token) {
-    const { TokenRules } = Package.ContractInteract;
     const tokenRulesTxOptions = this.auxiliary.txOptions;
     const tokenRules = await TokenRules.deploy(
       this.auxiliary.web3,
@@ -116,7 +118,49 @@ class OpenST {
     const modules = await gnosisSafe.getModules();
     const recoveryProxy = modules[0];
     logger.info(`gnosisSafeProxy: ${gnosisSafeProxy}\n tokenHolderProxy: ${tokenHolderProxy}\n recoveryProxy: ${recoveryProxy}`);
+    const user = {
+      gnosisSafeProxy,
+      tokenHolderProxy,
+      recoveryProxy,
+    };
+    this.chainConfig.users.push(user);
     return { tokenHolderProxy, gnosisSafeProxy, recoveryProxy };
+  }
+
+  async directTransfer(sessionKey, sender, beneficiaryArray, amountArray) {
+    const tokenRules = new TokenRules(this.auxiliary.web3, this.chainConfig.openst.tokenRules);
+    const tokenHolder = new TokenHolder(this.auxiliary.web3, sender);
+    const directTransferExecutable = tokenRules.getDirectTransferExecutableData(
+      beneficiaryArray,
+      amountArray,
+    );
+    const sessionKeyData = await tokenHolder.getSessionKeyData(sessionKey);
+    const sessionKeyNonce = sessionKeyData.nonce;
+    const transaction = {
+      from: sender,
+      to: this.chainConfig.openst.tokenRules,
+      data: directTransferExecutable,
+      nonce: sessionKeyNonce,
+      callPrefix: await tokenHolder.getTokenHolderExecuteRuleCallPrefix(),
+      value: 0,
+      gasPrice: 0,
+      gas: 0,
+    };
+    // Reuse of worker as session key as private key is logged to
+    // config.json on Organiation deployment.
+    const sessionKeyAccountInstance = this.auxiliary.web3.eth.accounts.privateKeyToAccount(
+      this.chainConfig.workerPrivateKey,
+    );
+    const vrs = sessionKeyAccountInstance.signEIP1077Transaction(transaction);
+    await tokenHolder.executeRule(
+      this.chainConfig.openst.tokenRules,
+      directTransferExecutable,
+      sessionKeyNonce,
+      vrs.r,
+      vrs.s,
+      vrs.v,
+      this.auxiliary.txOptions,
+    );
   }
 }
 

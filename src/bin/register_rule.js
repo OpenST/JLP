@@ -60,7 +60,7 @@ program
       console.log('');
       console.log('Examples:');
       console.log('  Register rule in TokenRules:');
-      console.log('  $ register_rule.js config.json PricerRule 0xa4aa50fbd4767085705db09e020a781e58e2fbf2 path_to_rule.abi');
+      console.log('  $ register_rule.js config.json PricerRule 0xa4aa50fbd4767085705db09e020a781e58e2fbf2 path_to_pricer_rule.abi');
     },
   )
   .parse(process.argv);

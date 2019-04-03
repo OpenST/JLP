@@ -28,7 +28,7 @@ class ChainConfig {
     this.redeems = {};
     this.utilityBrandedTokens = [];
     this.openst = {};
-    this.users = [];
+    this.users = []; // Store all the created user wallets.
     this.fileName = filePath;
 
     // If a file path is given, config from the file will overwrite config from ENV or default.
