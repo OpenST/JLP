@@ -80,6 +80,11 @@ const loadMocha = () => {
       // Skipping the file that manages shared state across tests.
       file => file !== path.join(__dirname, 'shared.js'),
     )
+    .filter(
+      file => file.indexOf(
+        'test/04_openst/gnosisSafeModules/delayedRecoveryModule/helpers/' === -1,
+      ),
+    )
     .forEach((file) => {
       mocha.addFile(file);
     });
