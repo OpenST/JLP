@@ -338,6 +338,31 @@ node ./src/bin/create_user.js <config.json> <eip20Token> <owners> <threshold> <s
 * Replace `sessionKeySpendingLimits` comma separated spending limits corresponding to session keys. 
 * Replace `sessionKeyExpirationHeights` comma separated expiration heights corresponding to session keys.  
  
+ ## Continuous Redeem(with co-gateway and utility branded token):
+ 
+ This command helps you to run redeem continuously till the totalRedeemAmount is redeemed. It expects `minRedeemAmount` and `maxRedeemAmount` which is used to defined a range in which random redeem amount is generated. 
+ 
+ If `maxRedeemAmount` is passed as `0`, then this command will redeem `minRedeemAmount` till `totalRedeemAmount` is not redeemed. 
+ 
+Prerequiste:
+1. Setup of utility branded token.
+2. Redeem should have tokens to redeem. 
+
+```bash
+
+node ./src/bin/facilitator continuousRedeem <config> <utilityTokenAddress> <totalRedeemAmount> <redeemer> <beneficiary> <gasPrice> <gasLimit> <minRedeemAmount> <maxRedeemAmount>
+
+```
+ * Replace `config` with the path to the configuration file.
+ * Replace `utilityTokenAddress` with the address of utility branded token.
+  * Replace `totalRedeemAmount` with the number representing total redeem amount.
+* Replace `redeemer` with the address of redeemer holding tokens.
+* Replace `beneficiary` with the address on origin chain where token will be unstaked.
+* Replace `gasPrice` with a number which is used to calculate facilitator reward.
+* Replace `gasLimit` with a number which is used to calculate facilitator reward.
+* Replace `minRedeemAmount` with a number which defines minimum redeem amount.
+* Replace `maxRedeemAmount` with a number which defines maximum redeem amount.
+  
 ## Tests
 
 To run the tests run `npm run test`.

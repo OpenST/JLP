@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint-disable no-await-in-loop */
 
 'use strict';
 
@@ -131,19 +132,34 @@ program.command('continuousRedeem <config>'
         configPath,
         async (chainConfig, connection) => {
           try {
+            minRedeemAmount = parseInt(minRedeemAmount, 10);
+            maxRedeemAmount = parseInt(maxRedeemAmount, 10);
+
+            // To redeem same amount each time, maxRedeem amount is passed zero.
+            if (maxRedeemAmount === 0) {
+              maxRedeemAmount = minRedeemAmount;
+            }
+
+            if (maxRedeemAmount > totalRedeemAmount) {
+              maxRedeemAmount = totalRedeemAmount;
+            }
+
+            if (minRedeemAmount > maxRedeemAmount) {
+              minRedeemAmount = maxRedeemAmount;
+            }
             const utilityToken = new ContractInteract.EIP20Token(
               connection.auxiliaryWeb3,
               utilityTokenAddress,
             );
-            const mosaic = mosaicInstance(connection, chainConfig, utilityTokenAddress);
+            const mosaic = chainConfig.toMosaicFromUtilityToken(
+              connection,
+              utilityTokenAddress,
+            );
             const facilitator = new Facilitator(chainConfig, connection, mosaic);
             let currentBalance = new BN((await utilityToken.balanceOf(redeemer)));
 
             if (currentBalance.gt(new BN(totalRedeemAmount))) {
-              let amount = randomNumberBetweenRange(
-                parseInt(minRedeemAmount, 10),
-                parseInt(maxRedeemAmount, 10),
-              );
+              let amount = randomNumberBetweenRange(minRedeemAmount, maxRedeemAmount);
               let amountRedeemed = amount;
               while (amountRedeemed.lten(totalRedeemAmount)) {
                 const { messageHash } = await facilitator.redeem(
@@ -152,22 +168,17 @@ program.command('continuousRedeem <config>'
                   beneficiary,
                 );
                 chainConfig.write(configPath);
-                console.log('message hash  ', messageHash);
 
                 await anchorAuxiliaryStateRoot(connection, chainConfig);
                 await facilitator.progressRedeem(messageHash);
                 chainConfig.write(configPath);
                 currentBalance = currentBalance.sub(amount);
-                amount = randomNumberBetweenRange(
-                  parseInt(minRedeemAmount, 10),
-                  parseInt(maxRedeemAmount, 10),
-                );
+                amount = randomNumberBetweenRange(minRedeemAmount, maxRedeemAmount);
                 amountRedeemed = amountRedeemed.add(amount);
-
               }
             }
           } catch (e) {
-            console.log('Exception in continuous redeem ', e);
+            logger.error(`Exception in continuous redeem , ${e}`);
           }
         },
       );
@@ -197,6 +208,24 @@ program.on(
     console.log('facilitator progressRedeem Arguments:');
     console.log('  config       path to a config file');
     console.log('  messageHash  hash to identify redeem process');
+    console.log('');
+    console.log('continuous redeem: continuousRedeem');
+    console.log('  config                path to a config file');
+    console.log('  utilityTokenAddress   address of utility token');
+    console.log('  totalRedeemAmount     total amount to redeem');
+    console.log('  redeemer              address of redeem ');
+    console.log('  amount                amount in wei for redeem ');
+    console.log('  beneficiary           address which will receive tokens'
+      + ' after successful redeem');
+    console.log('  gasPrice              gasPrice that redeemer is ready to'
+      + ' pay to get the redeem process done.');
+    console.log('  gasLimit              gasLimit that redeem is ready to'
+      + ' pay for reward');
+    console.log('  minRedeemAmount       minimum redeem amount.');
+    console.log('  maxRedeemAmount       maximum redeem amount, if this'
+      + ' amount is'
+      + ' passed as zero then minRedeemAmount will be redeemed until'
+      + ' totalRedeemAmount.');
   },
 );
 
@@ -205,33 +234,6 @@ program.parse(process.argv);
 function randomNumberBetweenRange(maxRedeemAmount, minRedeemAmount) {
   const range = maxRedeemAmount - minRedeemAmount;
   return new BN(Math.floor(Math.random() * range) + minRedeemAmount);
-}
-
-function mosaicInstance(connection, chainConfig, utilityTokenAddress) {
-  const utilityTokenConfig = chainConfig.utilityBrandedTokens.find(
-    ut => ut.address === utilityTokenAddress,
-  );
-
-  const originChain = new Mosaic.Chain(
-    connection.originWeb3,
-    {
-      Organization: chainConfig.brandedToken.originOrganization,
-      EIP20Gateway: utilityTokenConfig.originGatewayAddress,
-      Anchor: chainConfig.originAnchorAddress,
-      EIP20Token: chainConfig.eip20TokenAddress,
-    },
-  );
-  const auxiliaryChain = new Mosaic.Chain(
-    connection.auxiliaryWeb3,
-    {
-      Organization: utilityTokenConfig.organizationAddress,
-      EIP20CoGateway: utilityTokenConfig.auxiliaryCoGatewayAddress,
-      Anchor: chainConfig.auxiliaryAnchorAddress,
-      UtilityToken: utilityTokenAddress,
-    },
-  );
-
-  return new Mosaic(originChain, auxiliaryChain);
 }
 
 async function anchorAuxiliaryStateRoot(connection, chainConfig) {

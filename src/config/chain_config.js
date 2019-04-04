@@ -114,6 +114,37 @@ class ChainConfig {
 
     return new Mosaic(originChain, auxiliaryChain);
   }
+
+  toMosaicFromUtilityToken(connection, utilityTokenAddress) {
+    const utilityTokenConfig = this.utilityBrandedTokens.find(
+      ut => ut.address === utilityTokenAddress,
+    );
+
+    if (!utilityTokenConfig) {
+      throw new Error(`Config not found for utilityToken ${utilityTokenAddress}`);
+    }
+
+    const originChain = new Mosaic.Chain(
+      connection.originWeb3,
+      {
+        Organization: this.brandedToken.originOrganization,
+        EIP20Gateway: utilityTokenConfig.originGatewayAddress,
+        Anchor: this.originAnchorAddress,
+        EIP20Token: this.eip20TokenAddress,
+      },
+    );
+    const auxiliaryChain = new Mosaic.Chain(
+      connection.auxiliaryWeb3,
+      {
+        Organization: utilityTokenConfig.organizationAddress,
+        EIP20CoGateway: utilityTokenConfig.auxiliaryCoGatewayAddress,
+        Anchor: this.auxiliaryAnchorAddress,
+        UtilityToken: utilityTokenAddress,
+      },
+    );
+
+    return new Mosaic(originChain, auxiliaryChain);
+  }
 }
 
 module.exports = ChainConfig;
