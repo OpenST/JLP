@@ -2,23 +2,22 @@
 
 const assert = require('assert');
 const BN = require('bn.js');
-
 const { ContractInteract } = require('@openst/openst.js');
+
 const shared = require('../shared');
 const OpenST = require('../../src/openst');
 
 describe('PricerRule', async () => {
   it('deploys pricer rule', async () => {
-    const { chainConfig } = shared;
-    const { connection } = shared;
+    const { chainConfig, connection } = shared;
 
     const auxiliaryEIP20Token = chainConfig.utilityBrandedTokens[chainConfig.utilityBrandedTokens.length - 1].address;
     const baseCurrencyCode = 'USD';
     const conversionRate = 3;
     const conversionRateDecimals = 3;
     const requiredPriceOracleDecimals = 3;
-    const openST = new OpenST(chainConfig, shared.connection);
-    const { pricerOracleData } = await openST.deployPricerRule(
+    const openST = new OpenST(chainConfig, connection);
+    const { pricerRuleData } = await openST.deployPricerRule(
       auxiliaryEIP20Token,
       baseCurrencyCode,
       conversionRate,
@@ -29,7 +28,7 @@ describe('PricerRule', async () => {
     const { auxiliaryWeb3 } = connection;
     const pricerRule = await new ContractInteract.PricerRule(
       auxiliaryWeb3,
-      pricerOracleData[baseCurrencyCode].address,
+      pricerRuleData[baseCurrencyCode].address,
     );
 
     const contractConversionRate = new BN(

@@ -23,7 +23,7 @@ program.command('openst <config> <eip20Token> <organization> ')
         async (chainConfig, connection) => {
           try {
             const openst = new OpenST(chainConfig, connection);
-            await openst.setupOpenst(eip20Token, organization);
+            await openst.setupOpenst(organization, eip20Token);
             chainConfig.write(config);
           } catch (e) {
             logger.error(e.message);
@@ -84,7 +84,7 @@ program.on(
     console.log('');
     console.log('Examples:');
     console.log('  Deployment of openst contracts:');
-    console.log('  $ openst.js config.json eip20Token');
+    console.log('  $ openst.js config.json eip20Token organization');
     console.log('');
     console.log('  openst setup for JLP');
     console.log('  Deployment of PricerRule contract:');

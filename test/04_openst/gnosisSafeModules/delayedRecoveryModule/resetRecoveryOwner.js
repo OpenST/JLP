@@ -9,8 +9,7 @@ const OpenST = require('../../../../src/openst');
 
 describe('DelayedRecoveryModule', async () => {
   it('resets recovery owner', async () => {
-    const { chainConfig } = shared;
-    const { connection } = shared;
+    const { chainConfig, connection} = shared;
     const web3 = connection.auxiliaryWeb3;
 
     // Required but not validated arguments
