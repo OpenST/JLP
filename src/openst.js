@@ -71,6 +71,7 @@ class OpenST {
       tokenRules: tokenRulesAddress,
     };
 
+    // Fixme https://github.com/OpenST/JLP/issues/92
     Object.assign(this.chainConfig.openst, setupData);
 
     this.chainConfig.utilityBrandedTokens[index].openst = setupData;
