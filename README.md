@@ -173,7 +173,7 @@ node src/bin/bt.js setupBrandedToken <config.json> <symbol> <name> <decimal> <co
 
 ## Setup Utility Branded Token
 
-Prerequisite: Branded token config in config file.
+Prerequisite: Branded token config, `originAnchorAddress`, and `auxiliaryAnchorAddress` in config file.
 
 ```bash
 # Help: 
@@ -353,9 +353,26 @@ node ./src/bin/create_user.js <config.json> <eip20Token> <owners> <threshold> <s
 * Replace `eip20Token` with the UBT address of the economy.
 * Replace `owners` with comma separated owner addresses.
 * Replace `threshold` with gnosis requirement. 
-* Replace `sessionKeys` comma separated session keys. 
-* Replace `sessionKeySpendingLimits` comma separated spending limits corresponding to session keys. 
-* Replace `sessionKeyExpirationHeights` comma separated expiration heights corresponding to session keys.  
+* Replace `sessionKeys` with comma separated session keys. 
+* Replace `sessionKeySpendingLimits` with comma separated spending limits corresponding to session keys. 
+* Replace `sessionKeyExpirationHeights` with comma separated expiration heights corresponding to session keys.
+
+## Direct Transfer from sender to beneficiaries
+
+```bash
+# Help:
+node ./src/bin/direct_transfer.js --help
+  
+# Create User:
+node ./src/bin/direct_transfer.js <config.json> <sessionKey> <sender> <beneficiaries> <amounts>
+```
+
+* Replace `config.json` with the path to the configuration file.
+* Replace `sessionKey` with the authorized session key.
+* Replace `sender` with TokenHolder address which act as sender.
+* Replace `threshold` with gnosis requirement. 
+* Replace `beneficiaries` with comma separated beneficiaries. 
+* Replace `amounts` with comma separated amounts respective to beneficiary. 
  
 ## Tests
 
