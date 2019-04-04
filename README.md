@@ -265,14 +265,14 @@ node src/bin/facilitator.js progressRedeem path_to_config.json messageHash
   
 ## Setup OpenST
 
-Prerequisite: `eip20Token` and `organization` contract should have been deployed.
+Prerequisite: `organization` and `eip20Token` contract should have been deployed.
     
 ```bash
 # Help:
 node ./src/bin/openst.js --help
     
 # Setup OpenST:
-node ./src/bin/openst.js openst config.json eip20Token organization
+node ./src/bin/openst.js openst config.json organization eip20Token
 ```
     
 It will write below contract addresses to your config file:
@@ -285,8 +285,9 @@ It will write below contract addresses to your config file:
 * TokenRules contract address.
 
 * Replace `config.json` with the path to the configuration file.
+* Replace `organization` with an organization contract address.
 * Replace `eip20Token` with eip20Token address.
-* Replace `organization` with an organization contract address. 
+ 
 
 ## Deploy Pricer Rule
 

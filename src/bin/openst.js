@@ -14,10 +14,10 @@ program
   .name('openst')
   .description('An executable to setup OpenST.');
 
-program.command('openst <config> <eip20Token> <organization> ')
+program.command('openst <config> <organization> <eip20Token>')
   .description('An executable to setup OpenST.')
   .action(
-    async (config, eip20Token, organization) => {
+    async (config, organization, eip20Token) => {
       await connected.run(
         config,
         async (chainConfig, connection) => {
@@ -71,6 +71,7 @@ program.on(
     console.log('');
     console.log('openst Arguments:');
     console.log('  config        Path to a config file');
+    console.log('  organization  Organization contract address');
     console.log('  eip20Token    EIP20Token contract address');
     console.log('');
     console.log('pricerRule Arguments:');
@@ -84,7 +85,7 @@ program.on(
     console.log('');
     console.log('Examples:');
     console.log('  Deployment of openst contracts:');
-    console.log('  $ openst.js config.json eip20Token organization');
+    console.log('  $ openst.js config.json organization eip20Token');
     console.log('');
     console.log('  openst setup for JLP');
     console.log('  Deployment of PricerRule contract:');
