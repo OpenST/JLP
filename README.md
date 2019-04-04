@@ -265,14 +265,14 @@ node src/bin/facilitator.js progressRedeem path_to_config.json messageHash
   
 ## Setup OpenST
 
-Prerequisite: `organization` and `eip20Token` contracts should have been deployed.
+Prerequisite: `organization` and `eip20Token` contract should have been deployed.
     
 ```bash
 # Help:
 node ./src/bin/openst.js --help
     
 # Setup OpenST:
-node ./src/bin/openst.js config.json organization eip20Token
+node ./src/bin/openst.js openst config.json organization eip20Token
 ```
     
 It will write below contract addresses to your config file:
@@ -285,8 +285,28 @@ It will write below contract addresses to your config file:
 * TokenRules contract address.
 
 * Replace `config.json` with the path to the configuration file.
-* Replace `organization` with an organization contract address. 
+* Replace `organization` with an organization contract address.
 * Replace `eip20Token` with eip20Token address.
+ 
+
+## Deploy Pricer Rule
+
+Prerequisite: `eip20Token` contract should have been deployed.
+    
+```bash
+# Help:
+node ./src/bin/openst.js --help
+    
+node ./src/bin/openst.js pricerRule config.json eip20Token baseCurrencyCode conversionRate conversionRateDecimals requiredPriceOracleDecimals
+```
+
+* Replace `config` with the path to the json configuration file.
+* Replace `eip20Token` with eip20Token address of Auxiliary chain.
+* baseCurrencyCode with the economy's base currency code.
+* conversionRate with the conversion rate from the economy base currency to the token.
+* conversionRateDecimals with the conversion rate's decimals from the economy base currency to the token.
+* requiredPriceOracleDecimals with the required decimals for price oracles.
+
  
 ## Register Rule to TokenRules
   

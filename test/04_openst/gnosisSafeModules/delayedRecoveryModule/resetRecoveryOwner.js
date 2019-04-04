@@ -9,17 +9,23 @@ const OpenST = require('../../../../src/openst');
 
 describe('DelayedRecoveryModule', async () => {
   it('resets recovery owner', async () => {
-    const chainConfig = shared.chainConfig;
-    const connection = shared.connection;
+    const { chainConfig, connection} = shared;
     const web3 = connection.auxiliaryWeb3;
 
     // Required but not validated arguments
     const mockAddresses = {
-      organization: "0x0000000000000000000000000000000000000001",
-      utilityToken: "0x0000000000000000000000000000000000000001",
-      owner: "0x0000000000000000000000000000000000000002",  // 0x1 reserved for sentinels by Gnosis Safe
-      newRecoveryOwner: "0x0000000000000000000000000000000000000001",
-    }
+      organization: '0x0000000000000000000000000000000000000001',
+      utilityToken: '0x0000000000000000000000000000000000000001',
+      owner: '0x0000000000000000000000000000000000000002', // 0x1 reserved for sentinels by Gnosis Safe
+      newRecoveryOwner: '0x0000000000000000000000000000000000000001',
+    };
+
+    chainConfig.update({
+      utilityBrandedTokens: [{
+        address: mockAddresses.utilityToken,
+        organizationAddress: mockAddresses.organization,
+      }],
+    });
 
     // Setup OpenST
     //  deploys master contracts
@@ -28,7 +34,7 @@ describe('DelayedRecoveryModule', async () => {
     await openst.setupOpenst(
       mockAddresses.organization,
       mockAddresses.utilityToken,
-    )
+    );
 
     const userWallet = {
       owners: [mockAddresses.owner],
@@ -39,7 +45,7 @@ describe('DelayedRecoveryModule', async () => {
       sessionKeys: [], // not required
       sessionKeySpendingLimits: [], // not required
       sessionKeyExpirationHeights: [], // not required
-    }
+    };
 
     // Setup user helper
     //  adapted from ../../../../src/bin/create_user.js
@@ -82,7 +88,7 @@ describe('DelayedRecoveryModule', async () => {
     assert.strictEqual(
       userWallet.recoveryOwner.address,
       await delayedRecoveryModule.recoveryOwner(),
-    )
+    );
 
     // Calculate recovery data
     const resetRecoveryOwnerData = delayedRecoveryModule.resetRecoveryOwnerData(
@@ -100,7 +106,7 @@ describe('DelayedRecoveryModule', async () => {
     const resetRecoveryOwnerTxOptions = {
       from: userWallet.recoveryController.address,
       gasPrice: openst.auxiliary.txOptions.gasPrice,
-    }
+    };
 
     await delayedRecoveryModule.resetRecoveryOwner(
       mockAddresses.newRecoveryOwner,
@@ -114,6 +120,6 @@ describe('DelayedRecoveryModule', async () => {
     assert.strictEqual(
       mockAddresses.newRecoveryOwner,
       await delayedRecoveryModule.recoveryOwner(),
-    )
+    );
   });
 });
