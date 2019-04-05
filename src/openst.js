@@ -31,7 +31,7 @@ class OpenST {
 
   async setupOpenst(auxiliaryOrganization, auxiliaryEIP20Token) {
     logger.info('Starting Setup of OpenST');
-    const { ubt, index } = this.getUtilityBrandedTokenConfig(auxiliaryEIP20Token);
+    const { index } = this.getUtilityBrandedTokenConfig(auxiliaryEIP20Token);
     const tokenHolderTxOptions = this.auxiliary.txOptions;
     const gnosisTxOptions = this.auxiliary.txOptions;
     const recoveryTxOptions = this.auxiliary.txOptions;
@@ -127,6 +127,9 @@ class OpenST {
       gnosisSafeProxy,
       tokenHolderProxy,
       recoveryProxy,
+      recoveryOwnerAddress: this.chainConfig.openst.recoveryOwnerAddress,
+      recoveryControllerAddress: this.chainConfig.openst.recoveryControllerAddress,
+      recoveryBlockDelay: this.chainConfig.openst.recoveryBlockDelay,
     };
     this.chainConfig.users.push(user);
     return { tokenHolderProxy, gnosisSafeProxy, recoveryProxy };
