@@ -22,6 +22,8 @@ class ChainConfig {
     this.auxiliaryGasPrice = process.env.AUXILIARY_GAS_PRICE || '1000000000';
     this.workerAddress = process.env.WORKER_ADDRESS || '0x7F6A99881cC1ebcBc7209a636B4692133F8f9F36';
     this.workerPrivateKey = process.env.WORKER_PRIVATE_KEY || '0x5E882CADCDDBFDBB0E8058C08CB26CA5E303A57BBF6C316ACA88E3445CD82C43';
+    this.recoveryOwnerPrivateKey = process.env.RECOVERY_OWNER_PRIVATE_KEY || '0xFE6280E11F34CBBEB29768D9FBAB130A22A7113756426C9C276C5A2430DA8D0D';
+    this.recoveryOwnerAddress = process.env.RECOVERY_OWNER_ADDRESS || '0xCCFf24A25FbD086D9AA3f5b5b22aD0ca244f11a4';
     this.password = process.env.PASSWORD || 'hunter2';
     this.stakes = {};
     this.stakeRequests = {};
