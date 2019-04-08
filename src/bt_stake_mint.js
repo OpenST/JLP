@@ -236,14 +236,11 @@ class BTStakeMint {
       this.chainConfig.brandedToken.address,
     );
     const mintBT = await brandedToken.convertToBrandedTokens(stakeAmount);
-    console.log('mintBT: ', mintBT);
 
     const stakerNonce = await new MosaicContractInteract.EIP20Gateway(
       this.origin.web3,
       originGatewayAddress,
     ).getNonce(staker);
-
-    console.log('stakerNonce: ', stakerNonce);
 
     let stakeRequest = {
       staker,
@@ -262,7 +259,6 @@ class BTStakeMint {
       staker,
     ).call();
 
-    console.log('stakeRequestHash: ', stakeRequestHash);
     const { stakeRequests } = this.chainConfig;
 
     stakeRequest = {
