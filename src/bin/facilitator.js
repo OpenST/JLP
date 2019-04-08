@@ -87,7 +87,7 @@ program.command('redeem <config> <redeemer> <amount> <beneficiary>')
             logger.info(`  unlockSecret ${unlockSecret}`);
             chainConfig.write(configPath);
           } catch (e) {
-            console.log('exception in redeem  ', e);
+            logger.error(`exception in redeem  ', ${e}`);
           }
         },
       );
@@ -106,7 +106,7 @@ program.command('progressRedeem <config> <messageHash>')
 
             await facilitator.progressRedeem(messageHash);
           } catch (e) {
-            console.log('error in progress redeem ', e);
+            logger.error(`error in progress redeem ${e}`);
           }
         },
       );

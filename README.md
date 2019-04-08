@@ -340,7 +340,7 @@ node ./src/bin/create_user.js <config.json> <eip20Token> <owners> <threshold> <s
  
  ## Continuous Redeem(with co-gateway and utility branded token):
  
- This command helps you to run redeem continuously till the totalRedeemAmount is redeemed. It expects `minRedeemAmount` and `maxRedeemAmount` which is used to defined a range in which random redeem amount is generated. 
+ This command helps you to run redeem continuously till the totalRedeemAmount is redeemed. It expects `minRedeemAmount` and `maxRedeemAmount` which is used to define a range in which random redeem amount is generated. 
  
  If `maxRedeemAmount` is passed as `0`, then this command will redeem `minRedeemAmount` till `totalRedeemAmount` is not redeemed. 
  
@@ -353,9 +353,9 @@ Prerequiste:
 node ./src/bin/facilitator continuousRedeem <config> <utilityTokenAddress> <totalRedeemAmount> <redeemer> <beneficiary> <gasPrice> <gasLimit> <minRedeemAmount> <maxRedeemAmount>
 
 ```
- * Replace `config` with the path to the configuration file.
- * Replace `utilityTokenAddress` with the address of utility branded token.
-  * Replace `totalRedeemAmount` with the number representing total redeem amount.
+* Replace `config` with the path to the configuration file.
+* Replace `utilityTokenAddress` with the address of utility branded token.
+* Replace `totalRedeemAmount` with the number representing total redeem amount.
 * Replace `redeemer` with the address of redeemer holding tokens.
 * Replace `beneficiary` with the address on origin chain where token will be unstaked.
 * Replace `gasPrice` with a number which is used to calculate facilitator reward.
