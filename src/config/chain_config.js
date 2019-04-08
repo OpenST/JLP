@@ -124,6 +124,26 @@ class ChainConfig {
       throw new Error(`Config not found for utilityToken ${utilityTokenAddress}`);
     }
 
+    return this.toMosaicFromUtilityTokenConfig(connection, utilityTokenConfig);
+  }
+
+  toMosaicFromEIP20Gateway(connection, eip20GatewayAddress) {
+    const utilityTokenConfig = this.utilityBrandedTokens.find(
+      ut => ut.originGatewayAddress === eip20GatewayAddress,
+    );
+
+    if (!utilityTokenConfig) {
+      throw new Error(`Config not found for EIP20Gateway address ${eip20GatewayAddress}`);
+    }
+
+    return this.toMosaicFromUtilityTokenConfig(connection, utilityTokenConfig);
+  }
+
+  toMosaicFromUtilityTokenConfig(connection, utilityTokenConfig) {
+    if (!utilityTokenConfig) {
+      throw new Error('Utility token config must be defined.');
+    }
+
     const originChain = new Mosaic.Chain(
       connection.originWeb3,
       {
@@ -139,7 +159,7 @@ class ChainConfig {
         Organization: utilityTokenConfig.organizationAddress,
         EIP20CoGateway: utilityTokenConfig.auxiliaryCoGatewayAddress,
         Anchor: this.auxiliaryAnchorAddress,
-        UtilityToken: utilityTokenAddress,
+        UtilityToken: utilityTokenConfig.address,
       },
     );
 

@@ -338,6 +338,32 @@ node ./src/bin/create_user.js <config.json> <eip20Token> <owners> <threshold> <s
 * Replace `sessionKeySpendingLimits` comma separated spending limits corresponding to session keys. 
 * Replace `sessionKeyExpirationHeights` comma separated expiration heights corresponding to session keys.  
  
+  
+ ## Continuous stake of brand token (without gateway composer):
+ 
+ This command helps you to run stake continuously till the `totalStakeAmount` is staked. It expects `minStakeAmount` and `maxStakeAmount` which is used to define a range in which random stake amount is generated. 
+ 
+ If `maxStakeAmount` is passed as `0`, then this command will stake `minStakeAmount` un till `totalStakeAmount` is staked. 
+ 
+Prerequiste:
+1. Setup of utility branded token.
+2. `originGatewayAddress` in your config file 
+
+```bash
+
+node ./src/bin/bt continuousStake <config> <originGatewayAddress> <totalStakeAmount> <staker> <beneficiary> <gasPrice> <gasLimit> <minStakeAmount> <maxStakeAmount>
+
+```
+* Replace `config` with the path to the configuration file.
+* Replace `originGatewayAddress` with the address of EIP20 gateway contract address.
+* Replace `totalStakeAmount` with the number representing total stake amount.
+* Replace `staker` with the address of staker holding tokens.
+* Replace `beneficiary` with the address on origin chain where token will be minted.
+* Replace `gasPrice` with a number which is used to calculate facilitator reward.
+* Replace `gasLimit` with a number which is used to calculate facilitator reward.
+* Replace `minStakeAmount` with a number which defines minimum stake amount.
+* Replace `maxStakeAmount` with a number which defines maximum stake amount.
+
  ## Continuous Redeem(with co-gateway and utility branded token):
  
  This command helps you to run redeem continuously till the totalRedeemAmount is redeemed. It expects `minRedeemAmount` and `maxRedeemAmount` which is used to define a range in which random redeem amount is generated. 

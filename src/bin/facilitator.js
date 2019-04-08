@@ -13,6 +13,7 @@ const connected = require('../connected');
 const Facilitator = require('../facilitator.js');
 const StateRootAnchorService = require('../state_root_anchor_service.js');
 const logger = require('../logger');
+const utils = require('../utils.js');
 
 const { version } = require('../../package.json');
 
@@ -160,7 +161,7 @@ program.command('continuousRedeem <config>'
             let currentBalance = new BN((await utilityToken.balanceOf(redeemer)));
 
             if (currentBalance.gt(totalRedeemAmount)) {
-              let amount = randomNumberBetweenRange(minRedeemAmount, maxRedeemAmount);
+              let amount = utils.randomNumberBetweenRange(minRedeemAmount, maxRedeemAmount);
               let amountRedeemed = amount;
               while (amountRedeemed.lten(totalRedeemAmount)) {
                 const { messageHash } = await facilitator.redeem(
