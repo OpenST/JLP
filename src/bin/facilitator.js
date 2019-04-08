@@ -132,19 +132,20 @@ program.command('continuousRedeem <config>'
         configPath,
         async (chainConfig, connection) => {
           try {
-            minRedeemAmount = parseInt(minRedeemAmount, 10);
-            maxRedeemAmount = parseInt(maxRedeemAmount, 10);
+            minRedeemAmount = new BN(minRedeemAmount);
+            maxRedeemAmount = new BN(maxRedeemAmount);
+            totalRedeemAmount = new BN(totalRedeemAmount);
 
             // To redeem same amount each time, maxRedeem amount is passed zero.
-            if (maxRedeemAmount === 0) {
+            if (maxRedeemAmount.isZero()) {
               maxRedeemAmount = minRedeemAmount;
             }
 
-            if (maxRedeemAmount > totalRedeemAmount) {
+            if (maxRedeemAmount.gt(totalRedeemAmount)) {
               maxRedeemAmount = totalRedeemAmount;
             }
 
-            if (minRedeemAmount > maxRedeemAmount) {
+            if (minRedeemAmount.gt(maxRedeemAmount)) {
               minRedeemAmount = maxRedeemAmount;
             }
             const utilityToken = new ContractInteract.EIP20Token(
@@ -158,7 +159,7 @@ program.command('continuousRedeem <config>'
             const facilitator = new Facilitator(chainConfig, connection, mosaic);
             let currentBalance = new BN((await utilityToken.balanceOf(redeemer)));
 
-            if (currentBalance.gt(new BN(totalRedeemAmount))) {
+            if (currentBalance.gt(totalRedeemAmount)) {
               let amount = randomNumberBetweenRange(minRedeemAmount, maxRedeemAmount);
               let amountRedeemed = amount;
               while (amountRedeemed.lten(totalRedeemAmount)) {
@@ -232,8 +233,16 @@ program.on(
 program.parse(process.argv);
 
 function randomNumberBetweenRange(maxRedeemAmount, minRedeemAmount) {
-  const range = maxRedeemAmount - minRedeemAmount;
-  return new BN(Math.floor(Math.random() * range) + minRedeemAmount);
+  // Generate a random number between maxRedeemAmount and minRedeemAmount.
+  // If range is greater than JS Max safe integer, range is set to
+  // MAX_SAFE_INTEGER.
+  const range = maxRedeemAmount.sub(minRedeemAmount).lten(Number.MAX_SAFE_INTEGER)
+    ? maxRedeemAmount.sub(minRedeemAmount).toNumber()
+    : Number.MAX_SAFE_INTEGER;
+
+  const randomNumber = new BN(Math.floor(Math.random() * range));
+
+  return minRedeemAmount.add(randomNumber);
 }
 
 async function anchorAuxiliaryStateRoot(connection, chainConfig) {
