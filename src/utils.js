@@ -3,17 +3,13 @@ const Web3 = require('web3');
 const { BN } = Web3.utils;
 
 class Utils {
-  randomNumberBetweenRange(maxRedeemAmount, minRedeemAmount) {
-
-    // BN's max safe integer is 67108863 i.e (2 ** 26) - 1;
-    const maxNumber = (2 ** 26) - 1;
-
+  randomNumberBetweenRange(minRedeemAmount, maxRedeemAmount) {
     // Generate a random number between maxRedeemAmount and minRedeemAmount.
     // If range is greater than JS Max safe integer, range is set to
     // MAX_SAFE_INTEGER.
-    const range = maxRedeemAmount.sub(minRedeemAmount).lten(maxNumber)
+    const range = maxRedeemAmount.sub(minRedeemAmount).lte(new BN(Number.MAX_SAFE_INTEGER))
       ? maxRedeemAmount.sub(minRedeemAmount).toNumber()
-      : maxNumber;
+      : Number.MAX_SAFE_INTEGER;
 
     const randomNumber = new BN(Math.floor(Math.random() * range));
 

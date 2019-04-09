@@ -175,7 +175,7 @@ program.command('continuousRedeem <config>'
                 await facilitator.progressRedeem(messageHash);
                 chainConfig.write(configPath);
                 currentBalance = currentBalance.sub(amount);
-                amount = randomNumberBetweenRange(minRedeemAmount, maxRedeemAmount);
+                amount = utils.randomNumberBetweenRange(minRedeemAmount, maxRedeemAmount);
                 amountRedeemed = amountRedeemed.add(amount);
               }
             }
@@ -232,19 +232,6 @@ program.on(
 );
 
 program.parse(process.argv);
-
-function randomNumberBetweenRange(minRedeemAmount, maxRedeemAmount) {
-  // Generate a random number between maxRedeemAmount and minRedeemAmount.
-  // If range is greater than JS Max safe integer, range is set to
-  // MAX_SAFE_INTEGER.
-  const range = maxRedeemAmount.sub(minRedeemAmount).lte(new BN(Number.MAX_SAFE_INTEGER))
-    ? maxRedeemAmount.sub(minRedeemAmount).toNumber()
-    : Number.MAX_SAFE_INTEGER;
-
-  const randomNumber = new BN(Math.floor(Math.random() * range));
-
-  return minRedeemAmount.add(randomNumber);
-}
 
 async function anchorAuxiliaryStateRoot(connection, chainConfig) {
   const targetTxOptions = {

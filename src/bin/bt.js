@@ -148,6 +148,10 @@ program.command('continuousStake <config> <originGatewayAddress> '
         maxAmount = minAmount;
       }
 
+      if (maxAmount.gt(totalAmount)) {
+        maxAmount = totalAmount;
+      }
+
       if (minAmount.gt(maxAmount)) {
         logger.error('`minStakeAmount` must be less than `maxStakeAmount`');
         return;
