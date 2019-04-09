@@ -104,40 +104,11 @@ class BTStakeMint {
   async acceptStakeWithGatewayComposer(stakeRequestHash) {
     let stakeRequest = this.chainConfig.stakeRequests[stakeRequestHash];
 
-    const { originGateway } = stakeRequest;
+    const { originGateway, staker } = stakeRequest;
 
-    const utilityBrandedTokenConfig = this.getUtilityBrandedTokenConfig(originGateway);
-    const eip20Gateway = new MosaicContractInteract.EIP20Gateway(this.origin.web3, originGateway);
-    const bounty = await eip20Gateway.getBounty();
+    await this.registerInternalActor(originGateway, stakeRequest.beneficiary);
 
-    const ubtContractInstance = new ContractInteract.UtilityBrandedToken(
-      this.auxiliary.web3,
-      utilityBrandedTokenConfig.address,
-    );
-
-    const registerInternalActorTxOptions = {
-      from: this.auxiliary.masterKey,
-      gasPrice: this.auxiliary.txOptions.gasPrice,
-    };
-
-    const isAlreadyRegistered = await ubtContractInstance.contract.methods.isInternalActor(
-      stakeRequest.beneficiary,
-    ).call();
-
-    if (isAlreadyRegistered) {
-      logger.info(`Beneficiary address ${stakeRequest.beneficiary} already registered as Internal actor`);
-    } else {
-      await ubtContractInstance.registerInternalActors(
-        [stakeRequest.beneficiary],
-        registerInternalActorTxOptions,
-      );
-      logger.info(`${stakeRequest.beneficiary} address registered as Internal actor`);
-    }
-    const staker = this.chainConfig.gatewayComposerAddress;
-    const brandedToken = new ContractInteract.BrandedToken(
-      this.origin.web3,
-      this.chainConfig.brandedToken.address,
-    );
+    const signature = await this.getAcceptStakeSignature(stakeRequest);
 
     logger.info('acceptStake started');
 
@@ -154,19 +125,9 @@ class BTStakeMint {
       ...stakeRequest,
     };
 
-    const btNonce = await brandedToken.contract.methods.nonce().call();
+    const eip20Gateway = new MosaicContractInteract.EIP20Gateway(this.origin.web3, originGateway);
+    const bounty = await eip20Gateway.getBounty();
 
-    const stakeRequestTypedData = new Helpers.StakeHelper().getStakeRequestTypedData(
-      stakeRequest.stakeVT,
-      parseInt((btNonce) - 1, 10),
-      staker,
-      this.chainConfig.brandedToken.address,
-    );
-    const workerAccountInstance = this.origin.web3.eth.accounts.privateKeyToAccount(
-      this.chainConfig.workerPrivateKey,
-    );
-
-    const signature = workerAccountInstance.signEIP712TypedData(stakeRequestTypedData);
     await facilitator.acceptStakeRequest(
       stakeRequest.stakeRequestHash,
       signature,
@@ -194,6 +155,7 @@ class BTStakeMint {
     // FixMe In mosaic.js facilitator.stake should return messageHash. https://github.com/openst/mosaic.js/issues/136
     const messageHash = activeProcess.messageHash_;
 
+    const utilityBrandedTokenConfig = this.getUtilityBrandedTokenConfig(originGateway);
     const gatewayStakeRequest = {
       messageHash,
       nonce: currentNonce.toString(),
@@ -217,7 +179,7 @@ class BTStakeMint {
     delete stakeRequests[stakeRequestHash];
 
     logger.info('Stake successful');
-    logger.info(`Please use faciliator agent to progressStake and use this message hash : ${messageHash}`);
+    logger.info(`Please use facilitator agent to progressStake and use this message hash : ${messageHash}`);
     return messageHash;
   }
 
@@ -271,12 +233,8 @@ class BTStakeMint {
     return stakeRequestHash;
   }
 
-  async acceptStake(stakeRequestHash) {
-    const stakeRequest = this.chainConfig.stakeRequests[stakeRequestHash];
-
-    const { originGateway } = stakeRequest;
-
-    const utilityBrandedTokenConfig = this.getUtilityBrandedTokenConfig(originGateway);
+  async registerInternalActor(originGatewayAddress, internalActorAddress) {
+    const utilityBrandedTokenConfig = this.getUtilityBrandedTokenConfig(originGatewayAddress);
 
     const ubtContractInstance = new ContractInteract.UtilityBrandedToken(
       this.auxiliary.web3,
@@ -289,32 +247,32 @@ class BTStakeMint {
     };
 
     const isAlreadyRegistered = await ubtContractInstance.contract.methods.isInternalActor(
-      stakeRequest.beneficiary,
+      internalActorAddress,
     ).call();
 
     if (isAlreadyRegistered) {
-      logger.info(`Beneficiary address ${stakeRequest.beneficiary} already registered as Internal actor`);
+      logger.info(`Beneficiary address ${internalActorAddress} already registered as Internal actor`);
     } else {
       await ubtContractInstance.registerInternalActors(
-        [stakeRequest.beneficiary],
+        [internalActorAddress],
         registerInternalActorTxOptions,
       );
-      logger.info(`${stakeRequest.beneficiary} address registered as Internal actor`);
+      logger.info(`${internalActorAddress} address registered as Internal actor`);
     }
-    const { staker } = stakeRequest;
+  }
+
+  async getAcceptStakeSignature(stakeRequest) {
     const brandedToken = new ContractInteract.BrandedToken(
       this.origin.web3,
       this.chainConfig.brandedToken.address,
     );
-
-    logger.info('acceptStake started');
 
     const btNonce = await brandedToken.contract.methods.nonce().call();
 
     const stakeRequestTypedData = new Helpers.StakeHelper().getStakeRequestTypedData(
       stakeRequest.stakeVT,
       parseInt((btNonce) - 1, 10),
-      staker,
+      stakeRequest.staker,
       this.chainConfig.brandedToken.address,
     );
     const workerAccountInstance = this.origin.web3.eth.accounts.privateKeyToAccount(
@@ -322,6 +280,24 @@ class BTStakeMint {
     );
 
     const signature = workerAccountInstance.signEIP712TypedData(stakeRequestTypedData);
+    return signature;
+  }
+
+  async acceptStake(stakeRequestHash) {
+    const stakeRequest = this.chainConfig.stakeRequests[stakeRequestHash];
+
+    const { originGateway, staker } = stakeRequest;
+
+    await this.registerInternalActor(originGateway, stakeRequest.beneficiary);
+
+    const signature = await this.getAcceptStakeSignature(stakeRequest);
+
+    logger.info('acceptStake started');
+
+    const brandedToken = new ContractInteract.BrandedToken(
+      this.origin.web3,
+      this.chainConfig.brandedToken.address,
+    );
 
     await brandedToken.acceptStakeRequest(
       stakeRequest.stakeRequestHash,
@@ -335,6 +311,7 @@ class BTStakeMint {
 
     delete stakeRequests[stakeRequestHash];
 
+    const utilityBrandedTokenConfig = this.getUtilityBrandedTokenConfig(originGateway);
     const stakeInfo = {
       staker,
       beneficiary: stakeRequest.beneficiary,
