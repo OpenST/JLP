@@ -2,6 +2,8 @@
 
 const assert = require('assert');
 
+const utils = require('../../../../utils');
+
 const UserWallet = require('./user_wallet');
 
 /**
@@ -35,6 +37,7 @@ class RecoveryController {
 
   /**
    * Initiates a recovery process.
+   * Retrieves the previous owner by traversing owners list of gnosis safe.
    *
    * @param {string} oldOwnerAddress An old owner address to recover from.
    * @param {string} newOwnerAddress New owner address to recover to.
@@ -54,17 +57,18 @@ class RecoveryController {
       oldOwnerAddress,
     );
 
-    await this.userWallet.delayedRecoveryModule.initiateRecovery(
+    const txReceipt = await this.userWallet.delayedRecoveryModule.initiateRecovery(
       prevOwnerAddress, oldOwnerAddress, newOwnerAddress,
       signature.r, signature.s, signature.v,
       { from: this.recoveryControllerAddress },
     );
 
-    return this.userWallet.delayedRecoveryModule.auxiliaryWeb3.eth.getBlockNumber();
+    return txReceipt.blockNumber;
   }
 
   /**
    * Executes a recovery process.
+   * Retrieves the previous owner by traversing owners list of gnosis safe.
    *
    * @param {string} oldOwnerAddress An old owner address to recover from.
    * @param {string} newOwnerAddress New owner address to recover to.
@@ -78,6 +82,13 @@ class RecoveryController {
     const prevOwnerAddress = await this.userWallet.retrievePreviousOwner(
       oldOwnerAddress,
     );
+
+    const { web3 } = this.userWallet.openst.auxiliary;
+
+    const recoveryModule = this.userWallet.delayedRecoveryModule;
+    const { executionBlockHeight } = await recoveryModule.activeRecoveryInfo();
+
+    await utils.waitBlockNumber(web3, executionBlockHeight);
 
     await this.userWallet.delayedRecoveryModule.executeRecovery(
       prevOwnerAddress, oldOwnerAddress, newOwnerAddress,

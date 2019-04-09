@@ -3,7 +3,6 @@
 const { ContractInteract, Helpers } = require('@openst/openst.js');
 
 const UserWallet = require('./user_wallet');
-// const OpenST = require('../../../../../src/openst');
 
 /** Factory class for creating user wallets. */
 class UserWalletFactory {
@@ -54,24 +53,20 @@ class UserWalletFactory {
     delayedRecoveryModuleArgs,
     tokenHolderArgs,
   ) {
-    // @todo Assert that gnosisSafeOwnerKey.address is in gnosisSafeArgs.owners list.
-
-    // Retrieving the economy token's address from token rules.
-    // const tokenRulesContract = new this.web3.eth.Contract(
-    //   AbiBinProvider.getABI('TokenRules'),
-    //   this.chainConfig.openst.tokenRules,
-    // );
-    // const economyTokenAddress = await tokenRulesContract.methods.call.token(
-    //   this.openst.auxiliary.txOptions,
-    // );
-    const economyTokenAddress = '0x0000000000000000000000000000000000000001';
+    // Retrieving the utility token's address from token rules.
+    const tokenRulesContractInteract = new ContractInteract.TokenRules(
+      this.connection.auxiliaryWeb3,
+      this.chainConfig.openst.tokenRules,
+    );
+    const utilityTokenAddress = await tokenRulesContractInteract.contract.methods.token(
+    ).call(this.openst.auxiliary.txOptions);
 
     const userHelper = new Helpers.User(
       this.chainConfig.openst.tokenHolderMasterCopy,
       this.chainConfig.openst.gnosisSafeMasterCopy,
       this.chainConfig.openst.recoveryMasterCopy,
       this.chainConfig.openst.createAndAddModules,
-      economyTokenAddress,
+      utilityTokenAddress,
       this.chainConfig.openst.tokenRules,
       this.chainConfig.openst.userWalletFactory,
       this.chainConfig.openst.proxyFactory,

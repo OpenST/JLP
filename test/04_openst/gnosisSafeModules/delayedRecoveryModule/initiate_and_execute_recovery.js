@@ -10,27 +10,12 @@ const UserWalletOwner = require('./helpers/user_wallet_owner');
 const RecoveryOwner = require('./helpers/recovery_owner');
 const RecoveryController = require('./helpers/recovery_controller');
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-async function waitBlockNumber(web3, blockNumber) {
-  let currentBlockNumber = await web3.eth.getBlockNumber();
-
-  while (currentBlockNumber < blockNumber) {
-    // eslint-disable-next-line no-await-in-loop
-    await sleep(200);
-    // eslint-disable-next-line no-await-in-loop
-    currentBlockNumber = await web3.eth.getBlockNumber();
-  }
-}
 
 describe('Recover an access', async () => {
   let chainConfig = {};
   let connection = {};
   let openst = {};
 
-  // @todo Who/where should deploy organization and economy token contracts.
   const mockAddresses = {
     organization: '0x0000000000000000000000000000000000000001',
     utilityToken: '0x0000000000000000000000000000000000000001',
@@ -121,8 +106,6 @@ describe('Recover an access', async () => {
 
   let newOwnerKey = '';
 
-  let recoveryInitiationBlockNumber = -1;
-
   it('Initiate a recovery process to replace the lost device.', async () => {
     const web3 = connection.auxiliaryWeb3;
 
@@ -133,22 +116,16 @@ describe('Recover an access', async () => {
       newOwnerKey.address,
     );
 
-    recoveryInitiationBlockNumber = await recoveryController.initiateRecovery(
+    await recoveryController.initiateRecovery(
       userWalletOwner.ownerKey.address,
       newOwnerKey.address,
       signature,
     );
-
-    console.log('recoveryInitiationBlockNumber = ', recoveryInitiationBlockNumber);
   });
 
   let userWalletNewOwner = {};
 
   it('Execute recovery process to replace the lost device.', async () => {
-    const web3 = connection.auxiliaryWeb3;
-
-    await waitBlockNumber(web3, recoveryInitiationBlockNumber + recoveryBlockDelay);
-
     await recoveryController.executeRecovery(
       userWalletOwner.ownerKey.address,
       newOwnerKey.address,
