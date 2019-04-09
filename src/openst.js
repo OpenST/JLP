@@ -1,8 +1,7 @@
 const Package = require('@openst/openst.js');
-
 const logger = require('./logger');
 
-const { TokenRules, TokenHolder } = Package.ContractInteract;
+const { PricerRule, TokenRules, TokenHolder } = Package.ContractInteract;
 
 
 class OpenST {
@@ -32,6 +31,7 @@ class OpenST {
 
   async setupOpenst(auxiliaryOrganization, auxiliaryEIP20Token) {
     logger.info('Starting Setup of OpenST');
+    const { index } = this.getUtilityBrandedTokenConfig(auxiliaryEIP20Token);
     const tokenHolderTxOptions = this.auxiliary.txOptions;
     const gnosisTxOptions = this.auxiliary.txOptions;
     const recoveryTxOptions = this.auxiliary.txOptions;
@@ -70,7 +70,12 @@ class OpenST {
       createAndAddModules: createAndAddModules.address,
       tokenRules: tokenRulesAddress,
     };
+
+    // Fixme https://github.com/OpenST/JLP/issues/92
     Object.assign(this.chainConfig.openst, setupData);
+
+    this.chainConfig.utilityBrandedTokens[index].openst = setupData;
+
     logger.info('Completed Setup of OpenST');
   }
 
@@ -122,6 +127,9 @@ class OpenST {
       gnosisSafeProxy,
       tokenHolderProxy,
       recoveryProxy,
+      recoveryOwnerAddress: this.chainConfig.openst.recoveryOwnerAddress,
+      recoveryControllerAddress: this.chainConfig.openst.recoveryControllerAddress,
+      recoveryBlockDelay: this.chainConfig.openst.recoveryBlockDelay,
     };
     this.chainConfig.users.push(user);
     return { tokenHolderProxy, gnosisSafeProxy, recoveryProxy };
@@ -161,6 +169,50 @@ class OpenST {
       vrs.v,
       this.auxiliary.txOptions,
     );
+  }
+
+  getUtilityBrandedTokenConfig(auxiliaryEIP20Token) {
+    for (let i = 0; i < this.chainConfig.utilityBrandedTokens.length; i += 1) {
+      const ut = this.chainConfig.utilityBrandedTokens[i];
+      if (ut.address === auxiliaryEIP20Token) {
+        return { ubt: ut, index: i };
+      }
+    }
+    return { ubt: undefined, index: -1 };
+  }
+
+  async deployPricerRule(
+    auxiliaryEIP20Token,
+    baseCurrencyCode,
+    conversionRate,
+    conversionRateDecimals,
+    requiredPriceOracleDecimals,
+  ) {
+    logger.info('Deployment of PricerRule');
+    const ubtConfig = this.getUtilityBrandedTokenConfig(auxiliaryEIP20Token);
+
+    const pricerRule = await PricerRule.deploy(
+      this.auxiliary.web3,
+      ubtConfig.ubt.organizationAddress,
+      ubtConfig.ubt.address,
+      ubtConfig.ubt.openst.tokenRules,
+      baseCurrencyCode,
+      conversionRate,
+      conversionRateDecimals,
+      requiredPriceOracleDecimals,
+      this.auxiliary.txOptions,
+    );
+
+    const pricerRuleData = {
+      [baseCurrencyCode]: {
+        address: pricerRule.address,
+      },
+    };
+
+    this.chainConfig.utilityBrandedTokens[ubtConfig.index].pricerRules = pricerRuleData;
+    logger.info('PricerRule deployed');
+
+    return { pricerRuleData };
   }
 }
 

@@ -52,7 +52,7 @@ describe('BT stake and mint', async () => {
     await chainConfig.update({
       openst: {
         ...chainConfig.openst,
-        recoveryOwnerAddress: connection.auxiliaryAccount.address,
+        recoveryOwnerAddress: chainConfig.recoveryOwnerAddress,
         recoveryControllerAddress: connection.auxiliaryAccount.address,
         recoveryBlockDelay: '100000000000',
       },

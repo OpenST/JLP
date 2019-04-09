@@ -52,8 +52,8 @@ before(async () => {
   const originAccountAddress = await originWeb3.eth.personal.newAccount(password);
   const auxiliaryAccountAddress = await auxiliaryWeb3.eth.personal.newAccount(password);
 
-  await originWeb3.eth.personal.unlockAccount(originAccountAddress, password, 600);
-  await auxiliaryWeb3.eth.personal.unlockAccount(auxiliaryAccountAddress, password, 600);
+  await originWeb3.eth.personal.unlockAccount(originAccountAddress, password, 0);
+  await auxiliaryWeb3.eth.personal.unlockAccount(auxiliaryAccountAddress, password, 0);
 
   await originWeb3.eth.sendTransaction({
     from: originPrefundedAccounts[0],
