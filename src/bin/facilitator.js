@@ -233,11 +233,11 @@ program.on(
 
 program.parse(process.argv);
 
-function randomNumberBetweenRange(maxRedeemAmount, minRedeemAmount) {
+function randomNumberBetweenRange(minRedeemAmount, maxRedeemAmount) {
   // Generate a random number between maxRedeemAmount and minRedeemAmount.
   // If range is greater than JS Max safe integer, range is set to
   // MAX_SAFE_INTEGER.
-  const range = maxRedeemAmount.sub(minRedeemAmount).lten(Number.MAX_SAFE_INTEGER)
+  const range = maxRedeemAmount.sub(minRedeemAmount).lte(new BN(Number.MAX_SAFE_INTEGER))
     ? maxRedeemAmount.sub(minRedeemAmount).toNumber()
     : Number.MAX_SAFE_INTEGER;
 
