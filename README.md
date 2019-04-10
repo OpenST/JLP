@@ -375,6 +375,57 @@ node ./src/bin/direct_transfer.js <config.json> <sessionKey> <sender> <beneficia
 * Replace `beneficiaries` with comma separated beneficiaries. 
 * Replace `amounts` with comma separated amounts respective to beneficiary. 
  
+  
+ ## Continuous stake of brand token (without gateway composer):
+ 
+ This command helps you to run stake continuously till the `totalStakeAmount` is staked. It expects `minStakeAmount` and `maxStakeAmount` which is used to define a range in which random stake amount is generated. 
+ 
+ If `maxStakeAmount` is passed as `0`, then this command will stake `minStakeAmount` un till `totalStakeAmount` is staked. 
+ 
+Prerequiste:
+1. Setup of utility branded token.
+2. `originGatewayAddress` in your config file 
+
+```bash
+
+node ./src/bin/bt continuousStake <config> <originGatewayAddress> <totalStakeAmount> <staker> <beneficiary> <gasPrice> <gasLimit> <minStakeAmount> <maxStakeAmount>
+
+```
+* Replace `config` with the path to the configuration file.
+* Replace `originGatewayAddress` with the address of EIP20 gateway contract address.
+* Replace `totalStakeAmount` with the number representing total stake amount.
+* Replace `staker` with the address of staker holding tokens.
+* Replace `beneficiary` with the address on origin chain where token will be minted.
+* Replace `gasPrice` with a number which is used to calculate facilitator reward.
+* Replace `gasLimit` with a number which is used to calculate facilitator reward.
+* Replace `minStakeAmount` with a number which defines minimum stake amount.
+* Replace `maxStakeAmount` with a number which defines maximum stake amount.
+
+ ## Continuous Redeem(with co-gateway and utility branded token):
+ 
+ This command helps you to run redeem continuously till the totalRedeemAmount is redeemed. It expects `minRedeemAmount` and `maxRedeemAmount` which is used to define a range in which random redeem amount is generated. 
+ 
+ If `maxRedeemAmount` is passed as `0`, then this command will redeem `minRedeemAmount` till `totalRedeemAmount` is not redeemed. 
+ 
+Prerequiste:
+1. Setup of utility branded token.
+2. Redeem should have tokens to redeem. 
+
+```bash
+
+node ./src/bin/facilitator continuousRedeem <config> <utilityTokenAddress> <totalRedeemAmount> <redeemer> <beneficiary> <gasPrice> <gasLimit> <minRedeemAmount> <maxRedeemAmount>
+
+```
+* Replace `config` with the path to the configuration file.
+* Replace `utilityTokenAddress` with the address of utility branded token.
+* Replace `totalRedeemAmount` with the number representing total redeem amount.
+* Replace `redeemer` with the address of redeemer holding tokens.
+* Replace `beneficiary` with the address on origin chain where token will be unstaked.
+* Replace `gasPrice` with a number which is used to calculate facilitator reward.
+* Replace `gasLimit` with a number which is used to calculate facilitator reward.
+* Replace `minRedeemAmount` with a number which defines minimum redeem amount.
+* Replace `maxRedeemAmount` with a number which defines maximum redeem amount.
+  
 ## Tests
 
 To run the tests run `npm run test`.

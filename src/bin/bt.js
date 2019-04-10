@@ -3,11 +3,20 @@
 'use strict';
 
 const program = require('commander');
+const Web3 = require('web3');
+const Mosaic = require('@openst/mosaic.js');
 
+const { ContractInteract } = Mosaic;
+const { BN } = Web3.utils;
 const connected = require('../connected');
 const BTDeployer = require('../bt_deployer');
 const BTStakeMint = require('../bt_stake_mint');
 const { version } = require('../../package.json');
+const Facilitator = require('../facilitator');
+const logger = require('../logger');
+const StateRootAnchorService = require('../../src/state_root_anchor_service');
+const utils = require('../utils.js');
+
 
 program
   .version(version)
@@ -76,7 +85,7 @@ program.command('requestStake <config> <originGatewayAddress> <stakeVT> <benefic
         async (chainConfig, connection) => {
           try {
             const btStakeMint = new BTStakeMint(chainConfig, connection);
-            await btStakeMint.requestStake(
+            await btStakeMint.requestStakeWithGatewayComposer(
               originGatewayAddress,
               stakeVT,
               beneficiary,
@@ -98,10 +107,184 @@ program.command('acceptStake <config> <stakeRequestHash> ')
         async (chainConfig, connection) => {
           try {
             const btStakeMint = new BTStakeMint(chainConfig, connection);
-            await btStakeMint.acceptStake(stakeRequestHash);
+            await btStakeMint.acceptStakeWithGatewayComposer(stakeRequestHash);
             chainConfig.write(config);
           } catch (e) {
             console.error(e);
+          }
+        });
+    },
+  );
+
+program.command('continuousStake <config> <originGatewayAddress> '
+  + '<totalStakeAmount> <staker> <beneficiary> <gasPrice> <gasLimit> '
+  + '<minStakeAmount> <maxStakeAmount>')
+  .action(
+    async (
+      config,
+      originGatewayAddress,
+      totalStakeAmount,
+      staker,
+      beneficiary,
+      gasPrice,
+      gasLimit,
+      minStakeAmount,
+      maxStakeAmount,
+    ) => {
+      const totalAmount = new BN(totalStakeAmount);
+      if (totalAmount.eqn(0)) {
+        logger.error('`totalStakeAmount` must not be zero');
+        return;
+      }
+
+      const minAmount = new BN(minStakeAmount);
+      if (minAmount.isZero()) {
+        logger.error('`minStakeAmount` must not be zero');
+        return;
+      }
+
+      let maxAmount = new BN(maxStakeAmount);
+      if (maxAmount.isZero()) {
+        maxAmount = minAmount;
+      }
+
+      if (maxAmount.gt(totalAmount)) {
+        maxAmount = totalAmount;
+      }
+
+      if (minAmount.gt(maxAmount)) {
+        logger.error('`minStakeAmount` must be less than `maxStakeAmount`');
+        return;
+      }
+
+      await connected.run(config,
+        async (chainConfig, connection) => {
+          try {
+            const btStakeMint = new BTStakeMint(chainConfig, connection);
+
+            const gateway = new ContractInteract.EIP20Gateway(
+              connection.originWeb3,
+              originGatewayAddress,
+            );
+
+            const bountyAmount = new BN(await gateway.getBounty());
+            const baseTokenAddress = await gateway.getBaseToken();
+            const valueTokenAddress = await gateway.getValueToken();
+
+            const eip20Token = new ContractInteract.EIP20Token(
+              connection.originWeb3,
+              chainConfig.eip20TokenAddress,
+            );
+
+            const eip20BaseToken = new ContractInteract.EIP20Token(
+              connection.originWeb3,
+              baseTokenAddress,
+            );
+
+            let stakedAmount = new BN(0);
+
+            do {
+              let stakeVT = utils.randomNumberBetweenRange(minAmount, maxAmount);
+
+              const eip20TokenBalance = new BN(await eip20Token.balanceOf(staker));
+              logger.info(`EIP20 Token balance: ${eip20TokenBalance.toString(10)}`);
+
+              if (eip20TokenBalance.lt(stakeVT)) {
+                stakeVT = eip20TokenBalance;
+              }
+
+              if (totalAmount.lt(stakedAmount.add(stakeVT))) {
+                stakeVT = totalAmount.sub(stakedAmount);
+              }
+
+              if (eip20TokenBalance.eqn(0)) {
+                logger.info('EIP20 Token balance is zero');
+                break;
+              }
+
+              if (totalAmount.lte(stakedAmount)) {
+                logger.info(`Stake & Mint complete, staked ${totalAmount} tokens.`);
+                break;
+              }
+
+              logger.info(`Staking: ${stakeVT.toString(10)}`);
+
+              await eip20Token.approve(
+                valueTokenAddress,
+                stakeVT.toString(10),
+                { from: staker },
+              );
+
+              const stakeRequestHash = await btStakeMint.requestStake(
+                originGatewayAddress,
+                stakeVT.toString(10),
+                staker,
+                beneficiary,
+                gasPrice.toString(10),
+                gasLimit.toString(10),
+              );
+
+              chainConfig.write(config);
+
+              await btStakeMint.acceptStake(stakeRequestHash);
+              chainConfig.write(config);
+
+              const baseTokenBalance = new BN(await eip20BaseToken.balanceOf(staker));
+
+              if (baseTokenBalance.lt(bountyAmount)) {
+                logger.info(`Base token balance ${baseTokenBalance.toString(10)} is less than the required bounty amount ${bountyAmount.toString(10)}`);
+                break;
+              }
+
+              await gateway.approveStakeAmount(stakeVT.toString(10), { from: staker });
+              await gateway.approveBountyAmount({ from: staker });
+
+              const mosaic = chainConfig.toMosaicFromEIP20Gateway(
+                connection,
+                originGatewayAddress,
+              );
+
+              const facilitator = new Facilitator(
+                chainConfig,
+                connection,
+                mosaic,
+              );
+
+              const { messageHash } = await facilitator.stake(
+                staker,
+                stakeVT.toString(10),
+                beneficiary,
+              );
+
+              chainConfig.write(config);
+
+              const targetTxOptions = {
+                from: connection.auxiliaryAccount.address,
+                gasPrice: chainConfig.auxiliaryGasPrice,
+              };
+
+              const timeout = 1000;
+              const delay = 5;
+              const stateRootAnchorService = new StateRootAnchorService(
+                Number.parseInt(delay, 10),
+                connection.originWeb3,
+                connection.auxiliaryWeb3,
+                chainConfig.auxiliaryAnchorAddress,
+                targetTxOptions,
+                timeout,
+              );
+
+              const anchorInfo = await stateRootAnchorService.getSourceInfo('latest');
+              await stateRootAnchorService.anchor(anchorInfo, targetTxOptions);
+
+              await facilitator.progressStake(messageHash);
+              chainConfig.write(config);
+
+              stakedAmount = stakedAmount.add(stakeVT);
+            }
+            while (true);
+          } catch (e) {
+            logger.error(e);
           }
         });
     },
@@ -136,6 +319,17 @@ program.on(
     console.log('  config            Path to a config file');
     console.log('  stakeRequestHash  Hash received from requestStake process');
     console.log('');
+    console.log('continuousStake Arguments:');
+    console.log('  config                Path to a config file');
+    console.log('  originGatewayAddress  Origin chain gateway address');
+    console.log('  totalStakeAmount      Total tokens to be staked');
+    console.log('  staker                Staker address');
+    console.log('  beneficiary           Beneficiary address which will receive minted tokens');
+    console.log('  gasPrice              Gas price for the request');
+    console.log('  gasLimit              Gas limit for the request');
+    console.log('  minStakeAmount        Minimum stake amount');
+    console.log('  maxStakeAmount        Maximum stake amount');
+    console.log('');
     console.log('Examples:');
     console.log('  Setup JLP branded token with a total supply of 10 mio.:');
     console.log('  $ bt.js setupBrandedToken config.json JLP "Jean-Luc'
@@ -147,10 +341,15 @@ program.on(
     console.log('');
     console.log('  Deploy gateway composer');
     console.log('  $ bt.js setupUtilityBrandedToken config.json');
+    console.log('');
     console.log('  Request stake');
     console.log('  $ bt.js requestStake config.json 0x542478e47a576Dd359178Dc760E51A2b50da4761 10000 0x595dd34b760b0462bb2043cbe98ded01234d9f85 0 0');
+    console.log('');
     console.log('  Accept stake');
     console.log('  $ bt.js acceptStake config.json 0x8c8a68c8dc43c9378e5bb7d997d3e7bd425921c536706be14db4347f0815ddfc');
+    console.log('');
+    console.log('  Continuous stake');
+    console.log('  $ bt.js continuousStake config.json 0x8c8a68c8dc43c9378e5bb7d997d3e7bd425921c536706be14db4347f0815ddfc 1000 0x542478e47a576Dd359178Dc760E51A2b50da4761 0x595dd34b760b0462bb2043cbe98ded01234d9f85 0 0 10 50');
   },
 );
 

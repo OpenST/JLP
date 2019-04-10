@@ -99,7 +99,7 @@ describe('BT stake and mint', async () => {
     // result in test failure. Hence no need of explicit assertion.
     // Also request stake performs two transactions, approval of stake
     // amount and request stake on gateway composer.
-    stakeRequestHash = await btStakeAndMint.requestStake(
+    stakeRequestHash = await btStakeAndMint.requestStakeWithGatewayComposer(
       originGatewayAddress,
       stakeVT.toString(10),
       beneficiary,
@@ -111,7 +111,7 @@ describe('BT stake and mint', async () => {
   it('Accept Stake Request', async () => {
     // Below line will throw an exception if anything fails, which will
     // result in test failure. Hence no need of explicit assertion.
-    messageHash = await btStakeAndMint.acceptStake(stakeRequestHash);
+    messageHash = await btStakeAndMint.acceptStakeWithGatewayComposer(stakeRequestHash);
   });
 
   it('Anchor StateRoot', async () => {
