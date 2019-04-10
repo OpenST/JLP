@@ -12,28 +12,21 @@ const RecoveryController = require('./helpers/recovery_controller');
 
 
 describe('Recover an access', async () => {
-  let chainConfig = {};
-  let connection = {};
   let openst = {};
 
-  const mockAddresses = {
-    organization: '0x0000000000000000000000000000000000000001',
-    utilityToken: '0x0000000000000000000000000000000000000001',
-  };
+  it('Initialize chain config and shared.connection objects.', async () => {
+    const utilityBrandedTokenConfigs = shared.chainConfig.utilityBrandedTokens;
+    const utilityBrandedTokenConfig = utilityBrandedTokenConfigs[
+      utilityBrandedTokenConfigs.length - 1
+    ];
+    const { organizationAddress, address } = utilityBrandedTokenConfig;
 
-  it('Initialize chain config and connection objects.', async () => {
-    chainConfig = shared.chainConfig;
-    connection = shared.connection;
-
-    assert.notEqual(chainConfig, undefined);
-    assert.notEqual(connection, undefined);
-
-    openst = new OpenST(chainConfig, connection);
-
-    await openst.setupOpenst(
-      mockAddresses.organization,
-      mockAddresses.utilityToken,
+    openst = new OpenST(
+      shared.chainConfig,
+      shared.connection,
     );
+
+    await openst.setupOpenst(organizationAddress, address);
   });
 
   let userWallet = {};
@@ -46,9 +39,9 @@ describe('Recover an access', async () => {
   let recoveryOwner = {};
 
   it('Setup a user wallet with one owner/device.', async () => {
-    const web3 = connection.auxiliaryWeb3;
+    const { web3 } = openst.auxiliary;
 
-    recoveryControllerAddress = connection.auxiliaryAccount.address;
+    recoveryControllerAddress = openst.auxiliary.deployer;
 
     const ownerKey = await web3.eth.accounts.create();
     const recoveryOwnerKey = await web3.eth.accounts.create();
@@ -56,7 +49,7 @@ describe('Recover an access', async () => {
     await web3.eth.accounts.create();
 
     const userWalletFactory = new UserWalletFactory(
-      chainConfig, connection, openst,
+      openst,
     );
 
     userWallet = await userWalletFactory.create(
@@ -84,7 +77,7 @@ describe('Recover an access', async () => {
   });
 
   it('Authorize a session.', async () => {
-    const web3 = connection.auxiliaryWeb3;
+    const { web3 } = openst.auxiliary;
 
     const sessionKey = await web3.eth.accounts.create();
     const sessionKeySpendingLimit = 10;
@@ -107,7 +100,7 @@ describe('Recover an access', async () => {
   let newOwnerKey = '';
 
   it('Initiate a recovery process to replace the lost device.', async () => {
-    const web3 = connection.auxiliaryWeb3;
+    const { web3 } = openst.auxiliary;
 
     newOwnerKey = await web3.eth.accounts.create();
 
@@ -141,7 +134,7 @@ describe('Recover an access', async () => {
   });
 
   it('Register a new session key.', async () => {
-    const web3 = connection.auxiliaryWeb3;
+    const { web3 } = openst.auxiliary;
 
     const sessionKey = await web3.eth.accounts.create();
     const sessionKeySpendingLimit = 10;

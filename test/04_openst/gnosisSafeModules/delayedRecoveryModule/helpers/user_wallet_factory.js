@@ -9,21 +9,14 @@ class UserWalletFactory {
   /**
    * Creates an instance of UserWalletFactory on the auxiliary chain.
    *
-   * @param {Object} chainConfig Shared chain configuration object of JLP.
-   * @param {Object} connection  Shared connection object of JLP.
+   * @param {Object} openst
    *
    * @memberof UserWalletFactory
    */
   constructor(
-    chainConfig,
-    connection,
     openst,
   ) {
-    this.chainConfig = chainConfig;
-    this.connection = connection;
     this.openst = openst;
-
-    this.web3 = this.connection.auxiliaryWeb3;
   }
 
   /**
@@ -55,22 +48,22 @@ class UserWalletFactory {
   ) {
     // Retrieving the utility token's address from token rules.
     const tokenRulesContractInteract = new ContractInteract.TokenRules(
-      this.connection.auxiliaryWeb3,
-      this.chainConfig.openst.tokenRules,
+      this.openst.auxiliary.web3,
+      this.openst.chainConfig.openst.tokenRules,
     );
     const utilityTokenAddress = await tokenRulesContractInteract.contract.methods.token(
     ).call(this.openst.auxiliary.txOptions);
 
     const userHelper = new Helpers.User(
-      this.chainConfig.openst.tokenHolderMasterCopy,
-      this.chainConfig.openst.gnosisSafeMasterCopy,
-      this.chainConfig.openst.recoveryMasterCopy,
-      this.chainConfig.openst.createAndAddModules,
+      this.openst.chainConfig.openst.tokenHolderMasterCopy,
+      this.openst.chainConfig.openst.gnosisSafeMasterCopy,
+      this.openst.chainConfig.openst.recoveryMasterCopy,
+      this.openst.chainConfig.openst.createAndAddModules,
       utilityTokenAddress,
-      this.chainConfig.openst.tokenRules,
-      this.chainConfig.openst.userWalletFactory,
-      this.chainConfig.openst.proxyFactory,
-      this.web3,
+      this.openst.chainConfig.openst.tokenRules,
+      this.openst.chainConfig.openst.userWalletFactory,
+      this.openst.chainConfig.openst.proxyFactory,
+      this.openst.auxiliary.web3,
     );
 
     const response = await userHelper.createUserWallet(
@@ -89,18 +82,18 @@ class UserWalletFactory {
 
     const gnosisSafeProxy = returnValues._gnosisSafeProxy;
     const gnosisSafeContractInteract = new ContractInteract.GnosisSafe(
-      this.web3, gnosisSafeProxy,
+      this.openst.auxiliary.web3, gnosisSafeProxy,
     );
 
     const modules = await gnosisSafeContractInteract.getModules();
     const recoveryProxy = modules[0];
     const recoveryModuleContractInteract = new ContractInteract.Recovery(
-      this.web3, recoveryProxy,
+      this.openst.auxiliary.web3, recoveryProxy,
     );
 
     const tokenHolderProxy = returnValues._tokenHolderProxy;
     const tokenHolderContractInteract = new ContractInteract.TokenHolder(
-      this.web3, tokenHolderProxy,
+      this.openst.auxiliary.web3, tokenHolderProxy,
     );
 
     return new UserWallet(
