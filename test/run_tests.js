@@ -80,6 +80,17 @@ const loadMocha = () => {
       // Skipping the file that manages shared state across tests.
       file => file !== path.join(__dirname, 'shared.js'),
     )
+    .filter(
+      // Skipping the file that stores the common/utility functions shared
+      // across tests.
+      file => file !== path.join(__dirname, 'utils.js'),
+    )
+    .filter(
+      // Skipping helper contracts used in delayed recovery module smoke tests.
+      file => file.indexOf(
+        'test/04_openst/gnosisSafeModules/delayedRecoveryModule/helpers/',
+      ) === -1,
+    )
     .forEach((file) => {
       mocha.addFile(file);
     });
