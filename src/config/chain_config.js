@@ -1,5 +1,5 @@
 const fs = require('fs');
-const Mosaic = require('@openstfoundation/mosaic.js');
+const Mosaic = require('@openst/mosaic.js');
 
 class ChainConfig {
   /**
@@ -22,13 +22,16 @@ class ChainConfig {
     this.auxiliaryGasPrice = process.env.AUXILIARY_GAS_PRICE || '1000000000';
     this.workerAddress = process.env.WORKER_ADDRESS || '0x7F6A99881cC1ebcBc7209a636B4692133F8f9F36';
     this.workerPrivateKey = process.env.WORKER_PRIVATE_KEY || '0x5E882CADCDDBFDBB0E8058C08CB26CA5E303A57BBF6C316ACA88E3445CD82C43';
+    this.recoveryOwnerPrivateKey = process.env.RECOVERY_OWNER_PRIVATE_KEY || '0xFE6280E11F34CBBEB29768D9FBAB130A22A7113756426C9C276C5A2430DA8D0D';
+    this.recoveryOwnerAddress = process.env.RECOVERY_OWNER_ADDRESS || '0xCCFf24A25FbD086D9AA3f5b5b22aD0ca244f11a4';
     this.password = process.env.PASSWORD || 'hunter2';
     this.stakes = {};
     this.stakeRequests = {};
     this.redeems = {};
     this.utilityBrandedTokens = [];
     this.openst = {};
-    this.users = [];
+    this.users = []; // Store all the created user wallets.
+    this.fileName = filePath;
 
     // If a file path is given, config from the file will overwrite config from ENV or default.
     this.parseFile(filePath);
@@ -46,7 +49,8 @@ class ChainConfig {
   }
 
   write(filePath) {
-    fs.writeFileSync(filePath, JSON.stringify(this, null, '  '));
+    const fileName = filePath || this.fileName;
+    fs.writeFileSync(fileName, JSON.stringify(this, null, '  '));
   }
 
   toMosaic(connection) {
@@ -107,6 +111,57 @@ class ChainConfig {
         Anchor: this.auxiliaryAnchorAddress,
         UtilityToken: stake.auxiliaryUtilityTokenAddress,
         OSTPrime: this.auxiliaryOSTPrimeAddress || '0x05cd5fcd2aeca6aea1a554fae9fac76ce52dc5d6',
+      },
+    );
+
+    return new Mosaic(originChain, auxiliaryChain);
+  }
+
+  toMosaicFromUtilityToken(connection, utilityTokenAddress) {
+    const utilityTokenConfig = this.utilityBrandedTokens.find(
+      ut => ut.address === utilityTokenAddress,
+    );
+
+    if (!utilityTokenConfig) {
+      throw new Error(`Config not found for utilityToken ${utilityTokenAddress}`);
+    }
+
+    return this.toMosaicFromUtilityTokenConfig(connection, utilityTokenConfig);
+  }
+
+  toMosaicFromEIP20Gateway(connection, eip20GatewayAddress) {
+    const utilityTokenConfig = this.utilityBrandedTokens.find(
+      ut => ut.originGatewayAddress === eip20GatewayAddress,
+    );
+
+    if (!utilityTokenConfig) {
+      throw new Error(`Config not found for EIP20Gateway address ${eip20GatewayAddress}`);
+    }
+
+    return this.toMosaicFromUtilityTokenConfig(connection, utilityTokenConfig);
+  }
+
+  toMosaicFromUtilityTokenConfig(connection, utilityTokenConfig) {
+    if (!utilityTokenConfig) {
+      throw new Error('Utility token config must be defined.');
+    }
+
+    const originChain = new Mosaic.Chain(
+      connection.originWeb3,
+      {
+        Organization: this.brandedToken.originOrganization,
+        EIP20Gateway: utilityTokenConfig.originGatewayAddress,
+        Anchor: this.originAnchorAddress,
+        EIP20Token: this.eip20TokenAddress,
+      },
+    );
+    const auxiliaryChain = new Mosaic.Chain(
+      connection.auxiliaryWeb3,
+      {
+        Organization: utilityTokenConfig.organizationAddress,
+        EIP20CoGateway: utilityTokenConfig.auxiliaryCoGatewayAddress,
+        Anchor: this.auxiliaryAnchorAddress,
+        UtilityToken: utilityTokenConfig.address,
       },
     );
 

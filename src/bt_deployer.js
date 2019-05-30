@@ -1,4 +1,4 @@
-const { Setup, ContractInteract } = require('@openstfoundation/brandedtoken.js');
+const { Setup, ContractInteract } = require('@openst/brandedtoken.js');
 const logger = require('./logger');
 
 class BTDeployer {
@@ -31,7 +31,7 @@ class BTDeployer {
     };
   }
 
-  _deployOriginOrganization() {
+  async _deployOriginOrganization() {
     return Setup.organization(
       this.origin.web3,
       {
@@ -130,7 +130,7 @@ class BTDeployer {
 
     const originGatewayConfig = {
       token: this.chainConfig.brandedToken.address,
-      baseToken: this.origin.baseToken,
+      baseToken: this.origin.token,
       stateRootProvider: this.chainConfig.originAnchorAddress,
       bounty: '0',
       organization: this.chainConfig.originOrganizationAddress,
@@ -178,7 +178,6 @@ class BTDeployer {
     logger.info(`utilityBrandedToken address ${utilityBrandedToken.address}`);
     logger.info(`originGateway address ${originGateway.address}`);
     logger.info(`auxiliaryCoGateway address ${auxiliaryCoGateway.address}`);
-
 
     const brandedToken = new ContractInteract.BrandedToken(
       this.origin.web3,

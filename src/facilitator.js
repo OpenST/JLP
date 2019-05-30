@@ -1,4 +1,4 @@
-const { Facilitator: MosaicFacilitator, Utils, ContractInteract } = require('@openstfoundation/mosaic.js');
+const { Facilitator: MosaicFacilitator, Utils, ContractInteract } = require('@openst/mosaic.js');
 
 const logger = require('./logger');
 
@@ -57,11 +57,11 @@ class Facilitator {
       staker,
     ).call();
 
-    // FixMe https://github.com/OpenSTFoundation/mosaic.js/issues/136
+    // FixMe https://github.com/openst/mosaic.js/issues/136
     const nextNonce = await gatewayInstance.contract.methods.getNonce(staker).call();
     const currentNonce = parseInt(nextNonce, 10) - 1;
 
-    // FixMe In mosaic.js facilitator.stake should return messageHash. https://github.com/OpenSTFoundation/mosaic.js/issues/136
+    // FixMe In mosaic.js facilitator.stake should return messageHash. https://github.com/openst/mosaic.js/issues/136
     const messageHash = activeProcess.messageHash_;
     stakeRequest.messageHash = messageHash;
     stakeRequest.nonce = currentNonce.toString();
@@ -170,20 +170,19 @@ class Facilitator {
     logger.info('Redeem progress started');
     const redeemRequest = this.chainConfig.redeems[messageHash];
 
-    // logger.info('redeemrequest :- ', redeemRequest);
     if (!redeemRequest) {
-      logger.error('No stake request found');
-      return Promise.reject(new Error('No stake request found.'));
+      logger.error('No Redeem request found');
+      return Promise.reject(new Error('No Redeem request found.'));
     }
 
     const txOptionAuxiliary = {
       gasPrice: this.chainConfig.auxiliaryGasPrice,
-      from: this.chainConfig.auxiliaryDeployerAddress,
+      from: this.connection.auxiliaryAccount.address,
     };
 
     const txOptionOrigin = {
       gasPrice: this.chainConfig.originGasPrice,
-      from: this.chainConfig.originDeployerAddress,
+      from: this.connection.originAccount.address,
     };
 
     await this.mosaicFacilitator.progressRedeem(
@@ -195,8 +194,8 @@ class Facilitator {
       redeemRequest.gasLimit,
       redeemRequest.hashLock,
       redeemRequest.unlockSecret,
-      txOptionAuxiliary, // FixMe https://github.com/OpenSTFoundation/mosaic.js/issues/141
       txOptionOrigin,
+      txOptionAuxiliary,
     );
 
     const { redeems } = this.chainConfig;

@@ -2,7 +2,7 @@
 
 const assert = require('assert');
 const interval = require('interval-promise');
-const { ContractInteract } = require('@openstfoundation/mosaic.js');
+const { ContractInteract } = require('@openst/mosaic.js');
 
 const logger = require('./logger');
 

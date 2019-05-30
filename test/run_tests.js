@@ -21,24 +21,23 @@ const {
   CONFIG_INIT_FILE_PATH,
 } = require('./constants');
 
-/**
- * Runs before the test suite.
- */
-const setup = async () => {
-  // Check for an existing config-init file. If it doesn't exist, copy it from the distributed
-  // version.
+/** Runs before the test suite. */
+const setup = () => {
+  // Check for an existing config-init file. If it doesn't exist, copy it
+  // from the distributed version.
   try {
     fs.accessSync(CONFIG_INIT_FILE_PATH, fs.constants.F_OK);
   } catch (error) {
-    console.info(`Could not find ${CONFIG_INIT_FILE_PATH}. Copying './test/config_init.json.dist' with default values.`);
+    console.info(`Could not find ${CONFIG_INIT_FILE_PATH}. `
+    + 'Copying \'./test/config_init.json.dist\' with default values.');
     fs.copyFileSync(
       `${CONFIG_INIT_FILE_PATH}.dist`,
       CONFIG_INIT_FILE_PATH,
     );
   }
 
-  // Before every test suite, the config file is copied from the init version that only contains
-  // initial keys to start the tests.
+  // Before every test suite, the config file is copied from the init version
+  // that only contains initial keys to start the tests.
   fs.copyFileSync(
     CONFIG_INIT_FILE_PATH,
     CONFIG_FILE_PATH,
@@ -46,8 +45,8 @@ const setup = async () => {
 };
 
 /**
- * Deletes the temporary config file of this test run and closes the connection to the ethereum
- * nodes.
+ * Deletes the temporary config file of this test run and closes the
+ * connection to the ethereum nodes.
  */
 const teardown = () => {
   fs.unlinkSync(CONFIG_FILE_PATH);
@@ -58,9 +57,7 @@ const teardown = () => {
   }
 };
 
-/**
- * Creates a new Mocha instance and adds the test files.
- */
+/** Creates a new Mocha instance and adds the test files. */
 const loadMocha = () => {
   const mocha = new Mocha({
     timeout: false,
@@ -76,8 +73,23 @@ const loadMocha = () => {
       file => file !== path.join(__dirname, 'constants.js'),
     )
     .filter(
+      // Skipping the file that stores the constants.
+      file => file !== path.join(__dirname, 'docker.js'),
+    )
+    .filter(
       // Skipping the file that manages shared state across tests.
       file => file !== path.join(__dirname, 'shared.js'),
+    )
+    .filter(
+      // Skipping the file that stores the common/utility functions shared
+      // across tests.
+      file => file !== path.join(__dirname, 'utils.js'),
+    )
+    .filter(
+      // Skipping helper contracts used in delayed recovery module smoke tests.
+      file => file.indexOf(
+        'test/04_openst/gnosisSafeModules/delayedRecoveryModule/helpers/',
+      ) === -1,
     )
     .forEach((file) => {
       mocha.addFile(file);
@@ -91,10 +103,10 @@ program
   .name('JLP Tests')
   .description('Running the JLP tests expects a connection to nodes.')
   .action(
-    async () => {
+    () => {
       try {
         const mocha = loadMocha();
-        await setup();
+        setup();
 
         mocha.run((failures) => {
           teardown();

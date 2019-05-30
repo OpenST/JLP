@@ -173,7 +173,7 @@ node src/bin/bt.js setupBrandedToken <config.json> <symbol> <name> <decimal> <co
 
 ## Setup Utility Branded Token
 
-Prerequisite: Branded token config in config file.
+Prerequisite: Branded token config, `originAnchorAddress`, and `auxiliaryAnchorAddress` in config file.
 
 ```bash
 # Help: 
@@ -265,14 +265,14 @@ node src/bin/facilitator.js progressRedeem path_to_config.json messageHash
   
 ## Setup OpenST
 
-Prerequisite: `organization` and `eip20Token` contracts should have been deployed.
+Prerequisite: `organization` and `eip20Token` contract should have been deployed.
     
 ```bash
 # Help:
 node ./src/bin/openst.js --help
     
 # Setup OpenST:
-node ./src/bin/openst.js config.json organization eip20Token
+node ./src/bin/openst.js openst config.json organization eip20Token
 ```
     
 It will write below contract addresses to your config file:
@@ -285,8 +285,28 @@ It will write below contract addresses to your config file:
 * TokenRules contract address.
 
 * Replace `config.json` with the path to the configuration file.
-* Replace `organization` with an organization contract address. 
+* Replace `organization` with an organization contract address.
 * Replace `eip20Token` with eip20Token address.
+ 
+
+## Deploy Pricer Rule
+
+Prerequisite: `eip20Token` contract should have been deployed.
+    
+```bash
+# Help:
+node ./src/bin/openst.js --help
+    
+node ./src/bin/openst.js pricerRule config.json eip20Token baseCurrencyCode conversionRate conversionRateDecimals requiredPriceOracleDecimals
+```
+
+* Replace `config` with the path to the json configuration file.
+* Replace `eip20Token` with eip20Token address of Auxiliary chain.
+* baseCurrencyCode with the economy's base currency code.
+* conversionRate with the conversion rate from the economy base currency to the token.
+* conversionRateDecimals with the conversion rate's decimals from the economy base currency to the token.
+* requiredPriceOracleDecimals with the required decimals for price oracles.
+
  
 ## Register Rule to TokenRules
   
@@ -334,10 +354,78 @@ node ./src/bin/create_user.js <config.json> <eip20Token> <owners> <threshold> <s
 * Replace `eip20Token` with the UBT address of the economy.
 * Replace `owners` with comma separated owner addresses.
 * Replace `threshold` with gnosis requirement. 
-* Replace `sessionKeys` comma separated session keys. 
-* Replace `sessionKeySpendingLimits` comma separated spending limits corresponding to session keys. 
-* Replace `sessionKeyExpirationHeights` comma separated expiration heights corresponding to session keys.  
+* Replace `sessionKeys` with comma separated session keys. 
+* Replace `sessionKeySpendingLimits` with comma separated spending limits corresponding to session keys. 
+* Replace `sessionKeyExpirationHeights` with comma separated expiration heights corresponding to session keys.
+
+## Direct Transfer from sender to beneficiaries
+
+```bash
+# Help:
+node ./src/bin/direct_transfer.js --help
+  
+# Create User:
+node ./src/bin/direct_transfer.js <config.json> <sessionKey> <sender> <beneficiaries> <amounts>
+```
+
+* Replace `config.json` with the path to the configuration file.
+* Replace `sessionKey` with the authorized session key.
+* Replace `sender` with TokenHolder address which act as sender.
+* Replace `threshold` with gnosis requirement. 
+* Replace `beneficiaries` with comma separated beneficiaries. 
+* Replace `amounts` with comma separated amounts respective to beneficiary. 
  
+  
+ ## Continuous stake of brand token (without gateway composer):
+ 
+ This command helps you to run stake continuously till the `totalStakeAmount` is staked. It expects `minStakeAmount` and `maxStakeAmount` which is used to define a range in which random stake amount is generated. 
+ 
+ If `maxStakeAmount` is passed as `0`, then this command will stake `minStakeAmount` un till `totalStakeAmount` is staked. 
+ 
+Prerequiste:
+1. Setup of utility branded token.
+2. `originGatewayAddress` in your config file 
+
+```bash
+
+node ./src/bin/bt continuousStake <config> <originGatewayAddress> <totalStakeAmount> <staker> <beneficiary> <gasPrice> <gasLimit> <minStakeAmount> <maxStakeAmount>
+
+```
+* Replace `config` with the path to the configuration file.
+* Replace `originGatewayAddress` with the address of EIP20 gateway contract address.
+* Replace `totalStakeAmount` with the number representing total stake amount.
+* Replace `staker` with the address of staker holding tokens.
+* Replace `beneficiary` with the address on origin chain where token will be minted.
+* Replace `gasPrice` with a number which is used to calculate facilitator reward.
+* Replace `gasLimit` with a number which is used to calculate facilitator reward.
+* Replace `minStakeAmount` with a number which defines minimum stake amount.
+* Replace `maxStakeAmount` with a number which defines maximum stake amount.
+
+ ## Continuous Redeem(with co-gateway and utility branded token):
+ 
+ This command helps you to run redeem continuously till the totalRedeemAmount is redeemed. It expects `minRedeemAmount` and `maxRedeemAmount` which is used to define a range in which random redeem amount is generated. 
+ 
+ If `maxRedeemAmount` is passed as `0`, then this command will redeem `minRedeemAmount` till `totalRedeemAmount` is not redeemed. 
+ 
+Prerequiste:
+1. Setup of utility branded token.
+2. Redeem should have tokens to redeem. 
+
+```bash
+
+node ./src/bin/facilitator continuousRedeem <config> <utilityTokenAddress> <totalRedeemAmount> <redeemer> <beneficiary> <gasPrice> <gasLimit> <minRedeemAmount> <maxRedeemAmount>
+
+```
+* Replace `config` with the path to the configuration file.
+* Replace `utilityTokenAddress` with the address of utility branded token.
+* Replace `totalRedeemAmount` with the number representing total redeem amount.
+* Replace `redeemer` with the address of redeemer holding tokens.
+* Replace `beneficiary` with the address on origin chain where token will be unstaked.
+* Replace `gasPrice` with a number which is used to calculate facilitator reward.
+* Replace `gasLimit` with a number which is used to calculate facilitator reward.
+* Replace `minRedeemAmount` with a number which defines minimum redeem amount.
+* Replace `maxRedeemAmount` with a number which defines maximum redeem amount.
+  
 ## Tests
 
 To run the tests run `npm run test`.
