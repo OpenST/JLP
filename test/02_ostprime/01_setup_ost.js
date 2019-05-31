@@ -1,13 +1,14 @@
 const EIP20 = require('../../src/eip20');
 const shared = require('../shared');
 const Deployer = require('../../src/deployer');
+const config = require('../config');
 
 describe('OST Prime setup', () => {
   it('deploy eip20 token', async () => {
     const { chainConfig } = shared;
     const symbol = 'OST';
     const name = 'OST';
-    const decimal = 18;
+    const decimal = config.decimals;
     const totalSupply = '10000000000000000000000000000000000000';
     const eip20 = new EIP20(chainConfig, symbol, name, totalSupply, decimal);
     const eip20TokenAddress = await eip20.deployEIP20(shared.connection);

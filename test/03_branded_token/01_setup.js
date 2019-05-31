@@ -2,6 +2,7 @@
 
 const shared = require('../shared');
 const BTDeployer = require('../../src/bt_deployer.js');
+const config = require('../config');
 
 describe('Setup Branded token', async () => {
   let btDeployer;
@@ -12,7 +13,7 @@ describe('Setup Branded token', async () => {
 
     const symbol = 'JLP';
     const name = 'JLP';
-    const decimal = 18;
+    const decimal = config.decimals;
     // As per below conversion rate: 1 OST = 2 BT
     const conversionRate = 200000;
     const conversionDecimal = 5;

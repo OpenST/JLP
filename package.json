@@ -25,6 +25,7 @@
     "url": "https://github.com/openst/JLP/issues"
   },
   "scripts": {
+    "test:range": "cd test && ./test_range.sh",
     "test:devenv": "cd test && ./run_tests_devenv.sh"
   },
   "dependencies": {
