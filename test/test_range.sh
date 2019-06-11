@@ -33,7 +33,7 @@
 # decimal.
 ###
 
-# Tracking the exit code to run further tests if they fail for a spcefic decimal.
+# Tracking the exit code to run further tests if they fail for a specific decimal.
 EXIT_CODE=0
 
 # Tracking failed decimals for error output.
